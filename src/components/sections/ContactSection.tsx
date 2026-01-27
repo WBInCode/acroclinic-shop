@@ -1,10 +1,14 @@
-import { Phone, Mail } from 'lucide-react'
+import { Phone, Mail, MessageCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 // Spójne animacje
 const transition = { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
 
-export function ContactSection() {
+interface ContactSectionProps {
+  onContactClick?: () => void
+}
+
+export function ContactSection({ onContactClick }: ContactSectionProps) {
   return (
     <motion.section 
       className="container mx-auto px-4 py-24"
@@ -59,24 +63,24 @@ export function ContactSection() {
           transition={{ ...transition, delay: 0.5 }}
         >
           <a
-            href="tel:512206471"
+            href="tel:536200535"
             className="flex items-center gap-3 text-white hover:text-brand-gold transition-colors duration-300"
           >
             <Phone className="w-5 h-5 text-brand-gold" />
             <span className="font-[family-name:var(--font-heading)] font-semibold text-xl tracking-tight">
-              512 206 471
+              536 200 535
             </span>
           </a>
 
           <div className="hidden md:block w-px h-6 bg-white/20" />
 
           <a
-            href="mailto:kontakt@acroclinic.pl"
+            href="mailto:acro.clinic.rk@gmail.com"
             className="flex items-center gap-3 text-white/60 hover:text-white transition-colors duration-300"
           >
             <Mail className="w-5 h-5 text-brand-gold/60" />
             <span className="font-[family-name:var(--font-body)]">
-              kontakt@acroclinic.pl
+              acro.clinic.rk@gmail.com
             </span>
           </a>
         </motion.div>
@@ -87,8 +91,12 @@ export function ContactSection() {
           viewport={{ once: true }}
           transition={{ ...transition, delay: 0.6 }}
         >
-          <button className="btn-secondary">
-            Umów Konsultację
+          <button 
+            onClick={onContactClick}
+            className="btn-secondary inline-flex items-center gap-2"
+          >
+            <MessageCircle className="w-4 h-4" />
+            Napisz do nas
           </button>
         </motion.div>
       </div>

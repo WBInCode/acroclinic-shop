@@ -7,6 +7,16 @@ interface SplashScreenProps {
 // Spójne animacje
 const ease = [0.22, 1, 0.36, 1] as const
 
+// Generuj losowe pozycje dla cząsteczek
+const particles = Array.from({ length: 20 }, (_, i) => ({
+  id: i,
+  x: Math.random() * 100,
+  y: Math.random() * 100,
+  size: Math.random() * 4 + 2,
+  duration: Math.random() * 3 + 2,
+  delay: Math.random() * 2,
+}))
+
 export function SplashScreen({ onEnterShop }: SplashScreenProps) {
   return (
     <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center overflow-hidden">
@@ -17,6 +27,57 @@ export function SplashScreen({ onEnterShop }: SplashScreenProps) {
           background: 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(212,175,55,0.08) 0%, transparent 50%)',
         }}
       />
+
+      {/* Gwiazdy migające w tle */}
+      {Array.from({ length: 40 }).map((_, i) => (
+        <motion.div
+          key={`star-${i}`}
+          className="absolute rounded-full"
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            width: 3 + Math.random() * 4,
+            height: 3 + Math.random() * 4,
+            background: 'radial-gradient(circle, rgba(212,175,55,1) 0%, rgba(212,175,55,0.3) 50%, transparent 70%)',
+            boxShadow: '0 0 8px rgba(212,175,55,0.8), 0 0 15px rgba(212,175,55,0.4)',
+          }}
+          animate={{
+            opacity: [0, 1, 0],
+            scale: [0.3, 1.2, 0.3],
+          }}
+          transition={{
+            duration: 2 + Math.random() * 3,
+            delay: Math.random() * 4,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+      ))}
+
+      {/* Animowane cząsteczki */}
+      {particles.map((particle) => (
+        <motion.div
+          key={particle.id}
+          className="absolute rounded-full bg-brand-gold/30"
+          style={{
+            left: `${particle.x}%`,
+            top: `${particle.y}%`,
+            width: particle.size,
+            height: particle.size,
+          }}
+          animate={{
+            y: [-20, 20, -20],
+            opacity: [0.2, 0.6, 0.2],
+            scale: [1, 1.5, 1],
+          }}
+          transition={{
+            duration: particle.duration,
+            delay: particle.delay,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+      ))}
 
       {/* Animowana poświata */}
       <motion.div
@@ -101,14 +162,14 @@ export function SplashScreen({ onEnterShop }: SplashScreenProps) {
           transition={{ duration: 0.8, ease, delay: 0.5 }}
         />
 
-        {/* Tagline */}
+        {/* Opis */}
         <motion.p
-          className="text-white/60 text-sm md:text-base mb-10 uppercase tracking-[0.2em] font-[family-name:var(--font-body)]"
+          className="text-white/50 text-sm md:text-base mb-10 font-[family-name:var(--font-body)] max-w-md text-center px-4"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, ease, delay: 0.6 }}
         >
-          Premium Equipment
+          Sprzęt i akcesoria dla pasjonatów akrobatyki i tańca
         </motion.p>
 
         {/* Przycisk */}

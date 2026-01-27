@@ -17,9 +17,11 @@ import { TermsPage } from '@/components/pages/TermsPage'
 import { MarqueeText } from '@/components/sections/MarqueeText'
 import { TrustSignals } from '@/components/sections/TrustSignals'
 import { ContactSection } from '@/components/sections/ContactSection'
+import { AdminLogin } from '@/components/admin/AdminLogin'
+import { AdminPanel } from '@/components/admin/AdminPanel'
 import type { Product } from '@/components/shop/ProductCard'
 
-type PageView = 'home' | 'product' | 'cart' | 'wishlist' | 'about' | 'contact' | 'terms'
+type PageView = 'home' | 'product' | 'cart' | 'wishlist' | 'about' | 'contact' | 'terms' | 'admin-login' | 'admin'
 
 function App() {
   const [cartItems, setCartItems] = useKV<CartItem[]>('acro-cart-v2', [])
@@ -106,66 +108,166 @@ function App() {
   const products: Product[] = [
     {
       id: '1',
-      name: 'Elite Training Jersey',
-      price: 249,
-      image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=600&fit=crop',
+      name: 'Koszulka Bokserka',
+      price: 99.99,
+      image: '/images/Bluzka - 1.png',
       badge: 'NEW',
       category: 'clothing',
       isBestseller: true,
     },
     {
       id: '2',
-      name: 'Pro Performance Shorts',
-      price: 189,
-      image: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=600&h=600&fit=crop',
+      name: 'T-shirt Dziecięcy',
+      price: 89.99,
+      image: '/images/T-Shirt - 1.png',
       category: 'clothing',
       isBestseller: true,
     },
     {
       id: '3',
-      name: 'Kostka Piankowa Premium',
-      price: 79,
-      image: 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?w=600&h=600&fit=crop',
-      badge: 'LIMITED',
-      category: 'accessories',
-      isBestseller: true,
+      name: 'Longsleeve Dziecięcy',
+      price: 99.99,
+      image: '/images/sweter - 1.png',
+      category: 'clothing',
     },
     {
       id: '4',
-      name: 'Taśmy Oporowe Set',
-      price: 129,
-      image: 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=600&h=600&fit=crop',
-      category: 'accessories',
+      name: 'Spodenki Kolarki',
+      price: 89.99,
+      image: '/images/spodenki - 1.png',
+      badge: 'NEW',
+      category: 'clothing',
+      isBestseller: true,
     },
     {
       id: '5',
-      name: 'Athletic Compression Top',
-      price: 219,
-      image: 'https://images.unsplash.com/photo-1579364046732-c21c2da97abc?w=600&h=600&fit=crop',
-      badge: 'NEW',
+      name: 'Top Sportowy',
+      price: 99.99,
+      image: '/images/top - 1.png',
       category: 'clothing',
     },
     {
       id: '6',
-      name: 'Training Gloves Pro',
-      price: 159,
-      image: 'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=600&h=600&fit=crop',
-      category: 'accessories',
-    },
-    {
-      id: '7',
-      name: 'Performance Leggings',
-      price: 239,
-      image: 'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=600&h=600&fit=crop',
+      name: 'Legginsy',
+      price: 144.99,
+      image: '/images/legginsy 1.png',
+      badge: 'LIMITED',
       category: 'clothing',
       isBestseller: true,
     },
     {
+      id: '7',
+      name: 'Dresy Jogger Dziecięce',
+      price: 149.99,
+      image: '/images/spodnie - 1.png',
+      category: 'clothing',
+    },
+    {
       id: '8',
-      name: 'Yoga Mat Elite',
-      price: 199,
-      image: 'https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=600&h=600&fit=crop',
+      name: 'Bluza Regular Dziecięca',
+      price: 159.99,
+      image: '/images/Bluza - 1.png',
       badge: 'LIMITED',
+      category: 'clothing',
+    },
+    // Akcesoria - Gumy
+    {
+      id: '9',
+      name: 'Taśma Gimnastyczna Fioletowa',
+      price: 49.99,
+      image: '/images/gumy/Fioletowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_1.webp',
+      images: [
+        '/images/gumy/Fioletowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_1.webp',
+        '/images/gumy/Fioletowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_2.webp',
+        '/images/gumy/Fioletowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_3.webp',
+        '/images/gumy/Fioletowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_4.webp',
+        '/images/gumy/Fioletowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_5.webp',
+      ],
+      category: 'accessories',
+      badge: 'NEW',
+    },
+    {
+      id: '10',
+      name: 'Taśma Gimnastyczna Różowa',
+      price: 49.99,
+      image: '/images/gumy/Rózowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_1.webp',
+      images: [
+        '/images/gumy/Rózowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_1.webp',
+        '/images/gumy/Rózowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_2.webp',
+        '/images/gumy/Rózowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_3.webp',
+        '/images/gumy/Rózowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_4.webp',
+        '/images/gumy/Rózowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_6.webp',
+      ],
+      category: 'accessories',
+      isBestseller: true,
+    },
+    {
+      id: '11',
+      name: 'Taśma Gimnastyczna Zielona',
+      price: 49.99,
+      image: '/images/gumy/Zielona/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_1.webp',
+      images: [
+        '/images/gumy/Zielona/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_1.webp',
+        '/images/gumy/Zielona/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_2.webp',
+        '/images/gumy/Zielona/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_4.webp',
+        '/images/gumy/Zielona/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_5.webp',
+        '/images/gumy/Zielona/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_6.webp',
+      ],
+      category: 'accessories',
+    },
+    // Akcesoria - Kostki
+    {
+      id: '12',
+      name: 'Kostka do Jogi Czarna',
+      price: 39.99,
+      image: '/images/kostki/Czarna/pol_pl_Kostka-piankowa-do-jogi-czarna-74_1.webp',
+      images: [
+        '/images/kostki/Czarna/pol_pl_Kostka-piankowa-do-jogi-czarna-74_1.webp',
+        '/images/kostki/Czarna/pol_pl_Kostka-piankowa-do-jogi-czarna-74_2.webp',
+        '/images/kostki/Czarna/pol_pl_Kostka-piankowa-do-jogi-czarna-74_5.webp',
+        '/images/kostki/Czarna/pol_pm_Kostka-piankowa-do-jogi-czarna-74_8.webp',
+      ],
+      category: 'accessories',
+    },
+    {
+      id: '13',
+      name: 'Kostka do Jogi Niebieska',
+      price: 39.99,
+      image: '/images/kostki/Niebieska/pol_pl_Kostka-piankowa-do-jogi-niebieska-73_1.webp',
+      images: [
+        '/images/kostki/Niebieska/pol_pl_Kostka-piankowa-do-jogi-niebieska-73_1.webp',
+        '/images/kostki/Niebieska/pol_pl_Kostka-piankowa-do-jogi-niebieska-73_2.webp',
+        '/images/kostki/Niebieska/pol_pl_Kostka-piankowa-do-jogi-niebieska-73_9.webp',
+        '/images/kostki/Niebieska/pol_pl_Kostka-piankowa-do-jogi-niebieska-73_10.webp',
+      ],
+      category: 'accessories',
+      isBestseller: true,
+    },
+    {
+      id: '14',
+      name: 'Kostka do Jogi Różowa',
+      price: 39.99,
+      image: '/images/kostki/Różowa/pol_pl_Kostka-piankowa-do-jogi-rozowa-290_1.webp',
+      images: [
+        '/images/kostki/Różowa/pol_pl_Kostka-piankowa-do-jogi-rozowa-290_1.webp',
+        '/images/kostki/Różowa/pol_pl_Kostka-piankowa-do-jogi-rozowa-290_2.webp',
+        '/images/kostki/Różowa/pol_pl_Kostka-piankowa-do-jogi-rozowa-290_4.webp',
+        '/images/kostki/Różowa/pol_pl_Kostka-piankowa-do-jogi-rozowa-290_6.webp',
+      ],
+      category: 'accessories',
+      badge: 'NEW',
+    },
+    {
+      id: '15',
+      name: 'Kostka do Jogi Szara',
+      price: 39.99,
+      image: '/images/kostki/Szara/pol_pl_Kostka-piankowa-do-jogi-szara-291_1.webp',
+      images: [
+        '/images/kostki/Szara/pol_pl_Kostka-piankowa-do-jogi-szara-291_1.webp',
+        '/images/kostki/Szara/pol_pl_Kostka-piankowa-do-jogi-szara-291_2.webp',
+        '/images/kostki/Szara/pol_pl_Kostka-piankowa-do-jogi-szara-291_5.webp',
+        '/images/kostki/Szara/pol_pl_Kostka-piankowa-do-jogi-szara-291_8.webp',
+      ],
       category: 'accessories',
     },
   ]
@@ -244,11 +346,23 @@ function App() {
                 wishlistCount={wishlistCount}
                 onCartClick={handleOpenCart} 
                 onWishlistClick={handleOpenWishlist}
+                onLogoClick={handleBackToShop}
               />
               
               <main>
                 <AnimatePresence mode="wait">
-                  {currentView === 'about' ? (
+                  {currentView === 'admin-login' ? (
+                    <AdminLogin
+                      key="admin-login"
+                      onLogin={() => setCurrentView('admin')}
+                      onBack={handleBackToShop}
+                    />
+                  ) : currentView === 'admin' ? (
+                    <AdminPanel
+                      key="admin-panel"
+                      onBack={handleBackToShop}
+                    />
+                  ) : currentView === 'about' ? (
                     <AboutPage
                       key="about-page"
                       onBack={handleBackToShop}
@@ -308,7 +422,7 @@ function App() {
                       />
                       <MarqueeText />
                       <TrustSignals />
-                      <ContactSection />
+                      <ContactSection onContactClick={handleOpenContact} />
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -375,8 +489,11 @@ function App() {
                       </a>
                     </div>
                     
-                    {/* Copyright */}
-                    <p className="text-white/20 text-[11px] font-[family-name:var(--font-body)] uppercase tracking-[0.3em]">
+                    {/* Copyright - double click to access admin */}
+                    <p 
+                      className="text-white/20 text-[11px] font-[family-name:var(--font-body)] uppercase tracking-[0.3em] cursor-default select-none"
+                      onDoubleClick={() => setCurrentView('admin-login')}
+                    >
                       © 2026 Acro Clinic. Wszystkie prawa zastrzeżone.
                     </p>
                   </motion.div>

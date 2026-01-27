@@ -29,25 +29,25 @@ export function ContactPage({ onBack }: ContactPageProps) {
     {
       icon: Mail,
       title: 'Email',
-      value: 'kontakt@acroclinic.pl',
-      href: 'mailto:kontakt@acroclinic.pl'
+      value: 'acro.clinic.rk@gmail.com',
+      href: 'mailto:acro.clinic.rk@gmail.com'
     },
     {
       icon: Phone,
       title: 'Telefon',
-      value: '+48 123 456 789',
-      href: 'tel:+48123456789'
+      value: '+48 536 200 535',
+      href: 'tel:+48536200535'
     },
     {
       icon: MapPin,
-      title: 'Adres',
-      value: 'ul. Sportowa 15, Warszawa',
-      href: '#'
+      title: 'Lokalizacja',
+      value: 'Kościuszki, Kolbuszowa 36-100',
+      href: 'https://maps.google.com/?q=Kościuszki,Kolbuszowa,Poland'
     },
     {
       icon: Clock,
-      title: 'Godziny pracy',
-      value: 'Pon-Pt: 9:00-17:00',
+      title: 'Zajęcia',
+      value: 'Akrobatyka i Taniec',
       href: '#'
     }
   ]

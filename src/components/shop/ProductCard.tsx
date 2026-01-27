@@ -8,6 +8,7 @@ export interface Product {
   name: string
   price: number
   image: string
+  images?: string[] // Galeria zdjęć produktu
   badge?: 'NEW' | 'LIMITED'
   category: 'clothing' | 'accessories'
   isBestseller?: boolean
@@ -101,7 +102,11 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
 
           {/* Wishlist button */}
           <motion.button
-            className="absolute top-4 right-4 z-30 w-9 h-9 flex items-center justify-center bg-black/60 backdrop-blur-sm rounded-full transition-all duration-300 hover:bg-black/80"
+            className={`absolute top-4 right-4 z-30 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full transition-all duration-300 border ${
+              isInWishlist 
+                ? 'bg-brand-gold/20 border-brand-gold/60 hover:bg-brand-gold/30' 
+                : 'bg-black/40 border-brand-gold/30 hover:bg-black/60 hover:border-brand-gold/50'
+            }`}
             onClick={handleToggleWishlist}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -111,8 +116,8 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
             <Heart 
               className={`w-4 h-4 transition-colors duration-300 ${
                 isInWishlist 
-                  ? 'text-red-500 fill-red-500' 
-                  : 'text-white/60 hover:text-white'
+                  ? 'text-brand-gold fill-brand-gold' 
+                  : 'text-brand-gold/60 hover:text-brand-gold'
               }`} 
             />
           </motion.button>

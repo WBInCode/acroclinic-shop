@@ -14,6 +14,10 @@ interface ProductPageProps {
   isInWishlist?: boolean
 }
 
+// Rozmiary
+const childSizes = ['116', '122', '128', '134', '140', '146']
+const adultSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+
 // Rozszerzone dane produktów z opisami
 const productDetails: Record<string, {
   description: string
@@ -24,65 +28,119 @@ const productDetails: Record<string, {
   reviews: number
 }> = {
   '1': {
-    description: 'Profesjonalny jersey treningowy zaprojektowany z myślą o najwyższym komforcie podczas intensywnych sesji akrobatycznych. Wykonany z oddychających materiałów premium, zapewnia pełną swobodę ruchów.',
-    features: ['Oddychający materiał', 'Szybkoschnący', 'Antypoślizgowe wstawki', 'Płaskie szwy'],
+    description: 'Profesjonalna koszulka bokserka idealna do treningów akrobatyki i tańca. Wykonana z oddychających materiałów premium, zapewnia pełną swobodę ruchów.',
+    features: ['Oddychający materiał', 'Szybkoschnący', 'Wygodny krój', 'Płaskie szwy'],
     materials: '92% Poliester, 8% Elastan',
-    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+    sizes: [...childSizes, ...adultSizes],
     rating: 4.9,
     reviews: 127
   },
   '2': {
-    description: 'Szorty treningowe Pro Performance to idealne rozwiązanie dla wymagających sportowców. Elastyczna konstrukcja pozwala na wykonywanie nawet najbardziej skomplikowanych figur akrobatycznych.',
-    features: ['4-way stretch', 'Wbudowana kieszeń', 'Wzmocnione szwy', 'Odporność na ścieranie'],
-    materials: '88% Nylon, 12% Elastan',
-    sizes: ['XS', 'S', 'M', 'L', 'XL'],
+    description: 'T-shirt dziecięcy zaprojektowany z myślą o młodych akrobatach. Wygodny krój pozwala na wykonywanie nawet najbardziej skomplikowanych figur.',
+    features: ['Miękka bawełna', 'Wzmocnione szwy', 'Nadruk z logo', 'Łatwy w praniu'],
+    materials: '95% Bawełna, 5% Elastan',
+    sizes: childSizes,
     rating: 4.8,
     reviews: 89
   },
   '3': {
-    description: 'Kostka piankowa najwyższej jakości, idealna do ćwiczeń jogi i stretching. Gęsta pianka EVA zapewnia stabilność i trwałość przez długie lata użytkowania.',
-    features: ['Pianka EVA wysokiej gęstości', 'Antypoślizgowa powierzchnia', 'Lekka konstrukcja', 'Łatwa do czyszczenia'],
-    materials: '100% Pianka EVA',
+    description: 'Longsleeve dziecięcy na chłodniejsze dni treningowe. Doskonale sprawdza się podczas rozgrzewki i stretching.',
+    features: ['Długi rękaw', 'Ciepły materiał', 'Elastyczny', 'Z logo Acro Clinic'],
+    materials: '90% Bawełna, 10% Elastan',
+    sizes: childSizes,
     rating: 4.7,
-    reviews: 234
+    reviews: 65
   },
   '4': {
-    description: 'Kompletny zestaw taśm oporowych o różnych poziomach oporu. Idealny do rozgrzewki, rehabilitacji i budowania siły mięśni stabilizujących.',
-    features: ['5 poziomów oporu', 'Naturalna guma latex', 'Torba do przechowywania', 'Instrukcja ćwiczeń'],
-    materials: '100% Natural Latex',
-    rating: 4.6,
+    description: 'Spodenki kolarki idealne do treningu akrobatyki. Przylegający krój nie ogranicza ruchów podczas ćwiczeń.',
+    features: ['Przylegający krój', 'Antypoślizgowy brzeg', 'Szybkoschnące', 'Wygodny pas'],
+    materials: '88% Nylon, 12% Elastan',
+    sizes: [...childSizes, ...adultSizes],
+    rating: 4.8,
     reviews: 156
   },
   '5': {
-    description: 'Top kompresyjny Athletic zapewnia optymalne wsparcie podczas treningów siłowych i akrobatycznych. Technologia kompresji wspomaga krążenie i regenerację mięśni.',
-    features: ['Technologia kompresji', 'Ochrona UV', 'Termoaktywny', 'Bezszwowa konstrukcja'],
+    description: 'Top sportowy zapewniający optymalne wsparcie podczas treningów. Wygodny i stylowy.',
+    features: ['Wsparcie podczas ćwiczeń', 'Oddychający', 'Elastyczny', 'Modny design'],
     materials: '85% Poliamid, 15% Elastan',
-    sizes: ['XS', 'S', 'M', 'L', 'XL'],
+    sizes: adultSizes,
     rating: 4.8,
     reviews: 78
   },
   '6': {
-    description: 'Profesjonalne rękawiczki treningowe z wzmocnionymi dłońmi. Zapewniają doskonały chwyt na drążku i ochronę przed odciskami.',
-    features: ['Wzmocnione dłonie', 'Oddychający materiał', 'Regulowane zapięcie', 'Ochrona nadgarstka'],
-    materials: 'Skóra syntetyczna, Neopren',
-    sizes: ['S', 'M', 'L', 'XL'],
-    rating: 4.5,
-    reviews: 112
-  },
-  '7': {
-    description: 'Legginsy Performance to połączenie stylu i funkcjonalności. Wysoki stan zapewnia komfort, a elastyczny materiał pozwala na pełen zakres ruchu.',
+    description: 'Legginsy treningowe to połączenie stylu i funkcjonalności. Wysoki stan zapewnia komfort, a elastyczny materiał pozwala na pełen zakres ruchu.',
     features: ['Wysoki stan', 'Kieszeń na telefon', 'Antypoślizgowy pas', 'Modelujący krój'],
     materials: '78% Nylon, 22% Elastan',
-    sizes: ['XS', 'S', 'M', 'L', 'XL'],
+    sizes: [...childSizes, ...adultSizes],
     rating: 4.9,
     reviews: 203
   },
+  '7': {
+    description: 'Dresy jogger dziecięce - wygodne i stylowe spodnie na trening i na co dzień. Idealne do rozgrzewki.',
+    features: ['Ściągacze przy kostkach', 'Kieszenie', 'Miękka dzianina', 'Elastyczny pas'],
+    materials: '80% Bawełna, 20% Poliester',
+    sizes: childSizes,
+    rating: 4.6,
+    reviews: 92
+  },
   '8': {
-    description: 'Mata do jogi Elite to profesjonalne rozwiązanie dla zaawansowanych praktykujących. Extra grubość 6mm zapewnia komfort nawet podczas długich sesji.',
-    features: ['Grubość 6mm', 'Dwustronna tekstura', 'Pasek do noszenia', 'Biodegradowalna'],
-    materials: 'Naturalna guma, TPE',
+    description: 'Bluza regular dziecięca - ciepła i wygodna na chłodniejsze dni. Z nadrukiem logo Acro Clinic.',
+    features: ['Kaptur', 'Kieszeń kangurka', 'Ciepła dzianina', 'Nadruk z logo'],
+    materials: '70% Bawełna, 30% Poliester',
+    sizes: childSizes,
     rating: 4.8,
-    reviews: 167
+    reviews: 74
+  },
+  // Akcesoria - Taśmy gimnastyczne
+  '9': {
+    description: 'Taśma gimnastyczna do rozciągania 90cm - idealna do ćwiczeń rozciągających i zwiększania elastyczności. Wykonana z wytrzymałej gumy lateksowej.',
+    features: ['Długość 90cm', 'Wytrzymała guma', 'Antypoślizgowa', 'Lekka i poręczna'],
+    materials: '100% Lateks naturalny',
+    rating: 4.9,
+    reviews: 156
+  },
+  '10': {
+    description: 'Taśma gimnastyczna do rozciągania 90cm - idealna do ćwiczeń rozciągających i zwiększania elastyczności. Wykonana z wytrzymałej gumy lateksowej.',
+    features: ['Długość 90cm', 'Wytrzymała guma', 'Antypoślizgowa', 'Lekka i poręczna'],
+    materials: '100% Lateks naturalny',
+    rating: 4.8,
+    reviews: 203
+  },
+  '11': {
+    description: 'Taśma gimnastyczna do rozciągania 90cm - idealna do ćwiczeń rozciągających i zwiększania elastyczności. Wykonana z wytrzymałej gumy lateksowej.',
+    features: ['Długość 90cm', 'Wytrzymała guma', 'Antypoślizgowa', 'Lekka i poręczna'],
+    materials: '100% Lateks naturalny',
+    rating: 4.7,
+    reviews: 89
+  },
+  // Akcesoria - Kostki do jogi
+  '12': {
+    description: 'Kostka piankowa do jogi - niezbędny sprzęt do ćwiczeń jogi i stretching. Zapewnia stabilność i wsparcie podczas wykonywania pozycji.',
+    features: ['Lekka pianka EVA', 'Antypoślizgowa', 'Łatwa do czyszczenia', 'Wysoka gęstość'],
+    materials: '100% Pianka EVA',
+    rating: 4.8,
+    reviews: 134
+  },
+  '13': {
+    description: 'Kostka piankowa do jogi - niezbędny sprzęt do ćwiczeń jogi i stretching. Zapewnia stabilność i wsparcie podczas wykonywania pozycji.',
+    features: ['Lekka pianka EVA', 'Antypoślizgowa', 'Łatwa do czyszczenia', 'Wysoka gęstość'],
+    materials: '100% Pianka EVA',
+    rating: 4.9,
+    reviews: 178
+  },
+  '14': {
+    description: 'Kostka piankowa do jogi - niezbędny sprzęt do ćwiczeń jogi i stretching. Zapewnia stabilność i wsparcie podczas wykonywania pozycji.',
+    features: ['Lekka pianka EVA', 'Antypoślizgowa', 'Łatwa do czyszczenia', 'Wysoka gęstość'],
+    materials: '100% Pianka EVA',
+    rating: 4.8,
+    reviews: 112
+  },
+  '15': {
+    description: 'Kostka piankowa do jogi - niezbędny sprzęt do ćwiczeń jogi i stretching. Zapewnia stabilność i wsparcie podczas wykonywania pozycji.',
+    features: ['Lekka pianka EVA', 'Antypoślizgowa', 'Łatwa do czyszczenia', 'Wysoka gęstość'],
+    materials: '100% Pianka EVA',
+    rating: 4.7,
+    reviews: 95
   }
 }
 
@@ -99,12 +157,10 @@ export function ProductPage({ product, onBack, onAddToCart, onToggleWishlist, is
     reviews: 50
   }
 
-  // Symulowane dodatkowe zdjęcia (w prawdziwej aplikacji byłyby różne)
-  const images = [
-    product.image,
-    product.image.replace('w=600', 'w=601'), // Trick do symulacji różnych zdjęć
-    product.image.replace('w=600', 'w=602'),
-  ]
+  // Użyj rzeczywistych zdjęć z produktu lub pojedyncze zdjęcie główne
+  const images = product.images && product.images.length > 0 
+    ? product.images 
+    : [product.image]
 
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {

@@ -81,13 +81,13 @@ export function AboutPage({ onBack }: AboutPageProps) {
               Nasza Historia
             </h2>
             <p className="text-white/60 font-[family-name:var(--font-body)] leading-relaxed mb-6">
-              Acro Clinic powstało z pasji do akrobatyki i sportu. Jako aktywni sportowcy, doskonale rozumiemy potrzeby osób trenujących na najwyższym poziomie. Dlatego stworzyliśmy markę, która łączy najwyższą jakość z nowoczesnym designem.
+              Acro Clinic to szkoła zajęć z akrobatyki i tańca z siedzibą w Kolbuszowej. Prowadzimy zajęcia w Szkole Podstawowej nr 1 im. Henryka Sienkiewicza, gdzie uczymy dzieci i młodzież sztuki ruchu, elastyczności i koordynacji.
             </p>
             <p className="text-white/60 font-[family-name:var(--font-body)] leading-relaxed mb-6">
-              Każdy produkt w naszym sklepie został starannie wyselekcjonowany i przetestowany przez profesjonalnych sportowców. Współpracujemy z najlepszymi producentami, aby dostarczyć Ci sprzęt, który sprosta nawet najbardziej wymagającym treningom.
+              Organizujemy również półkolonie dla dzieci od 7 roku życia, gdzie zapewniamy wykwalifikowaną kadrę opiekunów i trenerów. Nasz program obejmuje treningi akrobatyki, tańca, szkolenia, warsztaty oraz zabawy psychoedukacyjne.
             </p>
             <p className="text-white/60 font-[family-name:var(--font-body)] leading-relaxed">
-              Naszą misją jest wspieranie rozwoju każdego sportowca - od początkujących po zawodowców. Wierzymy, że odpowiedni sprzęt to fundament sukcesu w sporcie.
+              Jako oficjalny partner WB Partners, oferujemy również wysokiej jakości sprzęt i akcesoria dla pasjonatów akrobatyki. Naszą misją jest wspieranie rozwoju każdego sportowca - od początkujących po zawodowców.
             </p>
             
             <div className="absolute bottom-0 right-8 w-16 h-px bg-brand-gold" />

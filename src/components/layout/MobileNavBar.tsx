@@ -1,19 +1,31 @@
-import { Home, ShoppingBag, ShoppingCart, User } from 'lucide-react'
+import { Home, Heart, ShoppingCart } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 
 interface MobileNavBarProps {
   cartCount: number
+  wishlistCount?: number
   activeTab: string
   onTabChange: (tab: string) => void
+  onCartClick?: () => void
+  onWishlistClick?: () => void
 }
 
-export function MobileNavBar({ cartCount, activeTab, onTabChange }: MobileNavBarProps) {
+export function MobileNavBar({ cartCount, wishlistCount = 0, activeTab, onTabChange, onCartClick, onWishlistClick }: MobileNavBarProps) {
   const navItems = [
     { id: 'home', icon: Home, label: 'Główna' },
-    { id: 'shop', icon: ShoppingBag, label: 'Sklep' },
+    { id: 'wishlist', icon: Heart, label: 'Ulubione', badge: wishlistCount },
     { id: 'cart', icon: ShoppingCart, label: 'Koszyk', badge: cartCount },
-    { id: 'profile', icon: User, label: 'Profil' },
   ]
+
+  const handleTabClick = (tabId: string) => {
+    if (tabId === 'cart' && onCartClick) {
+      onCartClick()
+    } else if (tabId === 'wishlist' && onWishlistClick) {
+      onWishlistClick()
+    } else {
+      onTabChange(tabId)
+    }
+  }
 
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md border-t border-[#1a1a1a] transition-transform duration-300">
@@ -25,7 +37,7 @@ export function MobileNavBar({ cartCount, activeTab, onTabChange }: MobileNavBar
           return (
             <button
               key={item.id}
-              onClick={() => onTabChange(item.id)}
+              onClick={() => handleTabClick(item.id)}
               className="relative flex flex-col items-center justify-center gap-1 transition-colors"
             >
               <div className="relative">

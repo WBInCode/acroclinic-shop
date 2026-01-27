@@ -2,6 +2,9 @@ import { Award, Shield, Zap } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { motion } from 'framer-motion'
 
+// Spójne animacje
+const ease = [0.22, 1, 0.36, 1] as const
+
 export function TrustSignals() {
   const signals = [
     {
@@ -22,28 +25,66 @@ export function TrustSignals() {
   ]
 
   return (
-    <section className="container mx-auto px-4 py-20">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <motion.section 
+      className="container mx-auto px-4 py-24 relative"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, ease }}
+    >
+      {/* Section title */}
+      <motion.div
+        className="text-center mb-16"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, ease }}
+      >
+        <span className="text-xs uppercase tracking-[0.3em] text-brand-gold/60 font-[family-name:var(--font-body)] block mb-4">Nasza obietnica</span>
+        <h2 className="font-[family-name:var(--font-heading)] font-bold text-3xl md:text-4xl text-white uppercase tracking-tight">
+          DLACZEGO <span className="text-brand-gold">MY?</span>
+        </h2>
+        <motion.div
+          className="w-16 h-px bg-gradient-to-r from-transparent via-brand-gold to-transparent mx-auto mt-6"
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease, delay: 0.2 }}
+        />
+      </motion.div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {signals.map((signal, index) => {
           const Icon = signal.icon
           return (
             <motion.div
               key={signal.title}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
+              transition={{ duration: 0.8, ease, delay: index * 0.15 }}
             >
-              <Card className="backdrop-blur-md bg-card/70 border-[#1a1a1a] p-8 text-center hover:border-brand-gold/50 transition-all duration-300 group">
-                <div className="flex justify-center mb-4">
-                  <div className="w-16 h-16 rounded-full bg-brand-gold/10 flex items-center justify-center group-hover:bg-brand-gold/20 transition-colors">
-                    <Icon className="w-8 h-8 text-brand-gold" />
-                  </div>
+              <Card className="relative bg-white/[0.02] border-white/10 p-10 text-center hover:border-brand-gold/40 transition-all duration-500 group overflow-hidden"
+              >
+                {/* Hover glow */}
+                <motion.div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: 'radial-gradient(circle at center, rgba(212,175,55,0.08) 0%, transparent 70%)' }}
+                />
+                
+                <div className="flex justify-center mb-8 relative">
+                  <motion.div 
+                    className="w-16 h-16 rounded-full border border-brand-gold/30 flex items-center justify-center group-hover:border-brand-gold/60 group-hover:bg-brand-gold/10 transition-all duration-500"
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                  >
+                    <Icon className="w-7 h-7 text-brand-gold" />
+                  </motion.div>
                 </div>
-                <h3 className="font-[family-name:var(--font-heading)] font-semibold text-lg text-brand-gold mb-2 tracking-tight">
+                
+                <h3 className="font-[family-name:var(--font-heading)] font-bold text-base text-white mb-3 uppercase tracking-wide relative">
                   {signal.title}
                 </h3>
-                <p className="text-white/70 text-sm font-[family-name:var(--font-body)]">
+                <p className="text-white/50 text-sm font-[family-name:var(--font-body)] leading-relaxed relative">
                   {signal.description}
                 </p>
               </Card>
@@ -51,6 +92,6 @@ export function TrustSignals() {
           )
         })}
       </div>
-    </section>
+    </motion.section>
   )
 }

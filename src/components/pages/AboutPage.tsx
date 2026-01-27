@@ -1,0 +1,158 @@
+import { motion } from 'framer-motion'
+import { ArrowLeft, Award, Users, Target, Heart } from 'lucide-react'
+
+const ease = [0.22, 1, 0.36, 1] as const
+
+interface AboutPageProps {
+  onBack: () => void
+}
+
+export function AboutPage({ onBack }: AboutPageProps) {
+  const values = [
+    {
+      icon: Award,
+      title: 'Jakość Premium',
+      description: 'Każdy produkt przechodzi rygorystyczne testy jakości, aby zapewnić najwyższy standard.'
+    },
+    {
+      icon: Users,
+      title: 'Społeczność',
+      description: 'Budujemy społeczność pasjonatów akrobatyki i sportu z całej Polski.'
+    },
+    {
+      icon: Target,
+      title: 'Innowacja',
+      description: 'Nieustannie rozwijamy nasze produkty, słuchając potrzeb sportowców.'
+    },
+    {
+      icon: Heart,
+      title: 'Pasja',
+      description: 'Sport to nasza pasja, którą dzielimy się z każdym klientem.'
+    }
+  ]
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5, ease }}
+      className="min-h-screen pt-28 pb-32"
+    >
+      <div className="container mx-auto px-4">
+        {/* Back button */}
+        <motion.button
+          onClick={onBack}
+          className="inline-flex items-center gap-2 text-white/60 hover:text-brand-gold transition-colors duration-300 mb-12 group cursor-pointer"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, ease }}
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300" />
+          <span className="font-[family-name:var(--font-body)] text-xs uppercase tracking-widest">Powrót</span>
+        </motion.button>
+
+        {/* Header */}
+        <motion.div
+          className="text-center mb-20"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease }}
+        >
+          <span className="text-xs uppercase tracking-[0.3em] text-brand-gold/60 font-[family-name:var(--font-body)] block mb-4">Poznaj nas</span>
+          <h1 className="font-[family-name:var(--font-heading)] font-bold text-4xl md:text-5xl text-white uppercase tracking-tight mb-6">
+            O <span className="text-brand-gold">Nas</span>
+          </h1>
+          <div className="w-24 h-px bg-gradient-to-r from-transparent via-brand-gold/60 to-transparent mx-auto" />
+        </motion.div>
+
+        {/* Story section */}
+        <motion.div
+          className="max-w-3xl mx-auto mb-24"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease, delay: 0.2 }}
+        >
+          <div className="relative p-8 md:p-12 bg-white/[0.02] border border-white/10">
+            <div className="absolute top-0 left-8 w-16 h-px bg-brand-gold" />
+            <div className="absolute top-0 left-0 w-px h-16 bg-brand-gold" />
+            
+            <h2 className="font-[family-name:var(--font-heading)] font-bold text-2xl text-white mb-6">
+              Nasza Historia
+            </h2>
+            <p className="text-white/60 font-[family-name:var(--font-body)] leading-relaxed mb-6">
+              Acro Clinic powstało z pasji do akrobatyki i sportu. Jako aktywni sportowcy, doskonale rozumiemy potrzeby osób trenujących na najwyższym poziomie. Dlatego stworzyliśmy markę, która łączy najwyższą jakość z nowoczesnym designem.
+            </p>
+            <p className="text-white/60 font-[family-name:var(--font-body)] leading-relaxed mb-6">
+              Każdy produkt w naszym sklepie został starannie wyselekcjonowany i przetestowany przez profesjonalnych sportowców. Współpracujemy z najlepszymi producentami, aby dostarczyć Ci sprzęt, który sprosta nawet najbardziej wymagającym treningom.
+            </p>
+            <p className="text-white/60 font-[family-name:var(--font-body)] leading-relaxed">
+              Naszą misją jest wspieranie rozwoju każdego sportowca - od początkujących po zawodowców. Wierzymy, że odpowiedni sprzęt to fundament sukcesu w sporcie.
+            </p>
+            
+            <div className="absolute bottom-0 right-8 w-16 h-px bg-brand-gold" />
+            <div className="absolute bottom-0 right-0 w-px h-16 bg-brand-gold" />
+          </div>
+        </motion.div>
+
+        {/* Values */}
+        <motion.div
+          className="mb-20"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease, delay: 0.4 }}
+        >
+          <h2 className="font-[family-name:var(--font-heading)] font-bold text-2xl text-white text-center mb-12">
+            Nasze <span className="text-brand-gold">Wartości</span>
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {values.map((value, index) => (
+              <motion.div
+                key={value.title}
+                className="p-6 bg-white/[0.02] border border-white/10 hover:border-brand-gold/30 transition-all duration-300 text-center group"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease, delay: 0.5 + index * 0.1 }}
+              >
+                <div className="w-14 h-14 mx-auto mb-4 flex items-center justify-center border border-brand-gold/30 group-hover:bg-brand-gold/10 transition-colors duration-300">
+                  <value.icon className="w-6 h-6 text-brand-gold" />
+                </div>
+                <h3 className="font-[family-name:var(--font-heading)] font-bold text-white text-sm uppercase tracking-wider mb-3">
+                  {value.title}
+                </h3>
+                <p className="text-white/50 text-sm font-[family-name:var(--font-body)] leading-relaxed">
+                  {value.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Stats */}
+        <motion.div
+          className="grid grid-cols-2 md:grid-cols-4 gap-6"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease, delay: 0.6 }}
+        >
+          {[
+            { number: '500+', label: 'Zadowolonych klientów' },
+            { number: '50+', label: 'Produktów premium' },
+            { number: '100%', label: 'Satysfakcji' },
+            { number: '24h', label: 'Wsparcie' }
+          ].map((stat, index) => (
+            <div key={stat.label} className="text-center p-6">
+              <p className="font-[family-name:var(--font-heading)] font-black text-3xl md:text-4xl text-brand-gold mb-2">
+                {stat.number}
+              </p>
+              <p className="text-white/40 text-xs uppercase tracking-wider font-[family-name:var(--font-body)]">
+                {stat.label}
+              </p>
+            </div>
+          ))}
+        </motion.div>
+      </div>
+    </motion.div>
+  )
+}

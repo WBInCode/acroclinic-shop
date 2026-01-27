@@ -1,33 +1,36 @@
+import { motion } from 'framer-motion'
+
 export function MarqueeText() {
-  const text = "ZMIENIAMY SIĘ DLA WAS • ACRO CLINIC PREMIUM • PERFORMANCE GEAR • "
+  const text = "ACRO CLINIC • PREMIUM EQUIPMENT • PROFESSIONAL GEAR • "
   
   return (
-    <div className="relative overflow-hidden bg-brand-gold py-4 my-20">
+    <motion.div 
+      className="relative overflow-hidden py-8 my-16 border-y border-white/10"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+    >
       <div className="flex whitespace-nowrap">
-        <div
-          className="flex animate-marquee"
-          style={{
-            animation: 'marquee-scroll 20s linear infinite',
+        <motion.div
+          className="flex"
+          animate={{ x: ['0%', '-50%'] }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: 'linear',
           }}
         >
-          <span className="font-[family-name:var(--font-heading)] font-bold text-3xl md:text-5xl text-black tracking-tight uppercase">
-            {text}
-          </span>
-          <span className="font-[family-name:var(--font-heading)] font-bold text-3xl md:text-5xl text-black tracking-tight uppercase">
-            {text}
-          </span>
-        </div>
+          {[1, 2, 3, 4].map((i) => (
+            <span 
+              key={i}
+              className="font-[family-name:var(--font-heading)] font-light text-2xl md:text-4xl text-white/20 tracking-[0.1em] uppercase px-4"
+            >
+              {text}
+            </span>
+          ))}
+        </motion.div>
       </div>
-
-      <style>{`
-        @keyframes marquee-scroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .animate-marquee {
-          display: inline-flex;
-        }
-      `}</style>
-    </div>
+    </motion.div>
   )
 }

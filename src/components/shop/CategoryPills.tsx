@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { motion } from 'framer-motion'
 
 export type Category = 'all' | 'clothing' | 'accessories' | 'bestsellers'
 
@@ -16,31 +16,29 @@ export function CategoryPills({ activeCategory, onCategoryChange }: CategoryPill
   ]
 
   return (
-    <div className="flex flex-wrap gap-3 justify-center mb-12">
-      {categories.map((category) => {
+    <motion.div 
+      className="flex flex-wrap gap-3 justify-center mb-12"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+    >
+      {categories.map((category, index) => {
         const isActive = activeCategory === category.id
         
         return (
-          <Button
+          <motion.button
             key={category.id}
             onClick={() => onCategoryChange(category.id)}
-            variant="outline"
-            className={`
-              relative px-6 py-3 rounded-full font-[family-name:var(--font-body)] font-semibold text-sm uppercase tracking-wide
-              transition-all duration-300
-              ${isActive 
-                ? 'bg-brand-gold/20 text-brand-gold border-brand-gold hover:bg-brand-gold/30' 
-                : 'bg-transparent text-white/70 border-[#1a1a1a] hover:bg-white/5 hover:text-white hover:border-white/20'
-              }
-            `}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1, duration: 0.3 }}
+            className={`btn-pill ${isActive ? 'active' : ''}`}
           >
             {category.label}
-            {isActive && (
-              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 h-0.5 bg-brand-gold rounded-full" />
-            )}
-          </Button>
+          </motion.button>
         )
       })}
-    </div>
+    </motion.div>
   )
 }

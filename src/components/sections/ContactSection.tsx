@@ -1,48 +1,97 @@
 import { Phone, Mail } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { motion } from 'framer-motion'
+
+// Spójne animacje
+const transition = { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
 
 export function ContactSection() {
   return (
-    <section className="container mx-auto px-4 py-20">
-      <div className="backdrop-blur-md bg-brand-gold/10 border border-brand-gold/30 rounded-lg p-12 text-center">
-        <h2 className="font-[family-name:var(--font-heading)] font-bold text-3xl md:text-4xl text-white mb-4 tracking-tight">
+    <motion.section 
+      className="container mx-auto px-4 py-24"
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-100px' }}
+      transition={transition}
+    >
+      <div className="max-w-2xl mx-auto text-center">
+        <motion.span 
+          className="text-xs uppercase tracking-[0.3em] text-brand-gold/60 font-[family-name:var(--font-body)] block mb-4"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ ...transition, delay: 0.1 }}
+        >
+          Kontakt
+        </motion.span>
+        
+        <motion.h2 
+          className="font-[family-name:var(--font-heading)] font-bold text-3xl md:text-4xl text-white mb-6 tracking-tight"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ ...transition, delay: 0.2 }}
+        >
           POTRZEBUJESZ POMOCY?
-        </h2>
-        <p className="text-white/80 text-lg mb-8 font-[family-name:var(--font-body)]">
-          Nasz zespół ekspertów jest gotowy, aby pomóc Ci wybrać idealne wyposażenie
-        </p>
+        </motion.h2>
+        <motion.div
+          className="w-16 h-px bg-gradient-to-r from-transparent via-brand-gold to-transparent mx-auto mb-8"
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true }}
+          transition={{ ...transition, delay: 0.3 }}
+        />
 
-        <div className="flex flex-col md:flex-row items-center justify-center gap-6 mb-8">
+        <motion.p 
+          className="text-white/50 text-base mb-12 font-[family-name:var(--font-body)] font-light"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ ...transition, delay: 0.4 }}
+        >
+          Nasz zespół ekspertów jest gotowy, aby pomóc Ci wybrać idealne wyposażenie
+        </motion.p>
+
+        <motion.div 
+          className="flex flex-col md:flex-row items-center justify-center gap-8 mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ ...transition, delay: 0.5 }}
+        >
           <a
             href="tel:512206471"
-            className="flex items-center gap-3 text-brand-gold hover:text-brand-gold/80 transition-colors"
+            className="flex items-center gap-3 text-white hover:text-brand-gold transition-colors duration-300"
           >
-            <Phone className="w-6 h-6" />
-            <span className="font-[family-name:var(--font-heading)] font-semibold text-2xl tracking-tight">
+            <Phone className="w-5 h-5 text-brand-gold" />
+            <span className="font-[family-name:var(--font-heading)] font-semibold text-xl tracking-tight">
               512 206 471
             </span>
           </a>
 
-          <div className="hidden md:block w-px h-8 bg-brand-gold/30" />
+          <div className="hidden md:block w-px h-6 bg-white/20" />
 
           <a
             href="mailto:kontakt@acroclinic.pl"
-            className="flex items-center gap-3 text-white/80 hover:text-white transition-colors"
+            className="flex items-center gap-3 text-white/60 hover:text-white transition-colors duration-300"
           >
-            <Mail className="w-5 h-5" />
-            <span className="font-[family-name:var(--font-body)] font-medium">
+            <Mail className="w-5 h-5 text-brand-gold/60" />
+            <span className="font-[family-name:var(--font-body)]">
               kontakt@acroclinic.pl
             </span>
           </a>
-        </div>
+        </motion.div>
 
-        <Button
-          size="lg"
-          className="bg-brand-gold hover:bg-brand-gold/90 text-black font-[family-name:var(--font-body)] font-semibold text-sm uppercase tracking-wider px-8 py-6 transition-all duration-300 hover:shadow-[0_0_30px_rgba(219,166,10,0.6)] hover:scale-105"
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ ...transition, delay: 0.6 }}
         >
-          UMÓW KONSULTACJĘ
-        </Button>
+          <button className="btn-secondary">
+            Umów Konsultację
+          </button>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   )
 }

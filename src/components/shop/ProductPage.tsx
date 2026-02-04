@@ -268,21 +268,6 @@ export function ProductPage({ product, onBack, onAddToCart, onToggleWishlist, is
               {product.name}
             </h1>
 
-            {/* Rating */}
-            <div className="flex items-center gap-3 mb-6">
-              <div className="flex gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`w-4 h-4 ${i < Math.floor(details.rating) ? 'text-brand-gold fill-brand-gold' : 'text-white/20'}`}
-                  />
-                ))}
-              </div>
-              <span className="text-white/60 text-sm font-[family-name:var(--font-body)]">
-                {details.rating} ({details.reviews} opinii)
-              </span>
-            </div>
-
             {/* Price */}
             <div className="mb-8">
               <span className="font-[family-name:var(--font-heading)] font-bold text-4xl text-brand-gold">
@@ -299,13 +284,13 @@ export function ProductPage({ product, onBack, onAddToCart, onToggleWishlist, is
             <div className="w-full h-px bg-white/10 mb-8" />
 
             {/* Sizes */}
-            {details.sizes && (
+            {product.sizes && product.sizes.length > 0 && (
               <div className="mb-8">
                 <span className="text-xs uppercase tracking-[0.2em] text-white/40 font-[family-name:var(--font-body)] block mb-4">
                   Rozmiar
                 </span>
                 <div className="flex flex-wrap gap-3">
-                  {details.sizes.map((size) => (
+                  {product.sizes.map((size) => (
                     <button
                       key={size}
                       onClick={() => setSelectedSize(size)}

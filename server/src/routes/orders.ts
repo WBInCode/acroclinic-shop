@@ -1,0 +1,309 @@
+import { Router, Request, Response, NextFunction } from 'express';
+import { prisma } from '../lib/prisma.js';
+import { createOrderSchema } from '../lib/validators.js';
+import { authenticate, optionalAuth } from '../middleware/auth.js';
+import { createError } from '../middleware/errorHandler.js';
+
+const router = Router();
+
+// Helper: generuj numer zamówienia
+function generateOrderNumber(): string {
+  const date = new Date();
+  const year = date.getFullYear().toString().slice(-2);
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+  return `AC${year}${month}${day}-${random}`;
+}
+
+// GET /api/orders - Lista zamówień użytkownika
+router.get('/', authenticate, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const orders = await prisma.order.findMany({
+      where: { userId: req.user!.userId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                images: { take: 1 },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    res.json({
+      orders: orders.map((order) => ({
+        id: order.id,
+        orderNumber: order.orderNumber,
+        status: order.status,
+        paymentStatus: order.paymentStatus,
+        total: Number(order.total),
+        itemCount: order.items.reduce((sum, item) => sum + item.quantity, 0),
+        createdAt: order.createdAt,
+        items: order.items.map((item) => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: Number(item.price),
+          image: item.product.images[0]?.url || null,
+        })),
+      })),
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// GET /api/orders/:id - Szczegóły zamówienia
+router.get('/:id', authenticate, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+
+    const order = await prisma.order.findFirst({
+      where: {
+        OR: [{ id }, { orderNumber: id }],
+        userId: req.user!.userId,
+      },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                images: { take: 1 },
+              },
+            },
+          },
+        },
+        payments: true,
+      },
+    });
+
+    if (!order) {
+      throw createError('Zamówienie nie znalezione', 404, 'ORDER_NOT_FOUND');
+    }
+
+    res.json({
+      order: {
+        id: order.id,
+        orderNumber: order.orderNumber,
+        status: order.status,
+        paymentStatus: order.paymentStatus,
+        paymentMethod: order.paymentMethod,
+        shippingAddress: {
+          firstName: order.shippingFirstName,
+          lastName: order.shippingLastName,
+          street: order.shippingStreet,
+          city: order.shippingCity,
+          postalCode: order.shippingPostalCode,
+          country: order.shippingCountry,
+          phone: order.shippingPhone,
+        },
+        subtotal: Number(order.subtotal),
+        shippingCost: Number(order.shippingCost),
+        discount: Number(order.discount),
+        total: Number(order.total),
+        note: order.note,
+        createdAt: order.createdAt,
+        paidAt: order.paidAt,
+        shippedAt: order.shippedAt,
+        deliveredAt: order.deliveredAt,
+        items: order.items.map((item) => ({
+          id: item.id,
+          productId: item.productId,
+          name: item.name,
+          quantity: item.quantity,
+          price: Number(item.price),
+          image: item.product.images[0]?.url || null,
+        })),
+        payments: order.payments.map((p) => ({
+          id: p.id,
+          amount: Number(p.amount),
+          status: p.status,
+          method: p.method,
+          createdAt: p.createdAt,
+        })),
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// POST /api/orders - Utwórz zamówienie
+router.post('/', optionalAuth, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const data = createOrderSchema.parse(req.body);
+    const userId = req.user?.userId;
+    const sessionId = req.sessionId;
+
+    // Pobierz koszyk
+    const cart = await prisma.cart.findFirst({
+      where: userId ? { userId } : { sessionId },
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    });
+
+    if (!cart || cart.items.length === 0) {
+      throw createError('Koszyk jest pusty', 400, 'EMPTY_CART');
+    }
+
+    // Sprawdź dostępność produktów
+    for (const item of cart.items) {
+      if (!item.product.isActive) {
+        throw createError(`Produkt "${item.product.name}" nie jest już dostępny`, 400, 'PRODUCT_UNAVAILABLE');
+      }
+      if (item.product.stock < item.quantity) {
+        throw createError(
+          `Niewystarczająca ilość produktu "${item.product.name}" (dostępne: ${item.product.stock})`,
+          400,
+          'INSUFFICIENT_STOCK'
+        );
+      }
+    }
+
+    // Oblicz kwoty
+    const subtotal = cart.items.reduce(
+      (sum, item) => sum + Number(item.product.price) * item.quantity,
+      0
+    );
+
+    // Pobierz ustawienia wysyłki
+    const shippingSettings = await prisma.setting.findUnique({
+      where: { key: 'shipping' },
+    });
+    const shippingConfig = (shippingSettings?.value as any) || {
+      freeShippingThreshold: 200,
+      standardShippingCost: 15.99,
+    };
+
+    const shippingCost = subtotal >= shippingConfig.freeShippingThreshold 
+      ? 0 
+      : shippingConfig.standardShippingCost;
+
+    const total = subtotal + shippingCost;
+
+    // Utwórz zamówienie
+    const order = await prisma.$transaction(async (tx) => {
+      // Utwórz zamówienie
+      const newOrder = await tx.order.create({
+        data: {
+          orderNumber: generateOrderNumber(),
+          userId,
+          status: 'PENDING',
+          paymentStatus: 'PENDING',
+          shippingFirstName: data.shippingAddress.firstName,
+          shippingLastName: data.shippingAddress.lastName,
+          shippingStreet: data.shippingAddress.street,
+          shippingCity: data.shippingAddress.city,
+          shippingPostalCode: data.shippingAddress.postalCode,
+          shippingCountry: data.shippingAddress.country,
+          shippingPhone: data.shippingAddress.phone,
+          subtotal,
+          shippingCost,
+          discount: 0,
+          total,
+          note: data.note,
+          items: {
+            create: cart.items.map((item) => ({
+              productId: item.productId,
+              quantity: item.quantity,
+              price: item.product.price,
+              name: item.product.name,
+            })),
+          },
+        },
+        include: {
+          items: true,
+        },
+      });
+
+      // Zmniejsz stan magazynowy
+      for (const item of cart.items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stock: { decrement: item.quantity },
+          },
+        });
+      }
+
+      // Wyczyść koszyk
+      await tx.cartItem.deleteMany({
+        where: { cartId: cart.id },
+      });
+
+      return newOrder;
+    });
+
+    res.status(201).json({
+      message: 'Zamówienie zostało utworzone',
+      order: {
+        id: order.id,
+        orderNumber: order.orderNumber,
+        total: Number(order.total),
+        status: order.status,
+        paymentStatus: order.paymentStatus,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// POST /api/orders/:id/cancel - Anuluj zamówienie
+router.post('/:id/cancel', authenticate, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+
+    const order = await prisma.order.findFirst({
+      where: {
+        OR: [{ id }, { orderNumber: id }],
+        userId: req.user!.userId,
+      },
+      include: { items: true },
+    });
+
+    if (!order) {
+      throw createError('Zamówienie nie znalezione', 404, 'ORDER_NOT_FOUND');
+    }
+
+    if (!['PENDING', 'CONFIRMED'].includes(order.status)) {
+      throw createError('Nie można anulować zamówienia w tym statusie', 400, 'CANNOT_CANCEL');
+    }
+
+    // Anuluj zamówienie i przywróć stan magazynowy
+    await prisma.$transaction(async (tx) => {
+      await tx.order.update({
+        where: { id: order.id },
+        data: {
+          status: 'CANCELLED',
+          paymentStatus: order.paymentStatus === 'COMPLETED' ? 'REFUNDED' : 'CANCELLED',
+        },
+      });
+
+      // Przywróć stan magazynowy
+      for (const item of order.items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stock: { increment: item.quantity },
+          },
+        });
+      }
+    });
+
+    res.json({ message: 'Zamówienie zostało anulowane' });
+  } catch (error) {
+    next(error);
+  }
+});
+
+export { router as ordersRouter };

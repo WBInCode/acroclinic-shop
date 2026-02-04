@@ -9,6 +9,7 @@ export interface Product {
   price: number
   image: string
   images?: string[] // Galeria zdjęć produktu
+  sizes?: string[] // Dostępne rozmiary
   badge?: 'NEW' | 'LIMITED'
   category: 'clothing' | 'accessories'
   isBestseller?: boolean

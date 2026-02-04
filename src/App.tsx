@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Toaster, toast } from 'sonner'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -20,6 +20,7 @@ import { ContactSection } from '@/components/sections/ContactSection'
 import { AdminLogin } from '@/components/admin/AdminLogin'
 import { AdminPanel } from '@/components/admin/AdminPanel'
 import type { Product } from '@/components/shop/ProductCard'
+import { productsApi } from '@/lib/api'
 
 type PageView = 'home' | 'product' | 'cart' | 'wishlist' | 'about' | 'contact' | 'terms' | 'admin-login' | 'admin'
 
@@ -30,6 +31,36 @@ function App() {
   const [showSplash, setShowSplash] = useState(true)
   const [currentView, setCurrentView] = useState<PageView>('home')
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [products, setProducts] = useState<Product[]>([])
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true)
+
+  // Pobierz produkty z API
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const response = await productsApi.getProducts({ limit: 100 })
+        // Mapuj produkty z API na format komponentów
+        const mappedProducts: Product[] = response.products.map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          price: p.price,
+          image: p.image || '',
+          images: p.images || [],
+          sizes: p.sizes || [],
+          badge: p.badge as 'NEW' | 'LIMITED' | undefined,
+          category: p.category?.slug === 'accessories' ? 'accessories' : 'clothing',
+          isBestseller: p.isBestseller,
+        }))
+        setProducts(mappedProducts)
+      } catch (error) {
+        console.error('Błąd pobierania produktów:', error)
+        toast.error('Nie udało się pobrać produktów')
+      } finally {
+        setIsLoadingProducts(false)
+      }
+    }
+    fetchProducts()
+  }, [])
 
   const handleEnterShop = () => {
     setShowSplash(false)
@@ -104,173 +135,6 @@ function App() {
     setCurrentView('terms')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
-
-  const products: Product[] = [
-    {
-      id: '1',
-      name: 'Koszulka Bokserka',
-      price: 99.99,
-      image: '/images/Bluzka - 1.png',
-      badge: 'NEW',
-      category: 'clothing',
-      isBestseller: true,
-    },
-    {
-      id: '2',
-      name: 'T-shirt Dziecięcy',
-      price: 89.99,
-      image: '/images/T-Shirt - 1.png',
-      category: 'clothing',
-      isBestseller: true,
-    },
-    {
-      id: '3',
-      name: 'Longsleeve Dziecięcy',
-      price: 99.99,
-      image: '/images/sweter - 1.png',
-      category: 'clothing',
-    },
-    {
-      id: '4',
-      name: 'Spodenki Kolarki',
-      price: 89.99,
-      image: '/images/spodenki - 1.png',
-      badge: 'NEW',
-      category: 'clothing',
-      isBestseller: true,
-    },
-    {
-      id: '5',
-      name: 'Top Sportowy',
-      price: 99.99,
-      image: '/images/top - 1.png',
-      category: 'clothing',
-    },
-    {
-      id: '6',
-      name: 'Legginsy',
-      price: 144.99,
-      image: '/images/legginsy 1.png',
-      badge: 'LIMITED',
-      category: 'clothing',
-      isBestseller: true,
-    },
-    {
-      id: '7',
-      name: 'Dresy Jogger Dziecięce',
-      price: 149.99,
-      image: '/images/spodnie - 1.png',
-      category: 'clothing',
-    },
-    {
-      id: '8',
-      name: 'Bluza Regular Dziecięca',
-      price: 159.99,
-      image: '/images/Bluza - 1.png',
-      badge: 'LIMITED',
-      category: 'clothing',
-    },
-    // Akcesoria - Gumy
-    {
-      id: '9',
-      name: 'Taśma Gimnastyczna Fioletowa',
-      price: 49.99,
-      image: '/images/gumy/Fioletowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_1.webp',
-      images: [
-        '/images/gumy/Fioletowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_1.webp',
-        '/images/gumy/Fioletowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_2.webp',
-        '/images/gumy/Fioletowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_3.webp',
-        '/images/gumy/Fioletowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_4.webp',
-        '/images/gumy/Fioletowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_5.webp',
-      ],
-      category: 'accessories',
-      badge: 'NEW',
-    },
-    {
-      id: '10',
-      name: 'Taśma Gimnastyczna Różowa',
-      price: 49.99,
-      image: '/images/gumy/Rózowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_1.webp',
-      images: [
-        '/images/gumy/Rózowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_1.webp',
-        '/images/gumy/Rózowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_2.webp',
-        '/images/gumy/Rózowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_3.webp',
-        '/images/gumy/Rózowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_4.webp',
-        '/images/gumy/Rózowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_6.webp',
-      ],
-      category: 'accessories',
-      isBestseller: true,
-    },
-    {
-      id: '11',
-      name: 'Taśma Gimnastyczna Zielona',
-      price: 49.99,
-      image: '/images/gumy/Zielona/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_1.webp',
-      images: [
-        '/images/gumy/Zielona/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_1.webp',
-        '/images/gumy/Zielona/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_2.webp',
-        '/images/gumy/Zielona/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_4.webp',
-        '/images/gumy/Zielona/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_5.webp',
-        '/images/gumy/Zielona/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_6.webp',
-      ],
-      category: 'accessories',
-    },
-    // Akcesoria - Kostki
-    {
-      id: '12',
-      name: 'Kostka do Jogi Czarna',
-      price: 39.99,
-      image: '/images/kostki/Czarna/pol_pl_Kostka-piankowa-do-jogi-czarna-74_1.webp',
-      images: [
-        '/images/kostki/Czarna/pol_pl_Kostka-piankowa-do-jogi-czarna-74_1.webp',
-        '/images/kostki/Czarna/pol_pl_Kostka-piankowa-do-jogi-czarna-74_2.webp',
-        '/images/kostki/Czarna/pol_pl_Kostka-piankowa-do-jogi-czarna-74_5.webp',
-        '/images/kostki/Czarna/pol_pm_Kostka-piankowa-do-jogi-czarna-74_8.webp',
-      ],
-      category: 'accessories',
-    },
-    {
-      id: '13',
-      name: 'Kostka do Jogi Niebieska',
-      price: 39.99,
-      image: '/images/kostki/Niebieska/pol_pl_Kostka-piankowa-do-jogi-niebieska-73_1.webp',
-      images: [
-        '/images/kostki/Niebieska/pol_pl_Kostka-piankowa-do-jogi-niebieska-73_1.webp',
-        '/images/kostki/Niebieska/pol_pl_Kostka-piankowa-do-jogi-niebieska-73_2.webp',
-        '/images/kostki/Niebieska/pol_pl_Kostka-piankowa-do-jogi-niebieska-73_9.webp',
-        '/images/kostki/Niebieska/pol_pl_Kostka-piankowa-do-jogi-niebieska-73_10.webp',
-      ],
-      category: 'accessories',
-      isBestseller: true,
-    },
-    {
-      id: '14',
-      name: 'Kostka do Jogi Różowa',
-      price: 39.99,
-      image: '/images/kostki/Różowa/pol_pl_Kostka-piankowa-do-jogi-rozowa-290_1.webp',
-      images: [
-        '/images/kostki/Różowa/pol_pl_Kostka-piankowa-do-jogi-rozowa-290_1.webp',
-        '/images/kostki/Różowa/pol_pl_Kostka-piankowa-do-jogi-rozowa-290_2.webp',
-        '/images/kostki/Różowa/pol_pl_Kostka-piankowa-do-jogi-rozowa-290_4.webp',
-        '/images/kostki/Różowa/pol_pl_Kostka-piankowa-do-jogi-rozowa-290_6.webp',
-      ],
-      category: 'accessories',
-      badge: 'NEW',
-    },
-    {
-      id: '15',
-      name: 'Kostka do Jogi Szara',
-      price: 39.99,
-      image: '/images/kostki/Szara/pol_pl_Kostka-piankowa-do-jogi-szara-291_1.webp',
-      images: [
-        '/images/kostki/Szara/pol_pl_Kostka-piankowa-do-jogi-szara-291_1.webp',
-        '/images/kostki/Szara/pol_pl_Kostka-piankowa-do-jogi-szara-291_2.webp',
-        '/images/kostki/Szara/pol_pl_Kostka-piankowa-do-jogi-szara-291_5.webp',
-        '/images/kostki/Szara/pol_pl_Kostka-piankowa-do-jogi-szara-291_8.webp',
-      ],
-      category: 'accessories',
-    },
-  ]
 
   const handleAddToCart = (product: Product) => {
     setCartItems((currentItems = []) => {

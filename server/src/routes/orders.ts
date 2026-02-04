@@ -197,6 +197,7 @@ router.post('/', optionalAuth, async (req: Request, res: Response, next: NextFun
         data: {
           orderNumber: generateOrderNumber(),
           userId,
+          guestEmail: userId ? null : data.email, // Zapisz email tylko dla gości
           status: 'PENDING',
           paymentStatus: 'PENDING',
           shippingFirstName: data.shippingAddress.firstName,

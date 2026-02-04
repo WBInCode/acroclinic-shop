@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, ShoppingCart, Shield, Truck, RotateCcw, Star, Check, Heart } from 'lucide-react'
+import { ArrowLeft, ShoppingCart, Shield, Truck, RotateCcw, Check, Heart } from 'lucide-react'
 import { useState } from 'react'
 import type { Product } from './ProductCard'
 
@@ -9,139 +9,9 @@ const ease = [0.22, 1, 0.36, 1] as const
 interface ProductPageProps {
   product: Product
   onBack: () => void
-  onAddToCart: (product: Product) => void
+  onAddToCart: (product: Product, selectedSize?: string) => void
   onToggleWishlist?: (product: Product) => void
   isInWishlist?: boolean
-}
-
-// Rozmiary
-const childSizes = ['116', '122', '128', '134', '140', '146']
-const adultSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
-
-// Rozszerzone dane produktów z opisami
-const productDetails: Record<string, {
-  description: string
-  features: string[]
-  materials: string
-  sizes?: string[]
-  rating: number
-  reviews: number
-}> = {
-  '1': {
-    description: 'Profesjonalna koszulka bokserka idealna do treningów akrobatyki i tańca. Wykonana z oddychających materiałów premium, zapewnia pełną swobodę ruchów.',
-    features: ['Oddychający materiał', 'Szybkoschnący', 'Wygodny krój', 'Płaskie szwy'],
-    materials: '92% Poliester, 8% Elastan',
-    sizes: [...childSizes, ...adultSizes],
-    rating: 4.9,
-    reviews: 127
-  },
-  '2': {
-    description: 'T-shirt dziecięcy zaprojektowany z myślą o młodych akrobatach. Wygodny krój pozwala na wykonywanie nawet najbardziej skomplikowanych figur.',
-    features: ['Miękka bawełna', 'Wzmocnione szwy', 'Nadruk z logo', 'Łatwy w praniu'],
-    materials: '95% Bawełna, 5% Elastan',
-    sizes: childSizes,
-    rating: 4.8,
-    reviews: 89
-  },
-  '3': {
-    description: 'Longsleeve dziecięcy na chłodniejsze dni treningowe. Doskonale sprawdza się podczas rozgrzewki i stretching.',
-    features: ['Długi rękaw', 'Ciepły materiał', 'Elastyczny', 'Z logo Acro Clinic'],
-    materials: '90% Bawełna, 10% Elastan',
-    sizes: childSizes,
-    rating: 4.7,
-    reviews: 65
-  },
-  '4': {
-    description: 'Spodenki kolarki idealne do treningu akrobatyki. Przylegający krój nie ogranicza ruchów podczas ćwiczeń.',
-    features: ['Przylegający krój', 'Antypoślizgowy brzeg', 'Szybkoschnące', 'Wygodny pas'],
-    materials: '88% Nylon, 12% Elastan',
-    sizes: [...childSizes, ...adultSizes],
-    rating: 4.8,
-    reviews: 156
-  },
-  '5': {
-    description: 'Top sportowy zapewniający optymalne wsparcie podczas treningów. Wygodny i stylowy.',
-    features: ['Wsparcie podczas ćwiczeń', 'Oddychający', 'Elastyczny', 'Modny design'],
-    materials: '85% Poliamid, 15% Elastan',
-    sizes: adultSizes,
-    rating: 4.8,
-    reviews: 78
-  },
-  '6': {
-    description: 'Legginsy treningowe to połączenie stylu i funkcjonalności. Wysoki stan zapewnia komfort, a elastyczny materiał pozwala na pełen zakres ruchu.',
-    features: ['Wysoki stan', 'Kieszeń na telefon', 'Antypoślizgowy pas', 'Modelujący krój'],
-    materials: '78% Nylon, 22% Elastan',
-    sizes: [...childSizes, ...adultSizes],
-    rating: 4.9,
-    reviews: 203
-  },
-  '7': {
-    description: 'Dresy jogger dziecięce - wygodne i stylowe spodnie na trening i na co dzień. Idealne do rozgrzewki.',
-    features: ['Ściągacze przy kostkach', 'Kieszenie', 'Miękka dzianina', 'Elastyczny pas'],
-    materials: '80% Bawełna, 20% Poliester',
-    sizes: childSizes,
-    rating: 4.6,
-    reviews: 92
-  },
-  '8': {
-    description: 'Bluza regular dziecięca - ciepła i wygodna na chłodniejsze dni. Z nadrukiem logo Acro Clinic.',
-    features: ['Kaptur', 'Kieszeń kangurka', 'Ciepła dzianina', 'Nadruk z logo'],
-    materials: '70% Bawełna, 30% Poliester',
-    sizes: childSizes,
-    rating: 4.8,
-    reviews: 74
-  },
-  // Akcesoria - Taśmy gimnastyczne
-  '9': {
-    description: 'Taśma gimnastyczna do rozciągania 90cm - idealna do ćwiczeń rozciągających i zwiększania elastyczności. Wykonana z wytrzymałej gumy lateksowej.',
-    features: ['Długość 90cm', 'Wytrzymała guma', 'Antypoślizgowa', 'Lekka i poręczna'],
-    materials: '100% Lateks naturalny',
-    rating: 4.9,
-    reviews: 156
-  },
-  '10': {
-    description: 'Taśma gimnastyczna do rozciągania 90cm - idealna do ćwiczeń rozciągających i zwiększania elastyczności. Wykonana z wytrzymałej gumy lateksowej.',
-    features: ['Długość 90cm', 'Wytrzymała guma', 'Antypoślizgowa', 'Lekka i poręczna'],
-    materials: '100% Lateks naturalny',
-    rating: 4.8,
-    reviews: 203
-  },
-  '11': {
-    description: 'Taśma gimnastyczna do rozciągania 90cm - idealna do ćwiczeń rozciągających i zwiększania elastyczności. Wykonana z wytrzymałej gumy lateksowej.',
-    features: ['Długość 90cm', 'Wytrzymała guma', 'Antypoślizgowa', 'Lekka i poręczna'],
-    materials: '100% Lateks naturalny',
-    rating: 4.7,
-    reviews: 89
-  },
-  // Akcesoria - Kostki do jogi
-  '12': {
-    description: 'Kostka piankowa do jogi - niezbędny sprzęt do ćwiczeń jogi i stretching. Zapewnia stabilność i wsparcie podczas wykonywania pozycji.',
-    features: ['Lekka pianka EVA', 'Antypoślizgowa', 'Łatwa do czyszczenia', 'Wysoka gęstość'],
-    materials: '100% Pianka EVA',
-    rating: 4.8,
-    reviews: 134
-  },
-  '13': {
-    description: 'Kostka piankowa do jogi - niezbędny sprzęt do ćwiczeń jogi i stretching. Zapewnia stabilność i wsparcie podczas wykonywania pozycji.',
-    features: ['Lekka pianka EVA', 'Antypoślizgowa', 'Łatwa do czyszczenia', 'Wysoka gęstość'],
-    materials: '100% Pianka EVA',
-    rating: 4.9,
-    reviews: 178
-  },
-  '14': {
-    description: 'Kostka piankowa do jogi - niezbędny sprzęt do ćwiczeń jogi i stretching. Zapewnia stabilność i wsparcie podczas wykonywania pozycji.',
-    features: ['Lekka pianka EVA', 'Antypoślizgowa', 'Łatwa do czyszczenia', 'Wysoka gęstość'],
-    materials: '100% Pianka EVA',
-    rating: 4.8,
-    reviews: 112
-  },
-  '15': {
-    description: 'Kostka piankowa do jogi - niezbędny sprzęt do ćwiczeń jogi i stretching. Zapewnia stabilność i wsparcie podczas wykonywania pozycji.',
-    features: ['Lekka pianka EVA', 'Antypoślizgowa', 'Łatwa do czyszczenia', 'Wysoka gęstość'],
-    materials: '100% Pianka EVA',
-    rating: 4.7,
-    reviews: 95
-  }
 }
 
 export function ProductPage({ product, onBack, onAddToCart, onToggleWishlist, isInWishlist = false }: ProductPageProps) {
@@ -149,13 +19,12 @@ export function ProductPage({ product, onBack, onAddToCart, onToggleWishlist, is
   const [quantity, setQuantity] = useState(1)
   const [activeImage, setActiveImage] = useState(0)
   
-  const details = productDetails[product.id] || {
-    description: 'Profesjonalny produkt dla wymagających sportowców.',
-    features: ['Najwyższa jakość', 'Trwałość', 'Komfort użytkowania'],
-    materials: 'Premium materials',
-    rating: 4.5,
-    reviews: 50
-  }
+  // Używaj danych z produktu (z API) z fallbackiem
+  const description = product.description || 'Profesjonalny produkt dla wymagających sportowców.'
+  const features = product.features && product.features.length > 0 
+    ? product.features 
+    : ['Najwyższa jakość', 'Trwałość', 'Komfort użytkowania']
+  const materials = product.materials || 'Premium materials'
 
   // Użyj rzeczywistych zdjęć z produktu lub pojedyncze zdjęcie główne
   const images = product.images && product.images.length > 0 
@@ -164,7 +33,7 @@ export function ProductPage({ product, onBack, onAddToCart, onToggleWishlist, is
 
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {
-      onAddToCart(product)
+      onAddToCart(product, selectedSize || undefined)
     }
   }
 
@@ -277,7 +146,7 @@ export function ProductPage({ product, onBack, onAddToCart, onToggleWishlist, is
 
             {/* Description */}
             <p className="text-white/60 font-[family-name:var(--font-body)] leading-relaxed mb-8">
-              {details.description}
+              {description}
             </p>
 
             {/* Divider */}
@@ -350,7 +219,7 @@ export function ProductPage({ product, onBack, onAddToCart, onToggleWishlist, is
 
             {/* Features */}
             <div className="space-y-3 mb-8">
-              {details.features.map((feature, idx) => (
+              {features.map((feature, idx) => (
                 <motion.div
                   key={idx}
                   className="flex items-center gap-3 text-white/60"
@@ -370,7 +239,7 @@ export function ProductPage({ product, onBack, onAddToCart, onToggleWishlist, is
                 Materiały
               </span>
               <span className="text-white/60 font-[family-name:var(--font-body)] text-sm">
-                {details.materials}
+                {materials}
               </span>
             </div>
 

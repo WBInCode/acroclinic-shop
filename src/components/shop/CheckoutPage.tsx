@@ -1,0 +1,815 @@
+import { motion } from 'framer-motion'
+import { ArrowLeft, CreditCard, Truck, Shield, Lock, CheckCircle, Loader2, Package, MapPin, Search } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import type { CartItem } from './CartPage'
+
+// Token GeoWidget InPost
+const INPOST_GEOWIDGET_TOKEN = 'eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzQlpXVzFNZzVlQnpDYU1XU3JvTlBjRWFveFpXcW9Ua2FuZVB3X291LWxvIn0.eyJleHAiOjIwODU1NTk0MzQsImlhdCI6MTc3MDE5OTQzNCwianRpIjoiZGExNDkzYjgtMjUxOC00M2ZjLWJmNzYtYmNkODZkMDcxZDIzIiwiaXNzIjoiaHR0cHM6Ly9sb2dpbi5pbnBvc3QucGwvYXV0aC9yZWFsbXMvZXh0ZXJuYWwiLCJzdWIiOiJmOjEyNDc1MDUxLTFjMDMtNGU1OS1iYTBjLTJiNDU2OTVlZjUzNTp3V2VfRW1yNU9XYmpRbnpuMmxSOU5Ubk5ncF9CWDZxaGZDWG5uQ1dyNko0IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoic2hpcHgiLCJzZXNzaW9uX3N0YXRlIjoiZGMyNGJkYjYtZmRlOC00YWQ1LTgyNDMtNmI4OWIwYzBlMzJmIiwic2NvcGUiOiJvcGVuaWQgYXBpOmFwaXBvaW50cyIsInNpZCI6ImRjMjRiZGI2LWZkZTgtNGFkNS04MjQzLTZiODliMGMwZTMyZiIsImFsbG93ZWRfcmVmZXJyZXJzIjoiIiwidXVpZCI6ImI3OTNjZTJhLThiZTItNDNhYS1iNjMzLTNkYjA1ZWE4MTRkYiJ9.HDBqjOx5BX_yeT4MYgWD-urqzFdPNiaC9cJq9vMdUjZUukuJlEF4D64Qhg5qj7UnJx91vuqL6i5clMe7Ecd-Mrc34m49Eec_OlJ9RKckz-CGiTty13jlZKEyTLqNRKdBrt19L0rGihotOW_eTWZ8DrhMxR-_Y0xpxk7mMJEQ-TWRoNnKB6xuYznaBQRaRhhJKzC-NWv2U4FFNrNQkKo4eu4HnHmpGKOkLoAxyB6RQwF7_s-NxqJgh17-uK0syS86VnwD8As3bNji6VQ_vqN78yXYc1-2WIiP1UonnK661_JlR0OV8tCnUAopRXo4B4yJDjRqJkyAjTLG1h23dfzm5w'
+
+const ease = [0.22, 1, 0.36, 1] as const
+
+const API_URL = 'http://localhost:3001/api'
+
+type DeliveryMethod = 'courier' | 'parcel-locker'
+
+interface CheckoutPageProps {
+  items: CartItem[]
+  onBack: () => void
+  onOrderComplete: (orderNumber: string) => void
+}
+
+interface ShippingAddress {
+  firstName: string
+  lastName: string
+  street: string
+  city: string
+  postalCode: string
+  country: string
+  phone: string
+  email: string
+  parcelLockerCode?: string
+  parcelLockerAddress?: string
+}
+
+interface FormErrors {
+  [key: string]: string
+}
+
+export function CheckoutPage({ items, onBack, onOrderComplete }: CheckoutPageProps) {
+  const [step, setStep] = useState<'shipping' | 'payment' | 'processing'>('shipping')
+  const [isLoading, setIsLoading] = useState(false)
+  const [errors, setErrors] = useState<FormErrors>({})
+  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>('courier')
+  const [shippingData, setShippingData] = useState<ShippingAddress>({
+    firstName: '',
+    lastName: '',
+    street: '',
+    city: '',
+    postalCode: '',
+    country: 'Polska',
+    phone: '',
+    email: '',
+    parcelLockerCode: '',
+    parcelLockerAddress: '',
+  })
+
+  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const shippingCost = 19.90
+  const shipping = subtotal > 300 ? 0 : shippingCost
+  const [showGeoWidget, setShowGeoWidget] = useState(false)
+  const [geoWidgetLoaded, setGeoWidgetLoaded] = useState(false)
+  const geoWidgetRef = useRef<HTMLElement | null>(null)
+  const total = subtotal + shipping
+  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
+
+  // Ładowanie skryptu InPost GeoWidget
+  useEffect(() => {
+    if (geoWidgetLoaded) return
+
+    // Sprawdź czy już załadowany
+    if (document.querySelector('script[src*="inpost-geowidget.js"]')) {
+      setGeoWidgetLoaded(true)
+      return
+    }
+
+    // Dodaj CSS
+    const cssLink = document.createElement('link')
+    cssLink.rel = 'stylesheet'
+    cssLink.href = 'https://geowidget.inpost.pl/inpost-geowidget.css'
+    document.head.appendChild(cssLink)
+
+    // Dodaj skrypt
+    const script = document.createElement('script')
+    script.src = 'https://geowidget.inpost.pl/inpost-geowidget.js'
+    script.defer = true
+    
+    script.onload = () => {
+      setGeoWidgetLoaded(true)
+    }
+    
+    document.body.appendChild(script)
+  }, [geoWidgetLoaded])
+
+  // Obsługa eventu wyboru punktu z GeoWidget
+  useEffect(() => {
+    const handleInPostPointSelect = (event: CustomEvent) => {
+      const point = event.detail
+      if (point) {
+        setShippingData(prev => ({
+          ...prev,
+          parcelLockerCode: point.name,
+          parcelLockerAddress: point.address?.line1 
+            ? `${point.address.line1}${point.address.line2 ? ', ' + point.address.line2 : ''}`
+            : point.address_details?.city || ''
+        }))
+        setShowGeoWidget(false)
+        // Wyczyść błąd
+        setErrors(prev => ({ ...prev, parcelLockerCode: '' }))
+      }
+    }
+
+    // Nasłuchuj na event wyboru punktu
+    document.addEventListener('onpointselect', handleInPostPointSelect as EventListener)
+
+    return () => {
+      document.removeEventListener('onpointselect', handleInPostPointSelect as EventListener)
+    }
+  }, [])
+
+  const validateShippingForm = (): boolean => {
+    const newErrors: FormErrors = {}
+
+    if (!shippingData.firstName || shippingData.firstName.length < 2) {
+      newErrors.firstName = 'Imię musi mieć minimum 2 znaki'
+    }
+    if (!shippingData.lastName || shippingData.lastName.length < 2) {
+      newErrors.lastName = 'Nazwisko musi mieć minimum 2 znaki'
+    }
+    if (!shippingData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(shippingData.email)) {
+      newErrors.email = 'Podaj prawidłowy adres email'
+    }
+    if (!shippingData.phone || shippingData.phone.length < 9) {
+      newErrors.phone = 'Podaj numer telefonu'
+    }
+
+    // Walidacja zależna od metody dostawy
+    if (deliveryMethod === 'courier') {
+      if (!shippingData.street || shippingData.street.length < 3) {
+        newErrors.street = 'Podaj pełny adres'
+      }
+      if (!shippingData.city || shippingData.city.length < 2) {
+        newErrors.city = 'Podaj miasto'
+      }
+      if (!shippingData.postalCode || !/^\d{2}-\d{3}$/.test(shippingData.postalCode)) {
+        newErrors.postalCode = 'Format: XX-XXX'
+      }
+    } else {
+      // Paczkomat
+      if (!shippingData.parcelLockerCode || shippingData.parcelLockerCode.length < 3) {
+        newErrors.parcelLockerCode = 'Podaj kod paczkomatu'
+      }
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    
+    // Format postal code
+    if (name === 'postalCode') {
+      let formatted = value.replace(/\D/g, '')
+      if (formatted.length > 2) {
+        formatted = formatted.slice(0, 2) + '-' + formatted.slice(2, 5)
+      }
+      setShippingData(prev => ({ ...prev, [name]: formatted }))
+    } else {
+      setShippingData(prev => ({ ...prev, [name]: value }))
+    }
+
+    // Clear error on change
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }))
+    }
+  }
+
+  const handleContinueToPayment = () => {
+    if (validateShippingForm()) {
+      setStep('payment')
+    }
+  }
+
+  const handlePayment = async () => {
+    setIsLoading(true)
+    setStep('processing')
+
+    try {
+      // 1. Sync cart with backend first
+      const sessionId = localStorage.getItem('sessionId') || crypto.randomUUID()
+      localStorage.setItem('sessionId', sessionId)
+
+      // Synchronizuj cały koszyk za jednym razem
+      const syncResponse = await fetch(`${API_URL}/cart/sync`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Session-ID': sessionId,
+        },
+        body: JSON.stringify({
+          items: items.map(item => ({
+            productId: item.id,
+            quantity: item.quantity,
+          })),
+        }),
+      })
+
+      if (!syncResponse.ok) {
+        const errorData = await syncResponse.json()
+        throw new Error(errorData.error || 'Błąd synchronizacji koszyka')
+      }
+
+      // 2. Create order
+      const orderResponse = await fetch(`${API_URL}/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Session-ID': sessionId,
+        },
+        body: JSON.stringify({
+          email: shippingData.email,
+          shippingAddress: {
+            firstName: shippingData.firstName,
+            lastName: shippingData.lastName,
+            street: deliveryMethod === 'courier' ? shippingData.street : `Paczkomat: ${shippingData.parcelLockerCode}`,
+            city: deliveryMethod === 'courier' ? shippingData.city : shippingData.parcelLockerAddress?.split(',')[0] || '',
+            postalCode: deliveryMethod === 'courier' ? shippingData.postalCode : '00-000',
+            country: shippingData.country,
+            phone: shippingData.phone,
+          },
+          deliveryMethod: deliveryMethod,
+          parcelLockerCode: deliveryMethod === 'parcel-locker' ? shippingData.parcelLockerCode : undefined,
+        }),
+      })
+
+      if (!orderResponse.ok) {
+        const errorData = await orderResponse.json()
+        throw new Error(errorData.error || 'Błąd tworzenia zamówienia')
+      }
+
+      const orderData = await orderResponse.json()
+
+      // 3. Create PayU payment
+      const payuResponse = await fetch(`${API_URL}/payu/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Session-ID': sessionId,
+        },
+        body: JSON.stringify({
+          orderId: orderData.order.id,
+        }),
+      })
+
+      if (!payuResponse.ok) {
+        const errorData = await payuResponse.json()
+        throw new Error(errorData.error || 'Błąd połączenia z PayU')
+      }
+
+      const payuData = await payuResponse.json()
+
+      // 4. Redirect to PayU
+      if (payuData.redirectUrl) {
+        window.location.href = payuData.redirectUrl
+      } else {
+        throw new Error('Brak URL do płatności')
+      }
+
+    } catch (error) {
+      console.error('Payment error:', error)
+      setIsLoading(false)
+      setStep('payment')
+      setErrors({ 
+        payment: error instanceof Error ? error.message : 'Wystąpił błąd podczas płatności. Spróbuj ponownie.'
+      })
+    }
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5, ease }}
+      className="min-h-screen pt-24 pb-32"
+    >
+      <div className="container mx-auto px-4 max-w-6xl">
+        {/* Back button */}
+        <motion.button
+          onClick={onBack}
+          className="inline-flex items-center gap-2 text-white/60 hover:text-brand-gold transition-colors duration-300 mb-8 group cursor-pointer"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, ease }}
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300" />
+          <span className="font-[family-name:var(--font-body)] text-xs uppercase tracking-widest">Wróć do koszyka</span>
+        </motion.button>
+
+        {/* Header */}
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease }}
+        >
+          <h1 className="font-[family-name:var(--font-heading)] font-bold text-3xl md:text-4xl text-white uppercase tracking-tight mb-2">
+            Checkout
+          </h1>
+        </motion.div>
+
+        {/* Progress steps */}
+        <motion.div
+          className="flex items-center justify-center mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease, delay: 0.1 }}
+        >
+          <div className="flex items-center gap-4">
+            <div className={`flex items-center gap-2 ${step === 'shipping' ? 'text-brand-gold' : 'text-white/60'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'shipping' ? 'bg-brand-gold text-black' : step === 'payment' || step === 'processing' ? 'bg-green-500 text-white' : 'bg-white/10 text-white/60'}`}>
+                {step !== 'shipping' ? <CheckCircle className="w-4 h-4" /> : '1'}
+              </div>
+              <span className="text-sm font-[family-name:var(--font-body)] uppercase tracking-wider hidden md:block">Dostawa</span>
+            </div>
+            
+            <div className={`w-16 h-px ${step !== 'shipping' ? 'bg-brand-gold' : 'bg-white/20'}`} />
+            
+            <div className={`flex items-center gap-2 ${step === 'payment' || step === 'processing' ? 'text-brand-gold' : 'text-white/40'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'payment' ? 'bg-brand-gold text-black' : step === 'processing' ? 'bg-green-500 text-white' : 'bg-white/10 text-white/40'}`}>
+                {step === 'processing' ? <CheckCircle className="w-4 h-4" /> : '2'}
+              </div>
+              <span className="text-sm font-[family-name:var(--font-body)] uppercase tracking-wider hidden md:block">Płatność</span>
+            </div>
+          </div>
+        </motion.div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+          {/* Form */}
+          <div className="lg:col-span-2">
+            {step === 'shipping' && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, ease }}
+                className="space-y-6"
+              >
+                {/* Wybór metody dostawy */}
+                <div className="bg-white/[0.02] border border-white/10 p-6 md:p-8">
+                  <h2 className="font-[family-name:var(--font-heading)] font-bold text-lg text-white uppercase tracking-wide mb-6 flex items-center gap-3">
+                    <Truck className="w-5 h-5 text-brand-gold" />
+                    Metoda dostawy
+                  </h2>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Kurier */}
+                    <button
+                      type="button"
+                      onClick={() => setDeliveryMethod('courier')}
+                      className={`p-4 border-2 transition-all duration-300 text-left ${
+                        deliveryMethod === 'courier'
+                          ? 'border-brand-gold bg-brand-gold/10'
+                          : 'border-white/10 hover:border-white/30'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <Truck className={`w-6 h-6 ${deliveryMethod === 'courier' ? 'text-brand-gold' : 'text-white/60'}`} />
+                        <span className="font-[family-name:var(--font-heading)] font-bold text-white">Kurier</span>
+                      </div>
+                      <p className="text-white/60 text-sm font-[family-name:var(--font-body)]">
+                        Dostawa pod wskazany adres
+                      </p>
+                      <p className="text-brand-gold font-bold mt-2">
+                        {subtotal > 300 ? 'GRATIS' : '19,90 PLN'}
+                      </p>
+                    </button>
+
+                    {/* Paczkomat */}
+                    <button
+                      type="button"
+                      onClick={() => setDeliveryMethod('parcel-locker')}
+                      className={`p-4 border-2 transition-all duration-300 text-left ${
+                        deliveryMethod === 'parcel-locker'
+                          ? 'border-brand-gold bg-brand-gold/10'
+                          : 'border-white/10 hover:border-white/30'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <Package className={`w-6 h-6 ${deliveryMethod === 'parcel-locker' ? 'text-brand-gold' : 'text-white/60'}`} />
+                        <span className="font-[family-name:var(--font-heading)] font-bold text-white">Paczkomat InPost</span>
+                      </div>
+                      <p className="text-white/60 text-sm font-[family-name:var(--font-body)]">
+                        Odbiór w paczkomacie 24/7
+                      </p>
+                      <p className="text-brand-gold font-bold mt-2">
+                        {subtotal > 300 ? 'GRATIS' : '19,90 PLN'}
+                      </p>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Dane kontaktowe */}
+                <div className="bg-white/[0.02] border border-white/10 p-6 md:p-8">
+                  <h2 className="font-[family-name:var(--font-heading)] font-bold text-lg text-white uppercase tracking-wide mb-6 flex items-center gap-3">
+                    <MapPin className="w-5 h-5 text-brand-gold" />
+                    {deliveryMethod === 'courier' ? 'Adres dostawy' : 'Dane odbiorcy'}
+                  </h2>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                      Imię *
+                    </label>
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={shippingData.firstName}
+                      onChange={handleInputChange}
+                      className={`checkout-input ${errors.firstName ? 'border-red-500' : ''}`}
+                      placeholder="Jan"
+                    />
+                    {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                      Nazwisko *
+                    </label>
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={shippingData.lastName}
+                      onChange={handleInputChange}
+                      className={`checkout-input ${errors.lastName ? 'border-red-500' : ''}`}
+                      placeholder="Kowalski"
+                    />
+                    {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                      Email *
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={shippingData.email}
+                      onChange={handleInputChange}
+                      className={`checkout-input ${errors.email ? 'border-red-500' : ''}`}
+                      placeholder="jan@example.com"
+                    />
+                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                      Telefon *
+                    </label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={shippingData.phone}
+                      onChange={handleInputChange}
+                      className={`checkout-input ${errors.phone ? 'border-red-500' : ''}`}
+                      placeholder="+48 123 456 789"
+                    />
+                    {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                  </div>
+
+                  {/* Pola dla kuriera */}
+                  {deliveryMethod === 'courier' && (
+                    <>
+                      <div className="md:col-span-2">
+                        <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                          Adres *
+                        </label>
+                        <input
+                          type="text"
+                          name="street"
+                          value={shippingData.street}
+                          onChange={handleInputChange}
+                          className={`checkout-input ${errors.street ? 'border-red-500' : ''}`}
+                          placeholder="ul. Przykładowa 10/5"
+                        />
+                        {errors.street && <p className="text-red-500 text-xs mt-1">{errors.street}</p>}
+                      </div>
+
+                      <div>
+                        <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                          Miasto *
+                        </label>
+                        <input
+                          type="text"
+                          name="city"
+                          value={shippingData.city}
+                          onChange={handleInputChange}
+                          className={`checkout-input ${errors.city ? 'border-red-500' : ''}`}
+                          placeholder="Warszawa"
+                        />
+                        {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
+                      </div>
+
+                      <div>
+                        <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                          Kod pocztowy *
+                        </label>
+                        <input
+                          type="text"
+                          name="postalCode"
+                          value={shippingData.postalCode}
+                          onChange={handleInputChange}
+                          className={`checkout-input ${errors.postalCode ? 'border-red-500' : ''}`}
+                          placeholder="00-000"
+                          maxLength={6}
+                        />
+                        {errors.postalCode && <p className="text-red-500 text-xs mt-1">{errors.postalCode}</p>}
+                      </div>
+                    </>
+                  )}
+
+                  {/* Pola dla paczkomatu */}
+                  {deliveryMethod === 'parcel-locker' && (
+                    <div className="md:col-span-2">
+                      <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                        Paczkomat InPost *
+                      </label>
+                      
+                      {/* Wybrany paczkomat lub przycisk wyboru */}
+                      {shippingData.parcelLockerCode ? (
+                        <div className="p-4 border-2 border-brand-gold bg-brand-gold/10">
+                          <div className="flex items-start justify-between gap-4">
+                            <div>
+                              <p className="text-white font-[family-name:var(--font-heading)] font-bold text-lg">
+                                {shippingData.parcelLockerCode}
+                              </p>
+                              {shippingData.parcelLockerAddress && (
+                                <p className="text-white/60 text-sm font-[family-name:var(--font-body)] mt-1">
+                                  {shippingData.parcelLockerAddress}
+                                </p>
+                              )}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setShowGeoWidget(true)}
+                              className="text-brand-gold text-sm hover:underline whitespace-nowrap"
+                            >
+                              Zmień
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setShowGeoWidget(true)}
+                          className="w-full p-4 border-2 border-dashed border-white/20 hover:border-brand-gold/50 transition-colors flex items-center justify-center gap-3 text-white/60 hover:text-white"
+                        >
+                          <Search className="w-5 h-5" />
+                          <span className="font-[family-name:var(--font-body)]">Wybierz paczkomat na mapie</span>
+                        </button>
+                      )}
+                      {errors.parcelLockerCode && <p className="text-red-500 text-xs mt-2">{errors.parcelLockerCode}</p>}
+                    </div>
+                  )}
+                </div>
+                </div>
+
+                <button
+                  onClick={handleContinueToPayment}
+                  className="btn-primary btn-full mt-8"
+                >
+                  Kontynuuj do płatności
+                </button>
+
+                {/* Modal z InPost GeoWidget */}
+                {showGeoWidget && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      className="relative w-full max-w-5xl h-[85vh] bg-white overflow-hidden rounded-lg"
+                    >
+                      {/* Header */}
+                      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-[#FFCD00]">
+                        <h3 className="font-[family-name:var(--font-heading)] font-bold text-lg text-black uppercase">
+                          Wybierz paczkomat InPost
+                        </h3>
+                        <button
+                          onClick={() => setShowGeoWidget(false)}
+                          className="text-black/60 hover:text-black transition-colors text-2xl leading-none font-bold"
+                        >
+                          ×
+                        </button>
+                      </div>
+                      
+                      {/* GeoWidget Container - używamy ref do dynamicznego tworzenia custom element */}
+                      <div 
+                        className="w-full h-[calc(100%-60px)]"
+                        ref={(container) => {
+                          if (container && geoWidgetLoaded) {
+                            // Sprawdź czy widget już istnieje
+                            if (!container.querySelector('inpost-geowidget')) {
+                              const widget = document.createElement('inpost-geowidget');
+                              widget.setAttribute('onpoint', 'onpointselect');
+                              widget.setAttribute('token', INPOST_GEOWIDGET_TOKEN);
+                              widget.setAttribute('language', 'pl');
+                              widget.setAttribute('config', 'parcelCollect');
+                              widget.style.width = '100%';
+                              widget.style.height = '100%';
+                              widget.style.display = 'block';
+                              container.appendChild(widget);
+                            }
+                          }
+                        }}
+                      >
+                        {!geoWidgetLoaded && (
+                          <div className="flex items-center justify-center h-full bg-gray-100">
+                            <div className="text-center">
+                              <Loader2 className="w-8 h-8 text-[#FFCD00] animate-spin mx-auto mb-4" />
+                              <p className="text-gray-600 font-[family-name:var(--font-body)]">
+                                Ładowanie mapy InPost...
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {step === 'payment' && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, ease }}
+                className="bg-white/[0.02] border border-white/10 p-6 md:p-8"
+              >
+                <h2 className="font-[family-name:var(--font-heading)] font-bold text-lg text-white uppercase tracking-wide mb-6 flex items-center gap-3">
+                  <CreditCard className="w-5 h-5 text-brand-gold" />
+                  Metoda płatności
+                </h2>
+
+                {errors.payment && (
+                  <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-4 mb-6 text-sm">
+                    {errors.payment}
+                  </div>
+                )}
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4 p-4 border border-brand-gold bg-brand-gold/10 rounded-lg">
+                    <input type="radio" name="payment" checked readOnly className="accent-brand-gold" />
+                    <div className="flex-1">
+                      <p className="text-white font-[family-name:var(--font-heading)] font-bold">PayU</p>
+                      <p className="text-white/60 text-sm font-[family-name:var(--font-body)]">
+                        Karta płatnicza, BLIK, przelew
+                      </p>
+                    </div>
+                    <img 
+                      src="https://static.payu.com/sites/all/files/payu_logo_2.png" 
+                      alt="PayU" 
+                      className="h-8 object-contain"
+                    />
+                  </div>
+                </div>
+
+                {/* Shipping summary */}
+                <div className="mt-8 pt-6 border-t border-white/10">
+                  <h3 className="text-sm text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-3">
+                    {deliveryMethod === 'courier' ? 'Adres dostawy (Kurier)' : 'Odbiór w paczkomacie'}
+                  </h3>
+                  <div className="text-white text-sm font-[family-name:var(--font-body)]">
+                    <p className="font-bold">{shippingData.firstName} {shippingData.lastName}</p>
+                    {deliveryMethod === 'courier' ? (
+                      <>
+                        <p>{shippingData.street}</p>
+                        <p>{shippingData.postalCode} {shippingData.city}</p>
+                      </>
+                    ) : (
+                      <p className="text-brand-gold">Paczkomat: {shippingData.parcelLockerCode}</p>
+                    )}
+                    <p>{shippingData.phone}</p>
+                    <p className="text-white/60">{shippingData.email}</p>
+                  </div>
+                  <button
+                    onClick={() => setStep('shipping')}
+                    className="text-brand-gold text-sm mt-2 hover:underline"
+                  >
+                    Zmień dane
+                  </button>
+                </div>
+
+                <div className="flex gap-4 mt-8">
+                  <button
+                    onClick={() => setStep('shipping')}
+                    className="btn-secondary flex-1"
+                  >
+                    Wróć
+                  </button>
+                  <button
+                    onClick={handlePayment}
+                    disabled={isLoading}
+                    className="btn-primary flex-1 flex items-center justify-center gap-2"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Przetwarzanie...
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="w-4 h-4" />
+                        Zapłać {total.toFixed(2)} PLN
+                      </>
+                    )}
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {step === 'processing' && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, ease }}
+                className="bg-white/[0.02] border border-white/10 p-12 flex flex-col items-center justify-center text-center"
+              >
+                <Loader2 className="w-16 h-16 text-brand-gold animate-spin mb-6" />
+                <h2 className="font-[family-name:var(--font-heading)] font-bold text-xl text-white uppercase tracking-wide mb-2">
+                  Przekierowanie do PayU
+                </h2>
+                <p className="text-white/60 font-[family-name:var(--font-body)]">
+                  Za chwilę zostaniesz przekierowany do bezpiecznej strony płatności...
+                </p>
+              </motion.div>
+            )}
+          </div>
+
+          {/* Order summary */}
+          <motion.div
+            className="lg:col-span-1"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease, delay: 0.2 }}
+          >
+            <div className="sticky top-24 p-6 md:p-8 bg-white/[0.02] border border-white/10">
+              <h2 className="font-[family-name:var(--font-heading)] font-bold text-lg text-white uppercase tracking-wide mb-6">
+                Twoje zamówienie
+              </h2>
+
+              {/* Items */}
+              <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
+                {items.map((item) => (
+                  <div key={item.id + (item.selectedSize || '')} className="flex gap-3">
+                    <div className="w-16 h-16 bg-white/[0.02] flex-shrink-0 overflow-hidden">
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white text-sm font-[family-name:var(--font-heading)] truncate">{item.name}</p>
+                      <p className="text-white/40 text-xs font-[family-name:var(--font-body)]">
+                        {item.quantity} × {item.price.toFixed(2)} PLN
+                        {item.selectedSize && <span> • {item.selectedSize}</span>}
+                      </p>
+                    </div>
+                    <p className="text-brand-gold text-sm font-[family-name:var(--font-heading)] font-bold">
+                      {(item.price * item.quantity).toFixed(2)} PLN
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="border-t border-white/10 pt-4 space-y-3">
+                <div className="flex justify-between text-white/60 font-[family-name:var(--font-body)] text-sm">
+                  <span>Produkty ({itemCount})</span>
+                  <span>{subtotal.toFixed(2)} PLN</span>
+                </div>
+                <div className="flex justify-between text-white/60 font-[family-name:var(--font-body)] text-sm">
+                  <span>{deliveryMethod === 'courier' ? 'Kurier' : 'Paczkomat InPost'}</span>
+                  <span className={shipping === 0 ? 'text-green-500' : ''}>
+                    {shipping === 0 ? 'GRATIS' : `${shipping.toFixed(2)} PLN`}
+                  </span>
+                </div>
+              </div>
+
+              <div className="border-t border-white/10 pt-4 mt-4">
+                <div className="flex justify-between items-baseline">
+                  <span className="font-[family-name:var(--font-heading)] font-bold text-white uppercase">Razem</span>
+                  <span className="font-[family-name:var(--font-heading)] font-bold text-2xl text-brand-gold">
+                    {total.toFixed(2)} PLN
+                  </span>
+                </div>
+              </div>
+
+              {/* Trust badges */}
+              <div className="grid grid-cols-2 gap-4 mt-8 pt-6 border-t border-white/10">
+                <div className="text-center">
+                  <Shield className="w-5 h-5 text-brand-gold mx-auto mb-2" />
+                  <span className="text-[10px] text-white/40 font-[family-name:var(--font-body)] uppercase tracking-wider block">
+                    Bezpieczna płatność
+                  </span>
+                </div>
+                <div className="text-center">
+                  <Lock className="w-5 h-5 text-brand-gold mx-auto mb-2" />
+                  <span className="text-[10px] text-white/40 font-[family-name:var(--font-body)] uppercase tracking-wider block">
+                    Szyfrowane SSL
+                  </span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </motion.div>
+  )
+}

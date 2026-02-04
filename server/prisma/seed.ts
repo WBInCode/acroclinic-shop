@@ -44,10 +44,14 @@ async function main() {
       description: 'Wygodna koszulka bokserka dla dzieci, idealna do treningu akrobatyki.',
       price: 99.99,
       stock: 50,
+      sizes: ['116', '122', '128', '134', '140', '146', 'XS', 'S', 'M', 'L', 'XL', 'XXL'],
       badge: 'NEW',
       isBestseller: true,
       categoryId: clothingCategory?.id,
-      images: [{ url: '/images/Bluzka - 1.png', isMain: true, position: 0 }],
+      images: [
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770194040/Bluzka_-_1_zkenzs.png', isMain: true, position: 0 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770194035/Bluzka_-_2_dp04xv.png', position: 1 }
+      ],
     },
     {
       name: 'T-shirt Dziecięcy',
@@ -55,9 +59,13 @@ async function main() {
       description: 'Oddychający t-shirt dla aktywnych dzieci.',
       price: 89.99,
       stock: 75,
+      sizes: ['116', '122', '128', '134', '140', '146', 'XS', 'S', 'M', 'L', 'XL', 'XXL'],
       isBestseller: true,
       categoryId: clothingCategory?.id,
-      images: [{ url: '/images/T-Shirt - 1.png', isMain: true, position: 0 }],
+      images: [
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770194043/T-Shirt_-_2_bqqboy.png', isMain: true, position: 0 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770194042/T-Shirt_-_1_lf6osl.png', position: 1 }
+      ],
     },
     {
       name: 'Longsleeve Dziecięcy',
@@ -65,8 +73,12 @@ async function main() {
       description: 'Ciepły longsleeve z długim rękawem.',
       price: 99.99,
       stock: 40,
+      sizes: ['116', '122', '128', '134', '140', '146', 'XS', 'S', 'M', 'L', 'XL', 'XXL'],
       categoryId: clothingCategory?.id,
-      images: [{ url: '/images/sweter - 1.png', isMain: true, position: 0 }],
+      images: [
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770194045/sweter_-_1_nrswcw.png', isMain: true, position: 0 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770194041/sweter_-_2_gnc7up.png', position: 1 }
+      ],
     },
     {
       name: 'Spodenki Kolarki',
@@ -74,10 +86,14 @@ async function main() {
       description: 'Elastyczne spodenki kolarki do ćwiczeń.',
       price: 89.99,
       stock: 60,
+      sizes: ['116', '122', '128', '134', '140', '146', 'XS', 'S', 'M', 'L', 'XL', 'XXL'],
       badge: 'NEW',
       isBestseller: true,
       categoryId: clothingCategory?.id,
-      images: [{ url: '/images/spodenki - 1.png', isMain: true, position: 0 }],
+      images: [
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770194039/spodenki_-_1_m2wbhf.png', isMain: true, position: 0 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770194038/spodenki_-_2_xc4ns9.png', position: 1 }
+      ],
     },
     {
       name: 'Top Sportowy',
@@ -85,8 +101,12 @@ async function main() {
       description: 'Lekki top sportowy dla dziewczynek.',
       price: 99.99,
       stock: 45,
+      sizes: ['116', '122', '128', '134', '140', '146', 'XS', 'S', 'M', 'L', 'XL', 'XXL'],
       categoryId: clothingCategory?.id,
-      images: [{ url: '/images/top - 1.png', isMain: true, position: 0 }],
+      images: [
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770194046/top_-_1_xesh5a.png', isMain: true, position: 0 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770194044/top_-_2_uzhoy3.png', position: 1 }
+      ],
     },
     {
       name: 'Legginsy',
@@ -94,10 +114,14 @@ async function main() {
       description: 'Wygodne legginsy do treningu.',
       price: 144.99,
       stock: 55,
+      sizes: ['116', '122', '128', '134', '140', '146', 'XS', 'S', 'M', 'L', 'XL', 'XXL'],
       badge: 'LIMITED',
       isBestseller: true,
       categoryId: clothingCategory?.id,
-      images: [{ url: '/images/legginsy 1.png', isMain: true, position: 0 }],
+      images: [
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770194041/legginsy_1_v4fwac.png', isMain: true, position: 0 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770194037/legginsy_2_iuduhu.png', position: 1 }
+      ],
     },
     {
       name: 'Dresy Jogger Dziecięce',
@@ -105,8 +129,12 @@ async function main() {
       description: 'Wygodne dresy jogger dla dzieci.',
       price: 149.99,
       stock: 35,
+      sizes: ['116', '122', '128', '134', '140', '146', 'XS', 'S', 'M', 'L', 'XL', 'XXL'],
       categoryId: clothingCategory?.id,
-      images: [{ url: '/images/spodnie - 1.png', isMain: true, position: 0 }],
+      images: [
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770194039/spodnie_-_1_vdy1ba.png', isMain: true, position: 0 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770194036/spodnie_-_2_cwsriw.png', position: 1 }
+      ],
     },
     {
       name: 'Bluza Regular Dziecięca',
@@ -114,9 +142,13 @@ async function main() {
       description: 'Klasyczna bluza dla dzieci.',
       price: 159.99,
       stock: 30,
+      sizes: ['116', '122', '128', '134', '140', '146', 'XS', 'S', 'M', 'L', 'XL', 'XXL'],
       badge: 'LIMITED',
       categoryId: clothingCategory?.id,
-      images: [{ url: '/images/Bluza - 1.png', isMain: true, position: 0 }],
+      images: [
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770194034/Bluza_-_2_srgyqk.png', isMain: true, position: 0 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770194034/Bluza_-_1_ekfs6y.png', position: 1 }
+      ],
     },
     // Akcesoria - Gumy
     {
@@ -128,11 +160,11 @@ async function main() {
       badge: 'NEW',
       categoryId: accessoriesCategory?.id,
       images: [
-        { url: '/images/gumy/Fioletowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_1.webp', isMain: true, position: 0 },
-        { url: '/images/gumy/Fioletowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_2.webp', position: 1 },
-        { url: '/images/gumy/Fioletowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_3.webp', position: 2 },
-        { url: '/images/gumy/Fioletowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_4.webp', position: 3 },
-        { url: '/images/gumy/Fioletowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_5.webp', position: 4 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193789/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_1_cfhcxv.webp', isMain: true, position: 0 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193788/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_2_tsabic.webp', position: 1 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193788/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_3_nsbxyh.webp', position: 2 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193790/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_4_tqpwxb.webp', position: 3 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193790/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-fioletowa-415_5_jm22gw.webp', position: 4 },
       ],
     },
     {
@@ -144,11 +176,11 @@ async function main() {
       isBestseller: true,
       categoryId: accessoriesCategory?.id,
       images: [
-        { url: '/images/gumy/Rózowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_1.webp', isMain: true, position: 0 },
-        { url: '/images/gumy/Rózowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_2.webp', position: 1 },
-        { url: '/images/gumy/Rózowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_3.webp', position: 2 },
-        { url: '/images/gumy/Rózowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_4.webp', position: 3 },
-        { url: '/images/gumy/Rózowa/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_6.webp', position: 4 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193791/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_1_aqtera.webp', isMain: true, position: 0 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193789/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_2_vrbwty.webp', position: 1 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193791/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_3_qfurmx.webp', position: 2 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193792/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_4_ok0sjs.webp', position: 3 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193792/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-rozowa-416_6_ruugdo.webp', position: 4 },
       ],
     },
     {
@@ -159,11 +191,11 @@ async function main() {
       stock: 90,
       categoryId: accessoriesCategory?.id,
       images: [
-        { url: '/images/gumy/Zielona/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_1.webp', isMain: true, position: 0 },
-        { url: '/images/gumy/Zielona/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_2.webp', position: 1 },
-        { url: '/images/gumy/Zielona/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_4.webp', position: 2 },
-        { url: '/images/gumy/Zielona/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_5.webp', position: 3 },
-        { url: '/images/gumy/Zielona/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_6.webp', position: 4 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193793/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_1_itsnhe.webp', isMain: true, position: 0 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193792/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_2_tqcu0g.webp', position: 1 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193794/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_4_lrrjwo.webp', position: 2 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193794/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_5_waqjva.webp', position: 3 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193794/pol_pl_Tasma-gimnastyczna-do-rozciagania-90-cm-zielona-414_6_lvj6hv.webp', position: 4 },
       ],
     },
     // Akcesoria - Kostki
@@ -175,10 +207,10 @@ async function main() {
       stock: 120,
       categoryId: accessoriesCategory?.id,
       images: [
-        { url: '/images/kostki/Czarna/pol_pl_Kostka-piankowa-do-jogi-czarna-74_1.webp', isMain: true, position: 0 },
-        { url: '/images/kostki/Czarna/pol_pl_Kostka-piankowa-do-jogi-czarna-74_2.webp', position: 1 },
-        { url: '/images/kostki/Czarna/pol_pl_Kostka-piankowa-do-jogi-czarna-74_5.webp', position: 2 },
-        { url: '/images/kostki/Czarna/pol_pm_Kostka-piankowa-do-jogi-czarna-74_8.webp', position: 3 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193798/pol_pl_Kostka-piankowa-do-jogi-czarna-74_1_k6lzl2.webp', isMain: true, position: 0 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193798/pol_pl_Kostka-piankowa-do-jogi-czarna-74_2_exdo8m.webp', position: 1 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193800/pol_pl_Kostka-piankowa-do-jogi-czarna-74_5_gjdxw3.webp', position: 2 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193797/pol_pm_Kostka-piankowa-do-jogi-czarna-74_8_srsrzd.webp', position: 3 },
       ],
     },
     {
@@ -190,10 +222,10 @@ async function main() {
       isBestseller: true,
       categoryId: accessoriesCategory?.id,
       images: [
-        { url: '/images/kostki/Niebieska/pol_pl_Kostka-piankowa-do-jogi-niebieska-73_1.webp', isMain: true, position: 0 },
-        { url: '/images/kostki/Niebieska/pol_pl_Kostka-piankowa-do-jogi-niebieska-73_2.webp', position: 1 },
-        { url: '/images/kostki/Niebieska/pol_pl_Kostka-piankowa-do-jogi-niebieska-73_9.webp', position: 2 },
-        { url: '/images/kostki/Niebieska/pol_pl_Kostka-piankowa-do-jogi-niebieska-73_10.webp', position: 3 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193798/pol_pl_Kostka-piankowa-do-jogi-niebieska-73_1_vwqpxj.webp', isMain: true, position: 0 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193801/pol_pl_Kostka-piankowa-do-jogi-niebieska-73_2_zojxrv.webp', position: 1 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193800/pol_pl_Kostka-piankowa-do-jogi-niebieska-73_9_fgfj5d.webp', position: 2 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193802/pol_pl_Kostka-piankowa-do-jogi-niebieska-73_10_ahjwhq.webp', position: 3 },
       ],
     },
     {
@@ -205,10 +237,10 @@ async function main() {
       badge: 'NEW',
       categoryId: accessoriesCategory?.id,
       images: [
-        { url: '/images/kostki/Różowa/pol_pl_Kostka-piankowa-do-jogi-rozowa-290_1.webp', isMain: true, position: 0 },
-        { url: '/images/kostki/Różowa/pol_pl_Kostka-piankowa-do-jogi-rozowa-290_2.webp', position: 1 },
-        { url: '/images/kostki/Różowa/pol_pl_Kostka-piankowa-do-jogi-rozowa-290_4.webp', position: 2 },
-        { url: '/images/kostki/Różowa/pol_pl_Kostka-piankowa-do-jogi-rozowa-290_6.webp', position: 3 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193802/pol_pl_Kostka-piankowa-do-jogi-rozowa-290_1_yg8bde.webp', isMain: true, position: 0 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193802/pol_pl_Kostka-piankowa-do-jogi-rozowa-290_2_mo2s4c.webp', position: 1 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193803/pol_pl_Kostka-piankowa-do-jogi-rozowa-290_4_mpx1lf.webp', position: 2 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193803/pol_pl_Kostka-piankowa-do-jogi-rozowa-290_6_thajhh.webp', position: 3 },
       ],
     },
     {
@@ -219,10 +251,10 @@ async function main() {
       stock: 70,
       categoryId: accessoriesCategory?.id,
       images: [
-        { url: '/images/kostki/Szara/pol_pl_Kostka-piankowa-do-jogi-szara-291_1.webp', isMain: true, position: 0 },
-        { url: '/images/kostki/Szara/pol_pl_Kostka-piankowa-do-jogi-szara-291_2.webp', position: 1 },
-        { url: '/images/kostki/Szara/pol_pl_Kostka-piankowa-do-jogi-szara-291_5.webp', position: 2 },
-        { url: '/images/kostki/Szara/pol_pl_Kostka-piankowa-do-jogi-szara-291_8.webp', position: 3 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193804/pol_pl_Kostka-piankowa-do-jogi-szara-291_1_igjvsv.webp', isMain: true, position: 0 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193805/pol_pl_Kostka-piankowa-do-jogi-szara-291_2_po89uk.webp', position: 1 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193805/pol_pl_Kostka-piankowa-do-jogi-szara-291_5_bsof0u.webp', position: 2 },
+        { url: 'https://res.cloudinary.com/dpseab5qy/image/upload/v1770193806/pol_pl_Kostka-piankowa-do-jogi-szara-291_8_ne9kzi.webp', position: 3 },
       ],
     },
   ];

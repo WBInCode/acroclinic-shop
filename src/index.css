@@ -308,3 +308,77 @@
     padding: 1rem 2.5rem;
   }
 }
+
+/* ========================================
+   CHECKOUT INPUT STYLES
+   ======================================== */
+
+.checkout-input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.02);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.checkout-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.checkout-input:focus {
+  border-color: #d4af37;
+  background: rgba(212, 175, 55, 0.02);
+}
+
+.checkout-input:hover:not(:focus) {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.checkout-input.border-red-500 {
+  border-color: rgb(239 68 68);
+}
+
+.checkout-input.border-red-500:focus {
+  border-color: rgb(239 68 68);
+  background: rgba(239, 68, 68, 0.02);
+}
+
+/* ========================================
+   INPOST GEOWIDGET CUSTOM STYLES
+   ======================================== */
+
+#inpost-geowidget {
+  background: #1a1a1a;
+}
+
+/* Dostosowanie kolorów wyszukiwarki */
+#inpost-geowidget .inpost-search {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+#inpost-geowidget .inpost-search input {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+#inpost-geowidget .inpost-search input::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Przycisk potwierdzenia */
+#inpost-geowidget .btn-primary,
+#inpost-geowidget .inpost-btn {
+  background: #d4af37 !important;
+  color: #000 !important;
+  border: none !important;
+}
+
+#inpost-geowidget .btn-primary:hover,
+#inpost-geowidget .inpost-btn:hover {
+  background: #c9a227 !important;
+}

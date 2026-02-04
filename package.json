@@ -5,8 +5,10 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
+        "dev:admin": "vite --config vite.admin.config.ts",
         "kill": "fuser -k 5000/tcp",
         "build": "tsc -b --noCheck && vite build",
+        "build:admin": "tsc -b --noCheck && vite build --config vite.admin.config.ts",
         "lint": "eslint .",
         "optimize": "vite optimize",
         "preview": "vite preview"
@@ -76,10 +78,11 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.21.0",
-        "@tailwindcss/postcss": "^4.1.8",
+        "@tailwindcss/postcss": "^4.1.18",
         "@types/react": "^19.0.10",
         "@types/react-dom": "^19.0.4",
         "@vitejs/plugin-react-swc": "^4.2.2",
+        "autoprefixer": "^10.4.24",
         "eslint": "^9.28.0",
         "eslint-plugin-react-hooks": "^5.2.0",
         "eslint-plugin-react-refresh": "^0.4.19",

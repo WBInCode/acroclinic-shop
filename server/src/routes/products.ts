@@ -73,6 +73,8 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
         name: p.name,
         slug: p.slug,
         description: p.description,
+        features: p.features || [],
+        materials: p.materials,
         price: Number(p.price),
         comparePrice: p.comparePrice ? Number(p.comparePrice) : null,
         stock: p.stock,

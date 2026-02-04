@@ -7,17 +7,22 @@ const ease = [0.22, 1, 0.36, 1] as const
 
 export interface CartItem extends Product {
   quantity: number
+  selectedSize?: string
 }
 
 interface CartPageProps {
   items: CartItem[]
   onContinueShopping: () => void
-  onUpdateQuantity: (productId: string, quantity: number) => void
-  onRemoveItem: (productId: string) => void
+  onUpdateQuantity: (itemKey: string, quantity: number) => void
+  onRemoveItem: (itemKey: string) => void
   onClearCart: () => void
+  onCheckout?: () => void
 }
 
-export function CartPage({ items, onContinueShopping, onUpdateQuantity, onRemoveItem, onClearCart }: CartPageProps) {
+// Helper do generowania unikalnego klucza
+const getItemKey = (item: CartItem) => item.selectedSize ? `${item.id}-${item.selectedSize}` : item.id
+
+export function CartPage({ items, onContinueShopping, onUpdateQuantity, onRemoveItem, onClearCart, onCheckout }: CartPageProps) {
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const shipping = subtotal > 300 ? 0 : 19.99
   const total = subtotal + shipping
@@ -86,9 +91,11 @@ export function CartPage({ items, onContinueShopping, onUpdateQuantity, onRemove
             {/* Cart items */}
             <div className="lg:col-span-2 space-y-4">
               <AnimatePresence mode="popLayout">
-                {items.map((item, index) => (
+                {items.map((item, index) => {
+                  const itemKey = getItemKey(item)
+                  return (
                   <motion.div
-                    key={item.id}
+                    key={itemKey}
                     layout
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -114,10 +121,11 @@ export function CartPage({ items, onContinueShopping, onUpdateQuantity, onRemove
                           </h3>
                           <p className="text-xs text-white/40 font-[family-name:var(--font-body)] uppercase tracking-wider mt-1">
                             {item.category === 'clothing' ? 'Odzież' : 'Akcesoria'}
+                            {item.selectedSize && <span className="ml-2">• Rozmiar: <span className="text-brand-gold">{item.selectedSize}</span></span>}
                           </p>
                         </div>
                         <button
-                          onClick={() => onRemoveItem(item.id)}
+                          onClick={() => onRemoveItem(itemKey)}
                           className="text-white/40 hover:text-red-500 transition-colors p-2"
                           aria-label="Usuń"
                         >
@@ -129,7 +137,7 @@ export function CartPage({ items, onContinueShopping, onUpdateQuantity, onRemove
                         {/* Quantity controls */}
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                            onClick={() => onUpdateQuantity(itemKey, Math.max(1, item.quantity - 1))}
                             className="btn-qty w-8 h-8 text-sm"
                             disabled={item.quantity <= 1}
                           >
@@ -139,7 +147,7 @@ export function CartPage({ items, onContinueShopping, onUpdateQuantity, onRemove
                             {item.quantity}
                           </span>
                           <button
-                            onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                            onClick={() => onUpdateQuantity(itemKey, item.quantity + 1)}
                             className="btn-qty w-8 h-8 text-sm"
                           >
                             <Plus className="w-3 h-3" />
@@ -153,7 +161,8 @@ export function CartPage({ items, onContinueShopping, onUpdateQuantity, onRemove
                       </div>
                     </div>
                   </motion.div>
-                ))}
+                  )
+                })}
               </AnimatePresence>
 
               {/* Clear cart */}
@@ -208,7 +217,11 @@ export function CartPage({ items, onContinueShopping, onUpdateQuantity, onRemove
                   </div>
                 </div>
 
-                <button className="btn-primary btn-full mb-4">
+                <button 
+                  onClick={onCheckout}
+                  disabled={items.length === 0}
+                  className="btn-primary btn-full mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                   <CreditCard className="w-4 h-4" />
                   Przejdź do płatności
                 </button>

@@ -1,7 +1,9 @@
 import { ShoppingCart, Heart } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 
 export interface Product {
   id: string
@@ -10,6 +12,9 @@ export interface Product {
   image: string
   images?: string[] // Galeria zdjęć produktu
   sizes?: string[] // Dostępne rozmiary
+  description?: string // Opis produktu
+  features?: string[] // Cechy produktu
+  materials?: string // Skład materiałowy
   badge?: 'NEW' | 'LIMITED'
   category: 'clothing' | 'accessories'
   isBestseller?: boolean
@@ -17,7 +22,7 @@ export interface Product {
 
 interface ProductCardProps {
   product: Product
-  onAddToCart: (product: Product) => void
+  onAddToCart: (product: Product, selectedSize?: string, quantity?: number) => void
   onProductClick?: (product: Product) => void
   onToggleWishlist?: (product: Product) => void
   isInWishlist?: boolean
@@ -29,10 +34,33 @@ const ease = [0.22, 1, 0.36, 1] as const
 
 export function ProductCard({ product, onAddToCart, onProductClick, onToggleWishlist, isInWishlist = false, index = 0 }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false)
+  const [showSizeModal, setShowSizeModal] = useState(false)
+  const [selectedSize, setSelectedSize] = useState<string>('')
+  const [quantity, setQuantity] = useState(1)
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation()
-    onAddToCart(product)
+    
+    // Jeśli produkt jest odzieżą i ma rozmiary, pokaż modal
+    if (product.category === 'clothing' && product.sizes && product.sizes.length > 0) {
+      setShowSizeModal(true)
+      setSelectedSize(product.sizes[0] || '')
+      setQuantity(1)
+    } else {
+      // Dla akcesoriów dodaj od razu
+      onAddToCart(product, undefined, 1)
+    }
+  }
+
+  const handleConfirmAddToCart = () => {
+    if (product.category === 'clothing' && !selectedSize) {
+      return // Nie dodawaj jeśli nie wybrano rozmiaru
+    }
+    
+    onAddToCart(product, selectedSize || undefined, quantity)
+    setShowSizeModal(false)
+    setSelectedSize('')
+    setQuantity(1)
   }
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
@@ -192,6 +220,83 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
           Dodaj do koszyka
         </button>
       </motion.div>
+
+      {/* Modal wyboru rozmiaru i ilości */}
+      <Dialog open={showSizeModal} onOpenChange={setShowSizeModal}>
+        <DialogContent className="bg-black/95 border-white/20 text-white max-w-md" onClick={(e) => e.stopPropagation()}>
+          <DialogHeader>
+            <DialogTitle className="font-[family-name:var(--font-heading)] text-2xl text-brand-gold">
+              {product.name}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            {/* Wybór rozmiaru */}
+            {product.sizes && product.sizes.length > 0 && (
+              <div className="space-y-3">
+                <label className="text-sm font-medium text-white/80">Rozmiar</label>
+                <div className="flex gap-2 flex-wrap">
+                  {product.sizes.map((size) => (
+                    <button
+                      key={size}
+                      onClick={() => setSelectedSize(size)}
+                      className={`px-4 py-2 border rounded-md transition-all ${
+                        selectedSize === size
+                          ? 'border-brand-gold bg-brand-gold/20 text-brand-gold'
+                          : 'border-white/20 text-white/60 hover:border-white/40 hover:text-white'
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Wybór ilości */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-white/80">Ilość</label>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  className="w-10 h-10 border border-white/20 rounded-md hover:border-brand-gold hover:text-brand-gold transition-all"
+                  disabled={quantity <= 1}
+                >
+                  -
+                </button>
+                <span className="text-xl font-bold w-12 text-center">{quantity}</span>
+                <button
+                  onClick={() => setQuantity(quantity + 1)}
+                  className="w-10 h-10 border border-white/20 rounded-md hover:border-brand-gold hover:text-brand-gold transition-all"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            {/* Podsumowanie */}
+            <div className="pt-4 border-t border-white/10">
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-white/60">Cena za sztukę:</span>
+                <span className="font-bold text-brand-gold">{product.price} PLN</span>
+              </div>
+              <div className="flex justify-between items-center mb-6">
+                <span className="text-white/80 font-medium">Razem:</span>
+                <span className="font-bold text-2xl text-brand-gold">{(product.price * quantity).toFixed(2)} PLN</span>
+              </div>
+              
+              <Button
+                onClick={handleConfirmAddToCart}
+                disabled={product.category === 'clothing' && !selectedSize}
+                className="w-full btn-primary"
+              >
+                <ShoppingCart className="w-4 h-4 mr-2" />
+                Dodaj do koszyka
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   )
 }

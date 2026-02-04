@@ -1,0 +1,84 @@
+@import 'tailwindcss';
+
+@utility border-border {
+  border-color: var(--border);
+}
+
+@utility bg-background {
+  background-color: var(--background);
+}
+
+@utility text-foreground {
+  color: var(--foreground);
+}
+
+@utility bg-card {
+  background-color: var(--card);
+}
+
+@utility text-card-foreground {
+  color: var(--card-foreground);
+}
+
+@utility bg-primary {
+  background-color: var(--primary);
+}
+
+@utility text-primary {
+  color: var(--primary);
+}
+
+@utility bg-secondary {
+  background-color: var(--secondary);
+}
+
+@utility text-muted-foreground {
+  color: var(--muted-foreground);
+}
+
+@utility bg-destructive {
+  background-color: var(--destructive);
+}
+
+@utility bg-brand-gold {
+  background-color: var(--brand-gold);
+}
+
+@utility text-brand-gold {
+  color: var(--brand-gold);
+}
+
+:root {
+  --background: #000;
+  --foreground: #fff;
+  --card: #0a0a0a;
+  --card-foreground: #fff;
+  --popover: #0a0a0a;
+  --popover-foreground: #fff;
+  --primary: #d4af37;
+  --primary-foreground: #000;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #fff;
+  --muted: #1a1a1a;
+  --muted-foreground: #999;
+  --accent: #d4af37;
+  --accent-foreground: #000;
+  --destructive: #ef4444;
+  --destructive-foreground: #fff;
+  --border: #1a1a1a;
+  --input: #1a1a1a;
+  --ring: #d4af37;
+  --radius: 0.5rem;
+  --brand-gold: #d4af37;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Inter, system-ui, sans-serif;
+}
+
+* {
+  border-color: var(--border);
+}

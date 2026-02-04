@@ -250,7 +250,7 @@ router.delete('/products/:id', async (req: Request, res: Response, next: NextFun
 // GET /api/admin/orders - Lista zamówień
 router.get('/orders', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { status, paymentStatus, search, page = '1', limit = '20' } = req.query;
+    const { status, paymentStatus, search, page = '1', limit = '100' } = req.query;
 
     const where: any = {};
 
@@ -279,7 +279,15 @@ router.get('/orders', async (req: Request, res: Response, next: NextFunction) =>
         take: parseInt(limit as string),
         include: {
           user: { select: { email: true } },
-          _count: { select: { items: true } },
+          items: {
+            include: {
+              product: {
+                include: {
+                  images: { take: 1 },
+                },
+              },
+            },
+          },
         },
         orderBy: { createdAt: 'desc' },
       }),
@@ -290,13 +298,27 @@ router.get('/orders', async (req: Request, res: Response, next: NextFunction) =>
       orders: orders.map((o) => ({
         id: o.id,
         orderNumber: o.orderNumber,
-        customerName: `${o.shippingFirstName} ${o.shippingLastName}`,
-        customerEmail: o.user?.email || 'Gość',
         status: o.status,
         paymentStatus: o.paymentStatus,
         total: Number(o.total),
-        itemCount: o._count.items,
+        subtotal: Number(o.subtotal),
+        shippingCost: Number(o.shippingCost),
+        itemCount: o.items.reduce((sum, item) => sum + item.quantity, 0),
         createdAt: o.createdAt,
+        shippingFirstName: o.shippingFirstName,
+        shippingLastName: o.shippingLastName,
+        shippingEmail: o.shippingEmail,
+        shippingPhone: o.shippingPhone,
+        shippingStreet: o.shippingStreet,
+        shippingCity: o.shippingCity,
+        shippingPostalCode: o.shippingPostalCode,
+        items: o.items.map((item) => ({
+          id: item.id,
+          name: item.name,
+          price: Number(item.price),
+          quantity: item.quantity,
+          image: item.product?.images?.[0]?.url || null,
+        })),
       })),
       pagination: {
         page: parseInt(page as string),
@@ -312,6 +334,44 @@ router.get('/orders', async (req: Request, res: Response, next: NextFunction) =>
 
 // PUT /api/admin/orders/:id/status - Zmień status zamówienia
 router.put('/orders/:id/status', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const validStatuses = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED'];
+    
+    if (!validStatuses.includes(status)) {
+      throw createError('Nieprawidłowy status', 400, 'INVALID_STATUS');
+    }
+
+    const updateData: any = { status };
+
+    if (status === 'SHIPPED') {
+      updateData.shippedAt = new Date();
+    } else if (status === 'DELIVERED') {
+      updateData.deliveredAt = new Date();
+    }
+
+    const order = await prisma.order.update({
+      where: { id },
+      data: updateData,
+    });
+
+    res.json({ 
+      message: 'Status zamówienia został zaktualizowany',
+      order: {
+        id: order.id,
+        orderNumber: order.orderNumber,
+        status: order.status,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// PATCH /api/admin/orders/:id/status - Zmień status zamówienia (alias)
+router.patch('/orders/:id/status', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const { status } = req.body;

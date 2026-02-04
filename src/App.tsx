@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useKV } from '@github/spark/hooks'
 import { Toaster, toast } from 'sonner'
 import { AnimatePresence, motion } from 'framer-motion'
 import { WireframeBackground } from '@/components/layout/WireframeBackground'
@@ -10,6 +9,8 @@ import { SplashScreen } from '@/components/sections/SplashScreen'
 import { ProductGrid } from '@/components/shop/ProductGrid'
 import { ProductPage } from '@/components/shop/ProductPage'
 import { CartPage, type CartItem } from '@/components/shop/CartPage'
+import { CheckoutPage } from '@/components/shop/CheckoutPage'
+import { OrderConfirmationPage } from '@/components/shop/OrderConfirmationPage'
 import { WishlistPage } from '@/components/shop/WishlistPage'
 import { AboutPage } from '@/components/pages/AboutPage'
 import { ContactPage } from '@/components/pages/ContactPage'
@@ -17,22 +18,71 @@ import { TermsPage } from '@/components/pages/TermsPage'
 import { MarqueeText } from '@/components/sections/MarqueeText'
 import { TrustSignals } from '@/components/sections/TrustSignals'
 import { ContactSection } from '@/components/sections/ContactSection'
-import { AdminLogin } from '@/components/admin/AdminLogin'
-import { AdminPanel } from '@/components/admin/AdminPanel'
+
 import type { Product } from '@/components/shop/ProductCard'
 import { productsApi } from '@/lib/api'
 
-type PageView = 'home' | 'product' | 'cart' | 'wishlist' | 'about' | 'contact' | 'terms' | 'admin-login' | 'admin'
+type PageView = 'home' | 'product' | 'cart' | 'checkout' | 'order-confirmation' | 'wishlist' | 'about' | 'contact' | 'terms'
 
 function App() {
-  const [cartItems, setCartItems] = useKV<CartItem[]>('acro-cart-v2', [])
-  const [wishlistItems, setWishlistItems] = useKV<Product[]>('acro-wishlist', [])
+  // Przechowywanie koszyka w localStorage
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('acro-cart-v2')
+      return saved ? JSON.parse(saved) : []
+    } catch {
+      return []
+    }
+  })
+
+  // Przechowywanie listy życzeń w localStorage
+  const [wishlistItems, setWishlistItems] = useState<Product[]>(() => {
+    try {
+      const saved = localStorage.getItem('acro-wishlist')
+      return saved ? JSON.parse(saved) : []
+    } catch {
+      return []
+    }
+  })
+
+  // Zapisz koszyk do localStorage przy każdej zmianie
+  useEffect(() => {
+    localStorage.setItem('acro-cart-v2', JSON.stringify(cartItems))
+  }, [cartItems])
+
+  // Zapisz wishlist do localStorage przy każdej zmianie
+  useEffect(() => {
+    localStorage.setItem('acro-wishlist', JSON.stringify(wishlistItems))
+  }, [wishlistItems])
+
   const [mobileTab, setMobileTab] = useState('home')
   const [showSplash, setShowSplash] = useState(true)
   const [currentView, setCurrentView] = useState<PageView>('home')
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [products, setProducts] = useState<Product[]>([])
   const [isLoadingProducts, setIsLoadingProducts] = useState(true)
+  const [orderNumber, setOrderNumber] = useState<string>('')
+  const [paymentStatus, setPaymentStatus] = useState<'success' | 'cancelled' | 'pending'>('pending')
+
+  // Sprawdź URL dla potwierdzenia płatności PayU
+  useEffect(() => {
+    const url = new URL(window.location.href)
+    const pathParts = url.pathname.split('/')
+    
+    // Sprawdź /order/:orderNumber pattern
+    if (pathParts[1] === 'order' && pathParts[2]) {
+      const orderNum = pathParts[2]
+      const payment = url.searchParams.get('payment')
+      
+      setOrderNumber(orderNum)
+      setPaymentStatus(payment === 'success' ? 'success' : payment === 'cancelled' ? 'cancelled' : 'pending')
+      setCurrentView('order-confirmation')
+      setShowSplash(false)
+      
+      // Wyczyść URL
+      window.history.replaceState({}, '', '/')
+    }
+  }, [])
 
   // Pobierz produkty z API
   useEffect(() => {
@@ -47,6 +97,9 @@ function App() {
           image: p.image || '',
           images: p.images || [],
           sizes: p.sizes || [],
+          description: p.description || '',
+          features: p.features || [],
+          materials: p.materials || '',
           badge: p.badge as 'NEW' | 'LIMITED' | undefined,
           category: p.category?.slug === 'accessories' ? 'accessories' : 'clothing',
           isBestseller: p.isBestseller,
@@ -75,6 +128,18 @@ function App() {
   const handleBackToShop = () => {
     setSelectedProduct(null)
     setCurrentView('home')
+  }
+
+  const handleOpenCheckout = () => {
+    setCurrentView('checkout')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handleOrderComplete = (orderNum: string) => {
+    setOrderNumber(orderNum)
+    setPaymentStatus('pending')
+    setCurrentView('order-confirmation')
+    setCartItems([])
   }
 
   const handleOpenCart = () => {
@@ -136,49 +201,66 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = (product: Product, selectedSize?: string, quantity: number = 1) => {
     setCartItems((currentItems = []) => {
-      const existingItem = currentItems.find((item) => item.id === product.id)
+      // Dla produktów z rozmiarem, sprawdź czy już jest taki sam produkt z tym samym rozmiarem
+      const itemKey = selectedSize ? `${product.id}-${selectedSize}` : product.id
+      const existingItem = currentItems.find((item) => {
+        const existingKey = item.selectedSize ? `${item.id}-${item.selectedSize}` : item.id
+        return existingKey === itemKey
+      })
+      
       if (existingItem) {
         toast.success('Zaktualizowano ilość w koszyku', {
-          description: product.name,
+          description: `${product.name}${selectedSize ? ` (${selectedSize})` : ''} - dodano ${quantity} szt.`,
         })
-        return currentItems.map(item => 
-          item.id === product.id 
-            ? { ...item, quantity: item.quantity + 1 }
+        return currentItems.map(item => {
+          const existingKey = item.selectedSize ? `${item.id}-${item.selectedSize}` : item.id
+          return existingKey === itemKey
+            ? { ...item, quantity: item.quantity + quantity }
             : item
-        )
+        })
       }
       
       toast.success('Dodano do koszyka', {
-        description: product.name,
+        description: `${product.name}${selectedSize ? ` (${selectedSize})` : ''} - ${quantity} szt.`,
       })
-      return [...currentItems, { ...product, quantity: 1 }]
+      return [...currentItems, { ...product, quantity, selectedSize }]
     })
   }
 
-  const handleUpdateQuantity = (productId: string, quantity: number) => {
+  const handleUpdateQuantity = (itemKey: string, quantity: number) => {
     setCartItems((currentItems = []) => {
       if (quantity <= 0) {
-        return currentItems.filter(item => item.id !== productId)
+        return currentItems.filter(item => {
+          const key = item.selectedSize ? `${item.id}-${item.selectedSize}` : item.id
+          return key !== itemKey
+        })
       }
-      return currentItems.map(item =>
-        item.id === productId
+      return currentItems.map(item => {
+        const key = item.selectedSize ? `${item.id}-${item.selectedSize}` : item.id
+        return key === itemKey
           ? { ...item, quantity }
           : item
-      )
+      })
     })
   }
 
-  const handleRemoveItem = (productId: string) => {
+  const handleRemoveItem = (itemKey: string) => {
     setCartItems((currentItems = []) => {
-      const item = currentItems.find(i => i.id === productId)
+      const item = currentItems.find(i => {
+        const key = i.selectedSize ? `${i.id}-${i.selectedSize}` : i.id
+        return key === itemKey
+      })
       if (item) {
         toast.success('Usunięto z koszyka', {
-          description: item.name,
+          description: `${item.name}${item.selectedSize ? ` (${item.selectedSize})` : ''}`,
         })
       }
-      return currentItems.filter(item => item.id !== productId)
+      return currentItems.filter(item => {
+        const key = item.selectedSize ? `${item.id}-${item.selectedSize}` : item.id
+        return key !== itemKey
+      })
     })
   }
 
@@ -215,18 +297,7 @@ function App() {
               
               <main>
                 <AnimatePresence mode="wait">
-                  {currentView === 'admin-login' ? (
-                    <AdminLogin
-                      key="admin-login"
-                      onLogin={() => setCurrentView('admin')}
-                      onBack={handleBackToShop}
-                    />
-                  ) : currentView === 'admin' ? (
-                    <AdminPanel
-                      key="admin-panel"
-                      onBack={handleBackToShop}
-                    />
-                  ) : currentView === 'about' ? (
+                  {currentView === 'about' ? (
                     <AboutPage
                       key="about-page"
                       onBack={handleBackToShop}
@@ -257,6 +328,21 @@ function App() {
                       onUpdateQuantity={handleUpdateQuantity}
                       onRemoveItem={handleRemoveItem}
                       onClearCart={handleClearCart}
+                      onContinueShopping={handleBackToShop}
+                      onCheckout={handleOpenCheckout}
+                    />
+                  ) : currentView === 'checkout' ? (
+                    <CheckoutPage
+                      key="checkout-page"
+                      items={cartItems ?? []}
+                      onBack={handleOpenCart}
+                      onOrderComplete={handleOrderComplete}
+                    />
+                  ) : currentView === 'order-confirmation' ? (
+                    <OrderConfirmationPage
+                      key="order-confirmation-page"
+                      orderNumber={orderNumber}
+                      paymentStatus={paymentStatus}
                       onContinueShopping={handleBackToShop}
                     />
                   ) : currentView === 'product' && selectedProduct ? (
@@ -353,11 +439,8 @@ function App() {
                       </a>
                     </div>
                     
-                    {/* Copyright - double click to access admin */}
-                    <p 
-                      className="text-white/20 text-[11px] font-[family-name:var(--font-body)] uppercase tracking-[0.3em] cursor-default select-none"
-                      onDoubleClick={() => setCurrentView('admin-login')}
-                    >
+                    {/* Copyright */}
+                    <p className="text-white/20 text-[11px] font-[family-name:var(--font-body)] uppercase tracking-[0.3em]">
                       © 2026 Acro Clinic. Wszystkie prawa zastrzeżone.
                     </p>
                   </motion.div>

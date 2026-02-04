@@ -76,6 +76,8 @@ model Product {
   name        String
   slug        String   @unique
   description String?
+  features    String[] @default([]) // Cechy produktu (bullet points)
+  materials   String?  // Skład materiałowy
   price       Decimal  @db.Decimal(10, 2)
   comparePrice Decimal? @db.Decimal(10, 2) // Cena przed promocją
   sku         String?  @unique
@@ -161,6 +163,7 @@ model Order {
   id              String      @id @default(cuid())
   orderNumber     String      @unique
   userId          String?
+  guestEmail      String?     // Email gościa (bez rejestracji)
   addressId       String?
   status          OrderStatus @default(PENDING)
   paymentStatus   PaymentStatus @default(PENDING)

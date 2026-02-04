@@ -53,6 +53,7 @@ export const addressSchema = z.object({
 
 // Order schemas
 export const createOrderSchema = z.object({
+  email: z.string().email('Nieprawidłowy adres email'),
   shippingAddress: addressSchema,
   note: z.string().optional(),
 });

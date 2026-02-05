@@ -4,6 +4,8 @@ import crypto from 'crypto';
 import { prisma } from '../lib/prisma.js';
 import { optionalAuth } from '../middleware/auth.js';
 import { createError } from '../middleware/errorHandler.js';
+import { generateInvoiceForOrder, getInvoicePdf } from '../lib/fakturownia.js';
+import { sendOrderConfirmationEmail } from '../lib/email.js';
 
 const router = Router();
 
@@ -239,12 +241,16 @@ router.post('/notify', async (req: Request, res: Response, next: NextFunction) =
     }
 
     // Update order
-    await prisma.order.update({
+    const updatedOrder = await prisma.order.update({
       where: { id: order.id },
       data: {
         paymentStatus,
         status: orderStatus,
         paidAt: paymentStatus === 'COMPLETED' ? new Date() : undefined,
+      },
+      include: {
+        items: true,
+        user: true,
       },
     });
 
@@ -258,6 +264,49 @@ router.post('/notify', async (req: Request, res: Response, next: NextFunction) =
     });
 
     console.log(`PayU notification processed: Order ${order.orderNumber}, Status: ${status}`);
+
+    // Jeśli płatność zakończona sukcesem - generuj fakturę i wyślij email
+    if (paymentStatus === 'COMPLETED') {
+      try {
+        // Generuj fakturę/paragon w Fakturownia.pl
+        const invoice = await generateInvoiceForOrder(order.id);
+        
+        // Pobierz PDF faktury (jeśli udało się wygenerować)
+        let invoicePdf: Buffer | null = null;
+        if (invoice?.id) {
+          invoicePdf = await getInvoicePdf(invoice.id.toString());
+        }
+        
+        // Wyślij email z potwierdzeniem zamówienia
+        const customerEmail = updatedOrder.user?.email || updatedOrder.guestEmail;
+        if (customerEmail) {
+          await sendOrderConfirmationEmail(customerEmail, {
+            orderNumber: updatedOrder.orderNumber,
+            customerName: updatedOrder.shippingFirstName,
+            items: updatedOrder.items.map(item => ({
+              name: item.name,
+              quantity: item.quantity,
+              price: Number(item.price),
+              size: (item as any).size || null,
+            })),
+            subtotal: Number(updatedOrder.subtotal),
+            shippingCost: Number(updatedOrder.shippingCost),
+            total: Number(updatedOrder.total),
+            shippingAddress: {
+              street: updatedOrder.shippingStreet,
+              city: updatedOrder.shippingCity,
+              postalCode: updatedOrder.shippingPostalCode,
+            },
+            invoiceNumber: invoice?.number,
+            invoicePdf,
+          });
+          console.log(`Order confirmation email sent to ${customerEmail}`);
+        }
+      } catch (emailError) {
+        console.error('Error sending order confirmation:', emailError);
+        // Nie rzucamy błędu - zamówienie przeszło, email jest opcjonalny
+      }
+    }
 
     res.status(200).json({ status: 'OK' });
   } catch (error) {

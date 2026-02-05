@@ -204,6 +204,7 @@ model Order {
   shippingPostalCode String
   shippingCountry   String    @default("Polska")
   shippingPhone     String?
+  shippingEmail     String?   // Email do powiadomień (dla gości)
 
   // Dane do faktury (opcjonalne)
   wantInvoice         Boolean   @default(false)
@@ -214,7 +215,13 @@ model Order {
   billingStreet       String?
   billingCity         String?
   billingPostalCode   String?
+  billingCountry      String?
   billingEmail        String?
+  
+  // Faktura / E-paragon (Fakturownia.pl)
+  invoiceNumber   String?
+  invoiceId       String?
+  invoiceUrl      String?
   
   // Kwoty
   subtotal        Decimal     @db.Decimal(10, 2)
@@ -263,6 +270,7 @@ model OrderItem {
   quantity  Int
   price     Decimal @db.Decimal(10, 2) // Cena w momencie zakupu
   name      String  // Nazwa produktu w momencie zakupu
+  size      String? // Rozmiar produktu
 
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id])

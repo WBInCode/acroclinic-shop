@@ -35,7 +35,7 @@ router.post('/', contactLimiter, async (req: Request, res: Response, next: NextF
     await resend.emails.send({
       from: 'Acro Clinic Shop <onboarding@resend.dev>', // Zmień na swoją zweryfikowaną domenę
       to: ['support@wb-partners.pl'],
-      replyTo: data.email,
+      reply_to: data.email,
       subject: `[Kontakt] ${data.subject}`,
       html: `
         <h2>Nowa wiadomość z formularza kontaktowego</h2>

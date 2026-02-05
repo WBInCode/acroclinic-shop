@@ -5,8 +5,8 @@ import rateLimit from 'express-rate-limit';
 
 const router = Router();
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend (null if no API key - email sending will be disabled)
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // Rate limiting dla contact endpoint - max 3 wiadomości na godzinę z tego samego IP
 const contactLimiter = rateLimit({
@@ -30,6 +30,15 @@ router.post('/', contactLimiter, async (req: Request, res: Response, next: NextF
   try {
     // Validate input
     const data = contactSchema.parse(req.body);
+
+    // Check if Resend is configured
+    if (!resend) {
+      console.log('Email sending disabled - no RESEND_API_KEY');
+      return res.json({
+        success: true,
+        message: 'Wiadomość została wysłana pomyślnie (dev mode)',
+      });
+    }
 
     // Wyślij email przez Resend
     await resend.emails.send({

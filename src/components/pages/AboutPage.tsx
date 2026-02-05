@@ -9,26 +9,7 @@ interface AboutPageProps {
 
 export function AboutPage({ onBack }: AboutPageProps) {
   const values = [
-    {
-      icon: Award,
-      title: 'Jakość Premium',
-      description: 'Każdy produkt przechodzi rygorystyczne testy jakości, aby zapewnić najwyższy standard.'
-    },
-    {
-      icon: Users,
-      title: 'Społeczność',
-      description: 'Budujemy społeczność pasjonatów akrobatyki i sportu z całej Polski.'
-    },
-    {
-      icon: Target,
-      title: 'Innowacja',
-      description: 'Nieustannie rozwijamy nasze produkty, słuchając potrzeb sportowców.'
-    },
-    {
-      icon: Heart,
-      title: 'Pasja',
-      description: 'Sport to nasza pasja, którą dzielimy się z każdym klientem.'
-    }
+    
   ]
 
   return (
@@ -37,7 +18,7 @@ export function AboutPage({ onBack }: AboutPageProps) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, ease }}
-      className="min-h-screen pt-28 pb-32"
+      className="min-h-screen pt-36 pb-32"
     >
       <div className="container mx-auto px-4">
         {/* Back button */}
@@ -95,63 +76,7 @@ export function AboutPage({ onBack }: AboutPageProps) {
           </div>
         </motion.div>
 
-        {/* Values */}
-        <motion.div
-          className="mb-20"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease, delay: 0.4 }}
-        >
-          <h2 className="font-[family-name:var(--font-heading)] font-bold text-2xl text-white text-center mb-12">
-            Nasze <span className="text-brand-gold">Wartości</span>
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {values.map((value, index) => (
-              <motion.div
-                key={value.title}
-                className="p-6 bg-white/[0.02] border border-white/10 hover:border-brand-gold/30 transition-all duration-300 text-center group"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease, delay: 0.5 + index * 0.1 }}
-              >
-                <div className="w-14 h-14 mx-auto mb-4 flex items-center justify-center border border-brand-gold/30 group-hover:bg-brand-gold/10 transition-colors duration-300">
-                  <value.icon className="w-6 h-6 text-brand-gold" />
-                </div>
-                <h3 className="font-[family-name:var(--font-heading)] font-bold text-white text-sm uppercase tracking-wider mb-3">
-                  {value.title}
-                </h3>
-                <p className="text-white/50 text-sm font-[family-name:var(--font-body)] leading-relaxed">
-                  {value.description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Stats */}
-        <motion.div
-          className="grid grid-cols-2 md:grid-cols-4 gap-6"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease, delay: 0.6 }}
-        >
-          {[
-            { number: '500+', label: 'Zadowolonych klientów' },
-            { number: '50+', label: 'Produktów premium' },
-            { number: '100%', label: 'Satysfakcji' },
-            { number: '24h', label: 'Wsparcie' }
-          ].map((stat, index) => (
-            <div key={stat.label} className="text-center p-6">
-              <p className="font-[family-name:var(--font-heading)] font-black text-3xl md:text-4xl text-brand-gold mb-2">
-                {stat.number}
-              </p>
-              <p className="text-white/40 text-xs uppercase tracking-wider font-[family-name:var(--font-body)]">
-                {stat.label}
-              </p>
-            </div>
-          ))}
-        </motion.div>
+        
       </div>
     </motion.div>
   )

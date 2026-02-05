@@ -8,14 +8,16 @@ interface NavigationProps {
   onCartClick?: () => void
   onWishlistClick?: () => void
   onLogoClick?: () => void
+  onUserClick?: () => void
+  isAuthenticated?: boolean
 }
 
 const ease = [0.22, 1, 0.36, 1] as const
 
-export function Navigation({ cartCount, wishlistCount = 0, onCartClick, onWishlistClick, onLogoClick }: NavigationProps) {
+export function Navigation({ cartCount, wishlistCount = 0, onCartClick, onWishlistClick, onLogoClick, onUserClick, isAuthenticated = false }: NavigationProps) {
   return (
     <motion.nav 
-      className="fixed top-0 left-0 right-0 z-50"
+      className="fixed left-0 right-0 z-50 top-[52px] md:top-[60px]"
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease }}
@@ -27,7 +29,7 @@ export function Navigation({ cartCount, wishlistCount = 0, onCartClick, onWishli
       {/* Bottom border with gold accent */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-gold/40 to-transparent" />
       
-      <div className="relative w-full max-w-7xl mx-auto px-4 h-[clamp(2.75rem,6vw,4rem)] flex items-center justify-between">
+      <div className="relative w-full max-w-7xl mx-auto px-4 h-[clamp(3.5rem,8vw,5rem)] flex items-center justify-between">
         {/* Logo */}
         <motion.button 
           onClick={onLogoClick}
@@ -74,6 +76,36 @@ export function Navigation({ cartCount, wishlistCount = 0, onCartClick, onWishli
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.6, ease }}
         >
+          {/* User button */}
+          <button 
+            onClick={onUserClick}
+            className="relative group rounded-full hover:bg-white/5 transition-all duration-300"
+            style={{ padding: 'clamp(0.375rem, 1vw, 0.625rem)' }}
+            aria-label="Konto użytkownika"
+          >
+            <User 
+              className="text-white/60 group-hover:text-brand-gold transition-colors duration-300" 
+              style={{ width: 'clamp(1rem, 2vw, 1.25rem)', height: 'clamp(1rem, 2vw, 1.25rem)' }}
+            />
+            {isAuthenticated && (
+              <span 
+                className="absolute flex items-center justify-center bg-brand-gold rounded-full shadow-[0_0_10px_rgba(212,175,55,0.5)]"
+                style={{ 
+                  top: 'clamp(0rem, 0.3vw, 0.25rem)', 
+                  right: 'clamp(0rem, 0.3vw, 0.25rem)',
+                  height: 'clamp(0.4rem, 0.7vw, 0.5rem)',
+                  width: 'clamp(0.4rem, 0.7vw, 0.5rem)'
+                }}
+              />
+            )}
+          </button>
+
+          {/* Separator */}
+          <div 
+            className="bg-white/10"
+            style={{ width: '1px', height: 'clamp(0.75rem, 2vw, 1.25rem)', margin: '0 clamp(0.2rem, 0.5vw, 0.375rem)' }}
+          />
+
           {/* Wishlist button */}
           <button 
             onClick={onWishlistClick}
@@ -100,12 +132,6 @@ export function Navigation({ cartCount, wishlistCount = 0, onCartClick, onWishli
               </span>
             )}
           </button>
-          
-          {/* Separator */}
-          <div 
-            className="bg-white/10"
-            style={{ width: '1px', height: 'clamp(0.75rem, 2vw, 1.25rem)', margin: '0 clamp(0.2rem, 0.5vw, 0.375rem)' }}
-          />
           
           {/* Cart button */}
           <button 

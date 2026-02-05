@@ -13,6 +13,8 @@ import { ordersRouter } from './routes/orders.js';
 import { payuRouter } from './routes/payu.js';
 import { wishlistRouter } from './routes/wishlist.js';
 import { adminRouter } from './routes/admin.js';
+import addressesRouter from './routes/addresses.js';
+import { contactRouter } from './routes/contact.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { prisma } from './lib/prisma.js';
 
@@ -32,8 +34,13 @@ app.use(helmet({
 // CORS configuration
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:5000',
-  'http://localhost:5001', // Admin panel
-];
+  process.env.ADMIN_URL || 'http://localhost:5001', // Admin panel
+].filter(Boolean);
+
+// Add any additional origins from env
+if (process.env.ADDITIONAL_ORIGINS) {
+  allowedOrigins.push(...process.env.ADDITIONAL_ORIGINS.split(','));
+}
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -101,7 +108,9 @@ app.use('/api/cart', cartRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/payu', payuRouter);
 app.use('/api/wishlist', wishlistRouter);
+app.use('/api/addresses', addressesRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/contact', contactRouter);
 
 // 404 handler
 app.use('/api/*', (req, res) => {

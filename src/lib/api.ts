@@ -190,6 +190,20 @@ export const authApi = {
     });
   },
 
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    return apiFetch('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  async resetPassword(token: string, password: string): Promise<{ message: string }> {
+    return apiFetch('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, password }),
+    });
+  },
+
   async getSession(): Promise<{ sessionId: string }> {
     const result = await apiFetch<{ sessionId: string }>('/auth/session');
     setSessionId(result.sessionId);
@@ -451,6 +465,87 @@ export const wishlistApi = {
 
   async checkInWishlist(productId: string): Promise<{ inWishlist: boolean }> {
     return apiFetch(`/wishlist/check/${productId}`);
+  },
+};
+
+// ==================== ADDRESSES API ====================
+
+export type AddressType = 'SHIPPING' | 'BILLING';
+
+export interface Address {
+  id: string;
+  type: AddressType;
+  label?: string;
+  firstName: string;
+  lastName: string;
+  companyName?: string;
+  nip?: string;
+  street: string;
+  city: string;
+  postalCode: string;
+  country: string;
+  phone?: string;
+  email?: string;
+  isDefault: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateAddressData {
+  type?: AddressType;
+  label?: string;
+  firstName: string;
+  lastName: string;
+  companyName?: string;
+  nip?: string;
+  street: string;
+  city: string;
+  postalCode: string;
+  country?: string;
+  phone?: string;
+  email?: string;
+  isDefault?: boolean;
+}
+
+export interface UpdateAddressData extends Partial<CreateAddressData> {}
+
+export const addressApi = {
+  async getAddresses(): Promise<{ addresses: Address[] }> {
+    return apiFetch('/addresses');
+  },
+
+  async getAddressesByType(type: AddressType): Promise<{ addresses: Address[] }> {
+    return apiFetch(`/addresses/type/${type.toLowerCase()}`);
+  },
+
+  async getAddress(id: string): Promise<{ address: Address }> {
+    return apiFetch(`/addresses/${id}`);
+  },
+
+  async createAddress(data: CreateAddressData): Promise<{ message: string; address: Address }> {
+    return apiFetch('/addresses', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async updateAddress(id: string, data: UpdateAddressData): Promise<{ message: string; address: Address }> {
+    return apiFetch(`/addresses/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async deleteAddress(id: string): Promise<{ message: string }> {
+    return apiFetch(`/addresses/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  async setDefaultAddress(id: string): Promise<{ message: string; address: Address }> {
+    return apiFetch(`/addresses/${id}/set-default`, {
+      method: 'POST',
+    });
   },
 };
 

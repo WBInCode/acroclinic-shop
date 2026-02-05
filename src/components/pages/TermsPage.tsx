@@ -66,7 +66,7 @@ export function TermsPage({ onBack }: TermsPageProps) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, ease }}
-      className="min-h-screen pt-28 pb-32"
+      className="min-h-screen pt-36 pb-32"
     >
       <div className="container mx-auto px-4">
         {/* Back button */}
@@ -138,8 +138,8 @@ export function TermsPage({ onBack }: TermsPageProps) {
         >
           <p className="text-white/60 font-[family-name:var(--font-body)]">
             W przypadku pytań dotyczących regulaminu, prosimy o kontakt: 
-            <a href="mailto:kontakt@acroclinic.pl" className="text-brand-gold hover:underline ml-1">
-              kontakt@acroclinic.pl
+            <a href="mailto:support@wb-partners.pl" className="text-brand-gold hover:underline ml-1">
+              support@wb-partners.pl
             </a>
           </p>
         </motion.div>

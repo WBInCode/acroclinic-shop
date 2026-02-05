@@ -47,7 +47,7 @@ export function ProductPage({ product, onBack, onAddToCart, onToggleWishlist, is
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, ease }}
-      className="min-h-screen pt-24 pb-32"
+      className="min-h-screen pt-36 pb-32"
     >
       <div className="container mx-auto px-4">
         {/* Back button */}

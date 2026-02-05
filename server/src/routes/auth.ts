@@ -1,4 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { prisma } from '../lib/prisma.js';
@@ -7,9 +8,10 @@ import {
   generateRefreshToken, 
   verifyRefreshToken 
 } from '../lib/jwt.js';
-import { registerSchema, loginSchema } from '../lib/validators.js';
+import { forgotPasswordSchema, loginSchema, registerSchema, resetPasswordSchema } from '../lib/validators.js';
 import { authenticate } from '../middleware/auth.js';
 import { createError } from '../middleware/errorHandler.js';
+import { sendPasswordResetEmail, sendWelcomeEmail } from '../lib/email.js';
 
 const router = Router();
 
@@ -77,6 +79,84 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
       user,
       accessToken,
     });
+
+    sendWelcomeEmail(user.email, user.firstName).catch((error) => {
+      console.error('Welcome email failed:', error);
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// POST /api/auth/forgot-password - Wyślij link resetu hasła
+router.post('/forgot-password', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const data = forgotPasswordSchema.parse(req.body);
+
+    const user = await prisma.user.findUnique({
+      where: { email: data.email },
+    });
+
+    if (!user) {
+      res.json({ message: 'Jeśli konto istnieje, wysłaliśmy link resetu hasła.' });
+      return;
+    }
+
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+
+    await prisma.passwordResetToken.create({
+      data: {
+        userId: user.id,
+        tokenHash,
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+      },
+    });
+
+    await sendPasswordResetEmail(user.email, rawToken);
+
+    res.json({ message: 'Jeśli konto istnieje, wysłaliśmy link resetu hasła.' });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// POST /api/auth/reset-password - Ustaw nowe hasło
+router.post('/reset-password', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const data = resetPasswordSchema.parse(req.body);
+    const tokenHash = crypto.createHash('sha256').update(data.token).digest('hex');
+
+    const resetToken = await prisma.passwordResetToken.findFirst({
+      where: {
+        tokenHash,
+        usedAt: null,
+        expiresAt: { gt: new Date() },
+      },
+      include: { user: true },
+    });
+
+    if (!resetToken || !resetToken.user.isActive) {
+      throw createError('Nieprawidłowy lub wygasły token', 400, 'INVALID_RESET_TOKEN');
+    }
+
+    const hashedPassword = await bcrypt.hash(data.password, 12);
+
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: resetToken.userId },
+        data: { password: hashedPassword },
+      }),
+      prisma.passwordResetToken.update({
+        where: { id: resetToken.id },
+        data: { usedAt: new Date() },
+      }),
+      prisma.session.deleteMany({
+        where: { userId: resetToken.userId },
+      }),
+    ]);
+
+    res.json({ message: 'Hasło zostało zresetowane' });
   } catch (error) {
     next(error);
   }

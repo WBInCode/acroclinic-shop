@@ -1,0 +1,51 @@
+# Render.com configuration for Backend API
+# https://render.com/docs/yaml-spec
+
+services:
+  - type: web
+    name: acroclinic-api
+    runtime: node
+    region: frankfurt # Closest to Poland
+    plan: starter # $7/month - upgrade as needed
+    branch: main
+    rootDir: server
+    buildCommand: npm install && npm run build && npx prisma generate
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: DATABASE_URL
+        sync: false # Set manually in Render dashboard
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        sync: false # Set to your Vercel URL
+      - key: PAYU_POS_ID
+        sync: false
+      - key: PAYU_SECOND_KEY
+        sync: false
+      - key: PAYU_CLIENT_ID
+        sync: false
+      - key: PAYU_CLIENT_SECRET
+        sync: false
+      - key: PAYU_BASE_URL
+        value: https://secure.payu.com
+      - key: PAYU_SANDBOX
+        value: "false"
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM
+        sync: false
+      - key: BACKEND_URL
+        sync: false # Set to your Render URL

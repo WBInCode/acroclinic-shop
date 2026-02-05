@@ -63,24 +63,24 @@ export function ContactSection({ onContactClick }: ContactSectionProps) {
           transition={{ ...transition, delay: 0.5 }}
         >
           <a
-            href="tel:536200535"
+            href="tel:570034367"
             className="flex items-center gap-3 text-white hover:text-brand-gold transition-colors duration-300"
           >
             <Phone className="w-5 h-5 text-brand-gold" />
             <span className="font-[family-name:var(--font-heading)] font-semibold text-xl tracking-tight">
-              536 200 535
+              570 034 367
             </span>
           </a>
 
           <div className="hidden md:block w-px h-6 bg-white/20" />
 
           <a
-            href="mailto:acro.clinic.rk@gmail.com"
+            href="mailto:support@wb-partners.pl"
             className="flex items-center gap-3 text-white/60 hover:text-white transition-colors duration-300"
           >
             <Mail className="w-5 h-5 text-brand-gold/60" />
             <span className="font-[family-name:var(--font-body)]">
-              acro.clinic.rk@gmail.com
+              support@wb-partners.pl
             </span>
           </a>
         </motion.div>

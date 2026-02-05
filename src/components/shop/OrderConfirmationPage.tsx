@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 const ease = [0.22, 1, 0.36, 1] as const
 
-const API_URL = 'http://localhost:3001/api'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
 interface OrderConfirmationPageProps {
   orderNumber: string
@@ -77,7 +77,7 @@ export function OrderConfirmationPage({ orderNumber, paymentStatus = 'pending', 
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, ease }}
-      className="min-h-screen pt-24 pb-32 flex items-center justify-center"
+      className="min-h-screen pt-36 pb-32 flex items-center justify-center"
     >
       <div className="container mx-auto px-4 max-w-2xl">
         <motion.div

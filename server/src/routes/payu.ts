@@ -304,7 +304,7 @@ router.get('/status/:orderId', optionalAuth, async (req: Request, res: Response,
 
         const payuStatus = response.data.orders?.[0]?.status;
         
-        if (payuStatus === 'COMPLETED' && order.paymentStatus !== 'COMPLETED') {
+        if (payuStatus === 'COMPLETED') {
           await prisma.order.update({
             where: { id: order.id },
             data: {

@@ -326,8 +326,8 @@ async function main() {
       key: 'store',
       value: {
         name: 'Acro Clinic',
-        email: 'kontakt@acroclinic.pl',
-        phone: '+48 123 456 789',
+        email: 'support@wb-partners.pl',
+        phone: '570 034 367',
         address: 'ul. Sportowa 1, 00-001 Warszawa',
       },
     },

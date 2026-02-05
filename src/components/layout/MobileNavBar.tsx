@@ -1,4 +1,4 @@
-import { Home, Heart, ShoppingCart } from 'lucide-react'
+import { Home, Heart, ShoppingCart, User } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 
 interface MobileNavBarProps {
@@ -8,13 +8,15 @@ interface MobileNavBarProps {
   onTabChange: (tab: string) => void
   onCartClick?: () => void
   onWishlistClick?: () => void
+  onUserClick?: () => void
 }
 
-export function MobileNavBar({ cartCount, wishlistCount = 0, activeTab, onTabChange, onCartClick, onWishlistClick }: MobileNavBarProps) {
+export function MobileNavBar({ cartCount, wishlistCount = 0, activeTab, onTabChange, onCartClick, onWishlistClick, onUserClick }: MobileNavBarProps) {
   const navItems = [
     { id: 'home', icon: Home, label: 'Główna' },
     { id: 'wishlist', icon: Heart, label: 'Ulubione', badge: wishlistCount },
     { id: 'cart', icon: ShoppingCart, label: 'Koszyk', badge: cartCount },
+    { id: 'user', icon: User, label: 'Konto' },
   ]
 
   const handleTabClick = (tabId: string) => {
@@ -22,6 +24,8 @@ export function MobileNavBar({ cartCount, wishlistCount = 0, activeTab, onTabCha
       onCartClick()
     } else if (tabId === 'wishlist' && onWishlistClick) {
       onWishlistClick()
+    } else if (tabId === 'user' && onUserClick) {
+      onUserClick()
     } else {
       onTabChange(tabId)
     }

@@ -1,14 +1,15 @@
 import { motion } from 'framer-motion'
-import { ArrowLeft, CreditCard, Truck, Shield, Lock, CheckCircle, Loader2, Package, MapPin, Search } from 'lucide-react'
+import { ArrowLeft, CreditCard, Truck, Shield, Lock, CheckCircle, Loader2, Package, MapPin, Search, ChevronDown, Star, Building2, Save } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import type { CartItem } from './CartPage'
+import { addressApi, type User, type Address, getAccessToken } from '@/lib/api'
 
 // Token GeoWidget InPost
 const INPOST_GEOWIDGET_TOKEN = 'eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzQlpXVzFNZzVlQnpDYU1XU3JvTlBjRWFveFpXcW9Ua2FuZVB3X291LWxvIn0.eyJleHAiOjIwODU1NTk0MzQsImlhdCI6MTc3MDE5OTQzNCwianRpIjoiZGExNDkzYjgtMjUxOC00M2ZjLWJmNzYtYmNkODZkMDcxZDIzIiwiaXNzIjoiaHR0cHM6Ly9sb2dpbi5pbnBvc3QucGwvYXV0aC9yZWFsbXMvZXh0ZXJuYWwiLCJzdWIiOiJmOjEyNDc1MDUxLTFjMDMtNGU1OS1iYTBjLTJiNDU2OTVlZjUzNTp3V2VfRW1yNU9XYmpRbnpuMmxSOU5Ubk5ncF9CWDZxaGZDWG5uQ1dyNko0IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoic2hpcHgiLCJzZXNzaW9uX3N0YXRlIjoiZGMyNGJkYjYtZmRlOC00YWQ1LTgyNDMtNmI4OWIwYzBlMzJmIiwic2NvcGUiOiJvcGVuaWQgYXBpOmFwaXBvaW50cyIsInNpZCI6ImRjMjRiZGI2LWZkZTgtNGFkNS04MjQzLTZiODliMGMwZTMyZiIsImFsbG93ZWRfcmVmZXJyZXJzIjoiIiwidXVpZCI6ImI3OTNjZTJhLThiZTItNDNhYS1iNjMzLTNkYjA1ZWE4MTRkYiJ9.HDBqjOx5BX_yeT4MYgWD-urqzFdPNiaC9cJq9vMdUjZUukuJlEF4D64Qhg5qj7UnJx91vuqL6i5clMe7Ecd-Mrc34m49Eec_OlJ9RKckz-CGiTty13jlZKEyTLqNRKdBrt19L0rGihotOW_eTWZ8DrhMxR-_Y0xpxk7mMJEQ-TWRoNnKB6xuYznaBQRaRhhJKzC-NWv2U4FFNrNQkKo4eu4HnHmpGKOkLoAxyB6RQwF7_s-NxqJgh17-uK0syS86VnwD8As3bNji6VQ_vqN78yXYc1-2WIiP1UonnK661_JlR0OV8tCnUAopRXo4B4yJDjRqJkyAjTLG1h23dfzm5w'
 
 const ease = [0.22, 1, 0.36, 1] as const
 
-const API_URL = 'http://localhost:3001/api'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
 type DeliveryMethod = 'courier' | 'parcel-locker'
 
@@ -16,6 +17,7 @@ interface CheckoutPageProps {
   items: CartItem[]
   onBack: () => void
   onOrderComplete: (orderNumber: string) => void
+  user?: User | null
 }
 
 interface ShippingAddress {
@@ -35,22 +37,45 @@ interface FormErrors {
   [key: string]: string
 }
 
-export function CheckoutPage({ items, onBack, onOrderComplete }: CheckoutPageProps) {
+export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutPageProps) {
   const [step, setStep] = useState<'shipping' | 'payment' | 'processing'>('shipping')
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<FormErrors>({})
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>('courier')
-  const [shippingData, setShippingData] = useState<ShippingAddress>({
+  const [shippingData, setShippingData] = useState<ShippingAddress>(() => ({
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    street: '',
+    city: '',
+    postalCode: '',
+    country: 'Polska',
+    phone: user?.phone || '',
+    email: user?.email || '',
+    parcelLockerCode: '',
+    parcelLockerAddress: '',
+  }))
+
+  // Saved addresses state
+  const [savedAddresses, setSavedAddresses] = useState<Address[]>([])
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
+  const [showAddressSelector, setShowAddressSelector] = useState(false)
+  const [saveAddressToAccount, setSaveAddressToAccount] = useState(false)
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(false)
+
+  // Billing address state
+  const [wantInvoice, setWantInvoice] = useState(false)
+  const [savedBillingAddresses, setSavedBillingAddresses] = useState<Address[]>([])
+  const [selectedBillingAddressId, setSelectedBillingAddressId] = useState<string | null>(null)
+  const [showBillingAddressSelector, setShowBillingAddressSelector] = useState(false)
+  const [billingData, setBillingData] = useState({
+    companyName: '',
+    nip: '',
     firstName: '',
     lastName: '',
     street: '',
     city: '',
     postalCode: '',
-    country: 'Polska',
-    phone: '',
     email: '',
-    parcelLockerCode: '',
-    parcelLockerAddress: '',
   })
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
@@ -61,6 +86,110 @@ export function CheckoutPage({ items, onBack, onOrderComplete }: CheckoutPagePro
   const geoWidgetRef = useRef<HTMLElement | null>(null)
   const total = subtotal + shipping
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
+
+  // Fetch saved addresses for logged-in users
+  useEffect(() => {
+    if (user) {
+      fetchSavedAddresses()
+    }
+  }, [user])
+
+  const fetchSavedAddresses = async () => {
+    if (!user) return
+    setIsLoadingAddresses(true)
+    try {
+      const data = await addressApi.getAddresses()
+      const addresses = data.addresses || []
+      setSavedAddresses(addresses.filter(a => a.type === 'SHIPPING'))
+      setSavedBillingAddresses(addresses.filter(a => a.type === 'BILLING'))
+      
+      // Auto-select default shipping address
+      const defaultShipping = addresses.find(a => a.type === 'SHIPPING' && a.isDefault)
+      if (defaultShipping) {
+        selectAddress(defaultShipping)
+      }
+      
+      // Auto-select default billing address
+      const defaultBilling = addresses.find(a => a.type === 'BILLING' && a.isDefault)
+      if (defaultBilling) {
+        setSelectedBillingAddressId(defaultBilling.id)
+        setBillingData({
+          companyName: defaultBilling.companyName || '',
+          nip: defaultBilling.nip || '',
+          firstName: defaultBilling.firstName,
+          lastName: defaultBilling.lastName,
+          street: defaultBilling.street,
+          city: defaultBilling.city,
+          postalCode: defaultBilling.postalCode,
+          email: defaultBilling.email || '',
+        })
+      }
+    } catch (error) {
+      console.error('Error fetching addresses:', error)
+    } finally {
+      setIsLoadingAddresses(false)
+    }
+  }
+
+  const selectAddress = (address: Address) => {
+    setSelectedAddressId(address.id)
+    setShippingData(prev => ({
+      ...prev,
+      firstName: address.firstName,
+      lastName: address.lastName,
+      street: address.street,
+      city: address.city,
+      postalCode: address.postalCode,
+      phone: address.phone || prev.phone,
+    }))
+    setShowAddressSelector(false)
+  }
+
+  const selectBillingAddress = (address: Address) => {
+    setSelectedBillingAddressId(address.id)
+    setBillingData({
+      companyName: address.companyName || '',
+      nip: address.nip || '',
+      firstName: address.firstName,
+      lastName: address.lastName,
+      street: address.street,
+      city: address.city,
+      postalCode: address.postalCode,
+      email: address.email || '',
+    })
+    setShowBillingAddressSelector(false)
+  }
+
+  const handleBillingInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    
+    if (name === 'postalCode') {
+      let formatted = value.replace(/\D/g, '')
+      if (formatted.length > 2) {
+        formatted = formatted.slice(0, 2) + '-' + formatted.slice(2, 5)
+      }
+      setBillingData(prev => ({ ...prev, [name]: formatted }))
+    } else {
+      setBillingData(prev => ({ ...prev, [name]: value }))
+    }
+    setSelectedBillingAddressId(null) // Deselect saved address when editing manually
+  }
+
+  useEffect(() => {
+    if (!user) return
+    setShippingData(prev => ({
+      ...prev,
+      firstName: prev.firstName || user.firstName || '',
+      lastName: prev.lastName || user.lastName || '',
+      email: prev.email || user.email || '',
+      phone: prev.phone || user.phone || '',
+    }))
+  }, [user])
 
   // Ładowanie skryptu InPost GeoWidget
   useEffect(() => {
@@ -168,15 +297,38 @@ export function CheckoutPage({ items, onBack, onOrderComplete }: CheckoutPagePro
       setShippingData(prev => ({ ...prev, [name]: value }))
     }
 
+    // Deselect saved address when editing manually
+    if (['firstName', 'lastName', 'street', 'city', 'postalCode'].includes(name)) {
+      setSelectedAddressId(null)
+    }
+
     // Clear error on change
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }))
     }
   }
 
-  const handleContinueToPayment = () => {
+  const handleContinueToPayment = async () => {
     if (validateShippingForm()) {
+      // Save address to account if requested
+      if (saveAddressToAccount && user && !selectedAddressId && deliveryMethod === 'courier') {
+        try {
+          await addressApi.createAddress({
+            type: 'SHIPPING',
+            firstName: shippingData.firstName,
+            lastName: shippingData.lastName,
+            street: shippingData.street,
+            city: shippingData.city,
+            postalCode: shippingData.postalCode,
+            country: shippingData.country,
+            phone: shippingData.phone,
+          })
+        } catch (error) {
+          console.error('Failed to save address:', error)
+        }
+      }
       setStep('payment')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 
@@ -188,14 +340,20 @@ export function CheckoutPage({ items, onBack, onOrderComplete }: CheckoutPagePro
       // 1. Sync cart with backend first
       const sessionId = localStorage.getItem('sessionId') || crypto.randomUUID()
       localStorage.setItem('sessionId', sessionId)
+      const token = getAccessToken()
+      
+      const authHeaders: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'X-Session-ID': sessionId,
+      }
+      if (token) {
+        authHeaders['Authorization'] = `Bearer ${token}`
+      }
 
       // Synchronizuj cały koszyk za jednym razem
       const syncResponse = await fetch(`${API_URL}/cart/sync`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Session-ID': sessionId,
-        },
+        headers: authHeaders,
         body: JSON.stringify({
           items: items.map(item => ({
             productId: item.id,
@@ -212,10 +370,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete }: CheckoutPagePro
       // 2. Create order
       const orderResponse = await fetch(`${API_URL}/orders`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Session-ID': sessionId,
-        },
+        headers: authHeaders,
         body: JSON.stringify({
           email: shippingData.email,
           shippingAddress: {
@@ -229,6 +384,18 @@ export function CheckoutPage({ items, onBack, onOrderComplete }: CheckoutPagePro
           },
           deliveryMethod: deliveryMethod,
           parcelLockerCode: deliveryMethod === 'parcel-locker' ? shippingData.parcelLockerCode : undefined,
+          // Dane do faktury
+          wantInvoice: wantInvoice,
+          billingAddress: wantInvoice ? {
+            companyName: billingData.companyName || undefined,
+            nip: billingData.nip || undefined,
+            firstName: billingData.firstName || undefined,
+            lastName: billingData.lastName || undefined,
+            street: billingData.street || undefined,
+            city: billingData.city || undefined,
+            postalCode: billingData.postalCode || undefined,
+            email: billingData.email || undefined,
+          } : undefined,
         }),
       })
 
@@ -242,10 +409,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete }: CheckoutPagePro
       // 3. Create PayU payment
       const payuResponse = await fetch(`${API_URL}/payu/create`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Session-ID': sessionId,
-        },
+        headers: authHeaders,
         body: JSON.stringify({
           orderId: orderData.order.id,
         }),
@@ -281,7 +445,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete }: CheckoutPagePro
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, ease }}
-      className="min-h-screen pt-24 pb-32"
+      className="min-h-screen pt-36 pb-32"
     >
       <div className="container mx-auto px-4 max-w-6xl">
         {/* Back button */}
@@ -404,6 +568,90 @@ export function CheckoutPage({ items, onBack, onOrderComplete }: CheckoutPagePro
                     <MapPin className="w-5 h-5 text-brand-gold" />
                     {deliveryMethod === 'courier' ? 'Adres dostawy' : 'Dane odbiorcy'}
                   </h2>
+
+                  {/* Saved address selector for logged in users */}
+                  {user && savedAddresses.length > 0 && deliveryMethod === 'courier' && (
+                    <div className="mb-6">
+                      <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                        Wybierz zapisany adres
+                      </label>
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setShowAddressSelector(!showAddressSelector)}
+                          className="w-full p-4 border-2 border-white/20 hover:border-white/40 bg-white/5 text-left transition-all flex items-center justify-between"
+                        >
+                          {selectedAddressId ? (
+                            <div className="flex-1">
+                              {(() => {
+                                const addr = savedAddresses.find(a => a.id === selectedAddressId)
+                                if (!addr) return <span className="text-white/60">Wybierz adres...</span>
+                                return (
+                                  <div>
+                                    <div className="flex items-center gap-2">
+                                      {addr.label && <span className="text-brand-gold font-medium">{addr.label}</span>}
+                                      {addr.isDefault && <Star className="w-3 h-3 text-brand-gold" />}
+                                    </div>
+                                    <p className="text-white text-sm">
+                                      {addr.firstName} {addr.lastName}, {addr.street}, {addr.postalCode} {addr.city}
+                                    </p>
+                                  </div>
+                                )
+                              })()}
+                            </div>
+                          ) : (
+                            <span className="text-white/60">Wybierz zapisany adres lub wpisz nowy...</span>
+                          )}
+                          <ChevronDown className={`w-5 h-5 text-white/60 transition-transform ${showAddressSelector ? 'rotate-180' : ''}`} />
+                        </button>
+                        
+                        {showAddressSelector && (
+                          <div className="absolute z-10 w-full mt-1 bg-[#1a1a1a] border border-white/20 max-h-60 overflow-y-auto">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedAddressId(null)
+                                setShippingData(prev => ({
+                                  ...prev,
+                                  firstName: user?.firstName || '',
+                                  lastName: user?.lastName || '',
+                                  street: '',
+                                  city: '',
+                                  postalCode: '',
+                                }))
+                                setShowAddressSelector(false)
+                              }}
+                              className="w-full p-3 text-left hover:bg-white/10 text-white/60 border-b border-white/10"
+                            >
+                              + Wpisz nowy adres
+                            </button>
+                            {savedAddresses.map(addr => (
+                              <button
+                                key={addr.id}
+                                type="button"
+                                onClick={() => selectAddress(addr)}
+                                className={`w-full p-3 text-left hover:bg-white/10 border-b border-white/5 ${
+                                  selectedAddressId === addr.id ? 'bg-brand-gold/10' : ''
+                                }`}
+                              >
+                                <div className="flex items-center gap-2 mb-1">
+                                  {addr.label && <span className="text-brand-gold text-sm font-medium">{addr.label}</span>}
+                                  {addr.isDefault && (
+                                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-brand-gold/20 text-brand-gold text-xs rounded">
+                                      <Star className="w-2.5 h-2.5" />
+                                      Domyślny
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-white text-sm">{addr.firstName} {addr.lastName}</p>
+                                <p className="text-white/60 text-xs">{addr.street}, {addr.postalCode} {addr.city}</p>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -561,6 +809,243 @@ export function CheckoutPage({ items, onBack, onOrderComplete }: CheckoutPagePro
                     </div>
                   )}
                 </div>
+
+                  {/* Checkbox - zapisz adres */}
+                  {user && !selectedAddressId && deliveryMethod === 'courier' && (
+                    <label className="flex items-center gap-3 mt-4 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={saveAddressToAccount}
+                        onChange={(e) => setSaveAddressToAccount(e.target.checked)}
+                        className="w-5 h-5 rounded border-white/20 bg-white/10 text-brand-gold focus:ring-brand-gold/50"
+                      />
+                      <span className="text-white/70 text-sm flex items-center gap-2">
+                        <Save className="w-4 h-4" />
+                        Zapisz adres na moim koncie
+                      </span>
+                    </label>
+                  )}
+                </div>
+
+                {/* Faktura VAT */}
+                <div className="bg-white/[0.02] border border-white/10 p-6 md:p-8">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={wantInvoice}
+                      onChange={(e) => setWantInvoice(e.target.checked)}
+                      className="w-5 h-5 rounded border-white/20 bg-white/10 text-brand-gold focus:ring-brand-gold/50"
+                    />
+                    <span className="font-[family-name:var(--font-heading)] font-bold text-lg text-white uppercase tracking-wide flex items-center gap-3">
+                      <Building2 className="w-5 h-5 text-brand-gold" />
+                      Chcę otrzymać fakturę VAT
+                    </span>
+                  </label>
+
+                  {wantInvoice && (
+                    <div className="mt-6 space-y-4">
+                      {/* Saved billing address selector */}
+                      {user && savedBillingAddresses.length > 0 && (
+                        <div>
+                          <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                            Wybierz zapisane dane do faktury
+                          </label>
+                          <div className="relative">
+                            <button
+                              type="button"
+                              onClick={() => setShowBillingAddressSelector(!showBillingAddressSelector)}
+                              className="w-full p-4 border-2 border-white/20 hover:border-white/40 bg-white/5 text-left transition-all flex items-center justify-between"
+                            >
+                              {selectedBillingAddressId ? (
+                                <div className="flex-1">
+                                  {(() => {
+                                    const addr = savedBillingAddresses.find(a => a.id === selectedBillingAddressId)
+                                    if (!addr) return <span className="text-white/60">Wybierz...</span>
+                                    return (
+                                      <div>
+                                        <div className="flex items-center gap-2">
+                                          {addr.label && <span className="text-brand-gold font-medium">{addr.label}</span>}
+                                          {addr.companyName && <span className="text-white">{addr.companyName}</span>}
+                                        </div>
+                                        {addr.nip && <p className="text-white/60 text-sm">NIP: {addr.nip}</p>}
+                                      </div>
+                                    )
+                                  })()}
+                                </div>
+                              ) : (
+                                <span className="text-white/60">Wybierz zapisane dane lub wpisz nowe...</span>
+                              )}
+                              <ChevronDown className={`w-5 h-5 text-white/60 transition-transform ${showBillingAddressSelector ? 'rotate-180' : ''}`} />
+                            </button>
+                            
+                            {showBillingAddressSelector && (
+                              <div className="absolute z-10 w-full mt-1 bg-[#1a1a1a] border border-white/20 max-h-60 overflow-y-auto">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedBillingAddressId(null)
+                                    setBillingData({
+                                      companyName: '',
+                                      nip: '',
+                                      firstName: user?.firstName || '',
+                                      lastName: user?.lastName || '',
+                                      street: '',
+                                      city: '',
+                                      postalCode: '',
+                                      email: user?.email || '',
+                                    })
+                                    setShowBillingAddressSelector(false)
+                                  }}
+                                  className="w-full p-3 text-left hover:bg-white/10 text-white/60 border-b border-white/10"
+                                >
+                                  + Wpisz nowe dane
+                                </button>
+                                {savedBillingAddresses.map(addr => (
+                                  <button
+                                    key={addr.id}
+                                    type="button"
+                                    onClick={() => selectBillingAddress(addr)}
+                                    className={`w-full p-3 text-left hover:bg-white/10 border-b border-white/5 ${
+                                      selectedBillingAddressId === addr.id ? 'bg-brand-gold/10' : ''
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-2 mb-1">
+                                      {addr.label && <span className="text-brand-gold text-sm font-medium">{addr.label}</span>}
+                                      {addr.isDefault && (
+                                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-brand-gold/20 text-brand-gold text-xs rounded">
+                                          <Star className="w-2.5 h-2.5" />
+                                          Domyślny
+                                        </span>
+                                      )}
+                                    </div>
+                                    {addr.companyName && <p className="text-white text-sm">{addr.companyName}</p>}
+                                    {addr.nip && <p className="text-white/60 text-xs">NIP: {addr.nip}</p>}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Billing form */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="md:col-span-2">
+                          <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                            Nazwa firmy
+                          </label>
+                          <input
+                            type="text"
+                            name="companyName"
+                            value={billingData.companyName}
+                            onChange={handleBillingInputChange}
+                            className="checkout-input"
+                            placeholder="Nazwa firmy Sp. z o.o."
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                            NIP *
+                          </label>
+                          <input
+                            type="text"
+                            name="nip"
+                            value={billingData.nip}
+                            onChange={handleBillingInputChange}
+                            className="checkout-input"
+                            placeholder="1234567890"
+                            maxLength={10}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                            Email do faktury
+                          </label>
+                          <input
+                            type="email"
+                            name="email"
+                            value={billingData.email}
+                            onChange={handleBillingInputChange}
+                            className="checkout-input"
+                            placeholder="faktury@firma.pl"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                            Imię
+                          </label>
+                          <input
+                            type="text"
+                            name="firstName"
+                            value={billingData.firstName}
+                            onChange={handleBillingInputChange}
+                            className="checkout-input"
+                            placeholder="Jan"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                            Nazwisko
+                          </label>
+                          <input
+                            type="text"
+                            name="lastName"
+                            value={billingData.lastName}
+                            onChange={handleBillingInputChange}
+                            className="checkout-input"
+                            placeholder="Kowalski"
+                          />
+                        </div>
+
+                        <div className="md:col-span-2">
+                          <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                            Ulica i numer
+                          </label>
+                          <input
+                            type="text"
+                            name="street"
+                            value={billingData.street}
+                            onChange={handleBillingInputChange}
+                            className="checkout-input"
+                            placeholder="ul. Biznesowa 10"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                            Miasto
+                          </label>
+                          <input
+                            type="text"
+                            name="city"
+                            value={billingData.city}
+                            onChange={handleBillingInputChange}
+                            className="checkout-input"
+                            placeholder="Warszawa"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                            Kod pocztowy
+                          </label>
+                          <input
+                            type="text"
+                            name="postalCode"
+                            value={billingData.postalCode}
+                            onChange={handleBillingInputChange}
+                            className="checkout-input"
+                            placeholder="00-000"
+                            maxLength={6}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <button

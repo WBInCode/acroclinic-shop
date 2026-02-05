@@ -20,7 +20,9 @@ import {
   Loader2,
   RefreshCw,
   Truck,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Building2,
+  FileText
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -67,6 +69,16 @@ interface Order {
   shippingStreet?: string
   shippingCity?: string
   shippingPostalCode?: string
+  // Dane do faktury
+  wantInvoice?: boolean
+  billingCompanyName?: string
+  billingNip?: string
+  billingFirstName?: string
+  billingLastName?: string
+  billingStreet?: string
+  billingCity?: string
+  billingPostalCode?: string
+  billingEmail?: string
   items: {
     id: string
     name: string
@@ -180,7 +192,7 @@ export function AdminPanel({ onBack }: AdminPanelProps) {
 
       setStats({
         totalOrders: loadedOrders.length,
-        totalRevenue: loadedOrders.filter(o => o.paymentStatus === 'PAID').reduce((sum, o) => sum + o.total, 0),
+        totalRevenue: loadedOrders.filter(o => o.paymentStatus === 'COMPLETED' || o.paymentStatus === 'PAID').reduce((sum, o) => sum + o.total, 0),
         pendingOrders: loadedOrders.filter(o => o.status === 'PENDING' || o.status === 'PROCESSING').length,
         completedOrders: loadedOrders.filter(o => o.status === 'DELIVERED').length,
         totalProducts: loadedProducts.length,
@@ -198,7 +210,7 @@ export function AdminPanel({ onBack }: AdminPanelProps) {
     if (products.length > 0 || orders.length > 0) {
       setStats({
         totalOrders: orders.length,
-        totalRevenue: orders.filter(o => o.paymentStatus === 'PAID').reduce((sum, o) => sum + o.total, 0),
+        totalRevenue: orders.filter(o => o.paymentStatus === 'COMPLETED' || o.paymentStatus === 'PAID').reduce((sum, o) => sum + o.total, 0),
         pendingOrders: orders.filter(o => o.status === 'PENDING' || o.status === 'PROCESSING').length,
         completedOrders: orders.filter(o => o.status === 'DELIVERED').length,
         totalProducts: products.length,
@@ -509,15 +521,15 @@ export function AdminPanel({ onBack }: AdminPanelProps) {
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-gold/50"
+                    className="bg-zinc-800 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-gold/50"
                   >
-                    <option value="all">Wszystkie statusy</option>
-                    <option value="PENDING">Oczekujące</option>
-                    <option value="CONFIRMED">Potwierdzone</option>
-                    <option value="PROCESSING">W realizacji</option>
-                    <option value="SHIPPED">Wysłane</option>
-                    <option value="DELIVERED">Dostarczone</option>
-                    <option value="CANCELLED">Anulowane</option>
+                    <option value="all" className="bg-zinc-800 text-white">Wszystkie statusy</option>
+                    <option value="PENDING" className="bg-zinc-800 text-white">Oczekujące</option>
+                    <option value="CONFIRMED" className="bg-zinc-800 text-white">Potwierdzone</option>
+                    <option value="PROCESSING" className="bg-zinc-800 text-white">W realizacji</option>
+                    <option value="SHIPPED" className="bg-zinc-800 text-white">Wysłane</option>
+                    <option value="DELIVERED" className="bg-zinc-800 text-white">Dostarczone</option>
+                    <option value="CANCELLED" className="bg-zinc-800 text-white">Anulowane</option>
                   </select>
                 </div>
 
@@ -557,14 +569,14 @@ export function AdminPanel({ onBack }: AdminPanelProps) {
                                 <select
                                   value={order.status}
                                   onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                                  className="bg-white/5 border border-white/10 rounded px-2 py-1 text-xs text-white focus:outline-none"
+                                  className="bg-zinc-800 border border-white/10 rounded px-2 py-1 text-xs text-white focus:outline-none"
                                 >
-                                  <option value="PENDING">Oczekujące</option>
-                                  <option value="CONFIRMED">Potwierdzone</option>
-                                  <option value="PROCESSING">W realizacji</option>
-                                  <option value="SHIPPED">Wysłane</option>
-                                  <option value="DELIVERED">Dostarczone</option>
-                                  <option value="CANCELLED">Anulowane</option>
+                                  <option value="PENDING" className="bg-zinc-800 text-white">Oczekujące</option>
+                                  <option value="CONFIRMED" className="bg-zinc-800 text-white">Potwierdzone</option>
+                                  <option value="PROCESSING" className="bg-zinc-800 text-white">W realizacji</option>
+                                  <option value="SHIPPED" className="bg-zinc-800 text-white">Wysłane</option>
+                                  <option value="DELIVERED" className="bg-zinc-800 text-white">Dostarczone</option>
+                                  <option value="CANCELLED" className="bg-zinc-800 text-white">Anulowane</option>
                                 </select>
                               </div>
                             </td>
@@ -732,6 +744,40 @@ export function AdminPanel({ onBack }: AdminPanelProps) {
                   </div>
                 </div>
 
+                {/* Dane do faktury */}
+                {selectedOrder.wantInvoice && (
+                  <div>
+                    <h4 className="font-[family-name:var(--font-heading)] font-bold text-white mb-3 flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-brand-gold" /> Dane do faktury
+                    </h4>
+                    <div className="bg-brand-gold/10 border border-brand-gold/30 rounded-lg p-4 space-y-2">
+                      {selectedOrder.billingCompanyName && (
+                        <p className="text-white font-medium flex items-center gap-2">
+                          <Building2 className="w-4 h-4 text-brand-gold" />
+                          {selectedOrder.billingCompanyName}
+                        </p>
+                      )}
+                      {selectedOrder.billingNip && (
+                        <p className="text-white/70 text-sm">NIP: {selectedOrder.billingNip}</p>
+                      )}
+                      {(selectedOrder.billingFirstName || selectedOrder.billingLastName) && (
+                        <p className="text-white/70">{selectedOrder.billingFirstName} {selectedOrder.billingLastName}</p>
+                      )}
+                      {selectedOrder.billingStreet && (
+                        <p className="text-white/60">{selectedOrder.billingStreet}</p>
+                      )}
+                      {(selectedOrder.billingPostalCode || selectedOrder.billingCity) && (
+                        <p className="text-white/60">{selectedOrder.billingPostalCode} {selectedOrder.billingCity}</p>
+                      )}
+                      {selectedOrder.billingEmail && (
+                        <p className="text-white/60 flex items-center gap-1 pt-2 border-t border-brand-gold/20 mt-2">
+                          <Mail className="w-4 h-4" /> {selectedOrder.billingEmail}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <h4 className="font-[family-name:var(--font-heading)] font-bold text-white mb-3 flex items-center gap-2">
                     <Package className="w-4 h-4 text-brand-gold" /> Produkty
@@ -767,14 +813,14 @@ export function AdminPanel({ onBack }: AdminPanelProps) {
                   <select
                     value={selectedOrder.status}
                     onChange={(e) => { updateOrderStatus(selectedOrder.id, e.target.value); setSelectedOrder({ ...selectedOrder, status: e.target.value as Order['status'] }) }}
-                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-gold/50"
+                    className="flex-1 bg-zinc-800 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-gold/50"
                   >
-                    <option value="PENDING">Oczekujące</option>
-                    <option value="CONFIRMED">Potwierdzone</option>
-                    <option value="PROCESSING">W realizacji</option>
-                    <option value="SHIPPED">Wysłane</option>
-                    <option value="DELIVERED">Dostarczone</option>
-                    <option value="CANCELLED">Anulowane</option>
+                    <option value="PENDING" className="bg-zinc-800 text-white">Oczekujące</option>
+                    <option value="CONFIRMED" className="bg-zinc-800 text-white">Potwierdzone</option>
+                    <option value="PROCESSING" className="bg-zinc-800 text-white">W realizacji</option>
+                    <option value="SHIPPED" className="bg-zinc-800 text-white">Wysłane</option>
+                    <option value="DELIVERED" className="bg-zinc-800 text-white">Dostarczone</option>
+                    <option value="CANCELLED" className="bg-zinc-800 text-white">Anulowane</option>
                   </select>
                   <button onClick={() => setSelectedOrder(null)} className="px-6 py-2 bg-brand-gold text-black font-medium rounded-lg hover:bg-brand-gold/90 transition-colors">Zamknij</button>
                 </div>
@@ -883,9 +929,9 @@ function ProductEditModal({ product, categories, onSave, onClose, isSaving }: {
             </div>
             <div>
               <label className="block text-white/40 text-xs uppercase tracking-wider mb-2">Kategoria</label>
-              <select value={formData.categoryId} onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg py-2 px-4 text-white focus:outline-none focus:border-brand-gold/50">
-                <option value="">Wybierz kategorię</option>
-                {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+              <select value={formData.categoryId} onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })} className="w-full bg-zinc-800 border border-white/10 rounded-lg py-2 px-4 text-white focus:outline-none focus:border-brand-gold/50">
+                <option value="" className="bg-zinc-800 text-white">Wybierz kategorię</option>
+                {categories.map(cat => <option key={cat.id} value={cat.id} className="bg-zinc-800 text-white">{cat.name}</option>)}
               </select>
             </div>
           </div>
@@ -918,11 +964,11 @@ function ProductEditModal({ product, categories, onSave, onClose, isSaving }: {
 
           <div>
             <label className="block text-white/40 text-xs uppercase tracking-wider mb-2">Badge</label>
-            <select value={formData.badge} onChange={(e) => setFormData({ ...formData, badge: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg py-2 px-4 text-white focus:outline-none focus:border-brand-gold/50">
-              <option value="">Brak</option>
-              <option value="NEW">Nowość</option>
-              <option value="LIMITED">Limitowany</option>
-              <option value="SALE">Promocja</option>
+            <select value={formData.badge} onChange={(e) => setFormData({ ...formData, badge: e.target.value })} className="w-full bg-zinc-800 border border-white/10 rounded-lg py-2 px-4 text-white focus:outline-none focus:border-brand-gold/50">
+              <option value="" className="bg-zinc-800 text-white">Brak</option>
+              <option value="NEW" className="bg-zinc-800 text-white">Nowość</option>
+              <option value="LIMITED" className="bg-zinc-800 text-white">Limitowany</option>
+              <option value="SALE" className="bg-zinc-800 text-white">Promocja</option>
             </select>
           </div>
 

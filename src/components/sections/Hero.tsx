@@ -21,7 +21,7 @@ const particles = [...Array(12)].map((_, i) => ({
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-40">
       {/* Dekoracyjne linie */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Pionowa linia środkowa */}
@@ -44,13 +44,13 @@ export function Hero() {
 
         {/* Narożniki */}
         <motion.div
-          className="absolute top-20 left-20 w-24 h-24 border-l-2 border-t-2 border-brand-gold/30"
+          className="absolute top-44 left-20 w-24 h-24 border-l-2 border-t-2 border-brand-gold/30"
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 1, ease }}
         />
         <motion.div
-          className="absolute top-20 right-20 w-24 h-24 border-r-2 border-t-2 border-brand-gold/30"
+          className="absolute top-44 right-20 w-24 h-24 border-r-2 border-t-2 border-brand-gold/30"
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 1.1, ease }}

@@ -9,6 +9,7 @@
         "kill": "fuser -k 5000/tcp",
         "build": "tsc -b --noCheck && vite build",
         "build:admin": "tsc -b --noCheck && vite build --config vite.admin.config.ts",
+        "test": "npm run lint",
         "lint": "eslint .",
         "optimize": "vite optimize",
         "preview": "vite preview"

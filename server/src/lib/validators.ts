@@ -17,6 +17,19 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'Hasło jest wymagane'),
 });
 
+export const forgotPasswordSchema = z.object({
+  email: z.string().email('Nieprawidłowy adres email'),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(10, 'Nieprawidłowy token'),
+  password: z
+    .string()
+    .min(8, 'Hasło musi mieć minimum 8 znaków')
+    .regex(/[A-Z]/, 'Hasło musi zawierać wielką literę')
+    .regex(/[0-9]/, 'Hasło musi zawierać cyfrę'),
+});
+
 // Product schemas
 export const productQuerySchema = z.object({
   category: z.string().optional(),
@@ -51,11 +64,25 @@ export const addressSchema = z.object({
   phone: z.string().optional(),
 });
 
+// Billing address schema (for invoice)
+export const billingAddressSchema = z.object({
+  companyName: z.string().optional(),
+  nip: z.string().regex(/^\d{10}$/, 'NIP musi mieć 10 cyfr').optional().or(z.literal('')),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  street: z.string().optional(),
+  city: z.string().optional(),
+  postalCode: z.string().optional(),
+  email: z.string().email().optional().or(z.literal('')),
+});
+
 // Order schemas
 export const createOrderSchema = z.object({
   email: z.string().email('Nieprawidłowy adres email'),
   shippingAddress: addressSchema,
   note: z.string().optional(),
+  wantInvoice: z.boolean().optional().default(false),
+  billingAddress: billingAddressSchema.optional(),
 });
 
 // Wishlist schema
@@ -86,6 +113,8 @@ export const adminProductSchema = z.object({
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 export type ProductQueryInput = z.infer<typeof productQuerySchema>;
 export type AddToCartInput = z.infer<typeof addToCartSchema>;
 export type UpdateCartItemInput = z.infer<typeof updateCartItemSchema>;

@@ -1,8 +1,7 @@
-import { ShoppingCart, Heart } from 'lucide-react'
+import { ShoppingCart, Heart, X } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 
 export interface Product {
@@ -222,81 +221,103 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
       </motion.div>
 
       {/* Modal wyboru rozmiaru i ilości */}
-      <Dialog open={showSizeModal} onOpenChange={setShowSizeModal}>
-        <DialogContent className="bg-black/95 border-white/20 text-white max-w-md" onClick={(e) => e.stopPropagation()}>
-          <DialogHeader>
-            <DialogTitle className="font-[family-name:var(--font-heading)] text-2xl text-brand-gold">
-              {product.name}
-            </DialogTitle>
-          </DialogHeader>
+      <AnimatePresence>
+        {showSizeModal && (
+          <motion.div 
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowSizeModal(false)}
+          >
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+            <motion.div
+              className="relative bg-black/95 border border-white/20 text-white max-w-md w-full rounded-lg p-6"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button 
+                onClick={() => setShowSizeModal(false)}
+                className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              
+              <h3 className="font-[family-name:var(--font-heading)] text-2xl text-brand-gold mb-6">
+                {product.name}
+              </h3>
           
-          <div className="space-y-6 py-4">
-            {/* Wybór rozmiaru */}
-            {product.sizes && product.sizes.length > 0 && (
-              <div className="space-y-3">
-                <label className="text-sm font-medium text-white/80">Rozmiar</label>
-                <div className="flex gap-2 flex-wrap">
-                  {product.sizes.map((size) => (
+              <div className="space-y-6">
+                {/* Wybór rozmiaru */}
+                {product.sizes && product.sizes.length > 0 && (
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium text-white/80">Rozmiar</label>
+                    <div className="flex gap-2 flex-wrap">
+                      {product.sizes.map((size) => (
+                        <button
+                          key={size}
+                          onClick={() => setSelectedSize(size)}
+                          className={`px-4 py-2 border rounded-md transition-all ${
+                            selectedSize === size
+                              ? 'border-brand-gold bg-brand-gold/20 text-brand-gold'
+                              : 'border-white/20 text-white/60 hover:border-white/40 hover:text-white'
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Wybór ilości */}
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-white/80">Ilość</label>
+                  <div className="flex items-center gap-4">
                     <button
-                      key={size}
-                      onClick={() => setSelectedSize(size)}
-                      className={`px-4 py-2 border rounded-md transition-all ${
-                        selectedSize === size
-                          ? 'border-brand-gold bg-brand-gold/20 text-brand-gold'
-                          : 'border-white/20 text-white/60 hover:border-white/40 hover:text-white'
-                      }`}
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="w-10 h-10 border border-white/20 rounded-md hover:border-brand-gold hover:text-brand-gold transition-all"
+                      disabled={quantity <= 1}
                     >
-                      {size}
+                      -
                     </button>
-                  ))}
+                    <span className="text-xl font-bold w-12 text-center">{quantity}</span>
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="w-10 h-10 border border-white/20 rounded-md hover:border-brand-gold hover:text-brand-gold transition-all"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                {/* Podsumowanie */}
+                <div className="pt-4 border-t border-white/10">
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-white/60">Cena za sztukę:</span>
+                    <span className="font-bold text-brand-gold">{product.price} PLN</span>
+                  </div>
+                  <div className="flex justify-between items-center mb-6">
+                    <span className="text-white/80 font-medium">Razem:</span>
+                    <span className="font-bold text-2xl text-brand-gold">{(product.price * quantity).toFixed(2)} PLN</span>
+                  </div>
+                  
+                  <Button
+                    onClick={handleConfirmAddToCart}
+                    disabled={product.category === 'clothing' && !selectedSize}
+                    className="w-full btn-primary"
+                  >
+                    <ShoppingCart className="w-4 h-4 mr-2" />
+                    Dodaj do koszyka
+                  </Button>
                 </div>
               </div>
-            )}
-
-            {/* Wybór ilości */}
-            <div className="space-y-3">
-              <label className="text-sm font-medium text-white/80">Ilość</label>
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="w-10 h-10 border border-white/20 rounded-md hover:border-brand-gold hover:text-brand-gold transition-all"
-                  disabled={quantity <= 1}
-                >
-                  -
-                </button>
-                <span className="text-xl font-bold w-12 text-center">{quantity}</span>
-                <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="w-10 h-10 border border-white/20 rounded-md hover:border-brand-gold hover:text-brand-gold transition-all"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            {/* Podsumowanie */}
-            <div className="pt-4 border-t border-white/10">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-white/60">Cena za sztukę:</span>
-                <span className="font-bold text-brand-gold">{product.price} PLN</span>
-              </div>
-              <div className="flex justify-between items-center mb-6">
-                <span className="text-white/80 font-medium">Razem:</span>
-                <span className="font-bold text-2xl text-brand-gold">{(product.price * quantity).toFixed(2)} PLN</span>
-              </div>
-              
-              <Button
-                onClick={handleConfirmAddToCart}
-                disabled={product.category === 'clothing' && !selectedSize}
-                className="w-full btn-primary"
-              >
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                Dodaj do koszyka
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }

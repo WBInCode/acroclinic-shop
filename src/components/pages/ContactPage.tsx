@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion'
-import { ArrowLeft, Mail, Phone, MapPin, Clock, Send } from 'lucide-react'
+import { ArrowLeft, Mail, Phone, MapPin, Clock, Send, Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 const ease = [0.22, 1, 0.36, 1] as const
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
 interface ContactPageProps {
   onBack: () => void
@@ -16,27 +17,55 @@ export function ContactPage({ onBack }: ContactPageProps) {
     subject: '',
     message: ''
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    toast.success('Wiadomość została wysłana!', {
-      description: 'Odpowiemy najszybciej jak to możliwe.'
-    })
-    setFormData({ name: '', email: '', subject: '', message: '' })
+    setIsSubmitting(true)
+
+    try {
+      const response = await fetch(`${API_URL}/contact`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        toast.success('Wiadomość została wysłana!', {
+          description: 'Odpowiemy najszybciej jak to możliwe.'
+        })
+        setFormData({ name: '', email: '', subject: '', message: '' })
+      } else {
+        toast.error('Błąd podczas wysyłania', {
+          description: data.error || 'Spróbuj ponownie później.'
+        })
+      }
+    } catch (error) {
+      console.error('Contact form error:', error)
+      toast.error('Błąd połączenia', {
+        description: 'Sprawdź połączenie z internetem i spróbuj ponownie.'
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const contactInfo = [
     {
       icon: Mail,
       title: 'Email',
-      value: 'acro.clinic.rk@gmail.com',
-      href: 'mailto:acro.clinic.rk@gmail.com'
+      value: 'support@wb-partners.pl',
+      href: 'mailto:support@wb-partners.pl'
     },
     {
       icon: Phone,
       title: 'Telefon',
-      value: '+48 536 200 535',
-      href: 'tel:+48536200535'
+      value: '570 034 367',
+      href: 'tel:570034367'
     },
     {
       icon: MapPin,
@@ -58,7 +87,7 @@ export function ContactPage({ onBack }: ContactPageProps) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, ease }}
-      className="min-h-screen pt-28 pb-32"
+      className="min-h-screen pt-36 pb-32"
     >
       <div className="container mx-auto px-4">
         {/* Back button */}
@@ -156,9 +185,22 @@ export function ContactPage({ onBack }: ContactPageProps) {
                 />
               </div>
               
-              <button type="submit" className="btn-primary">
-                <Send className="w-4 h-4" />
-                Wyślij wiadomość
+              <button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Wysyłanie...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    Wyślij wiadomość
+                  </>
+                )}
               </button>
             </form>
           </motion.div>

@@ -12,7 +12,7 @@ interface NavigationProps {
   isAuthenticated?: boolean
 }
 
-const ease = [0.22, 1, 0.36, 1] as const
+const ease = [0.4, 0, 0.2, 1] as const
 
 export function Navigation({ cartCount, wishlistCount = 0, onCartClick, onWishlistClick, onLogoClick, onUserClick, isAuthenticated = false }: NavigationProps) {
   return (
@@ -22,56 +22,46 @@ export function Navigation({ cartCount, wishlistCount = 0, onCartClick, onWishli
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease }}
     >
-      {/* Gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-black/95 to-black/80 backdrop-blur-xl" />
-      <div className="absolute inset-0 bg-gradient-to-r from-brand-gold/5 via-transparent to-brand-gold/5" />
+      {/* Eleganckie tło */}
+      <div className="absolute inset-0 bg-[#0a0a0a]/95 backdrop-blur-md" />
       
-      {/* Bottom border with gold accent */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-gold/40 to-transparent" />
+      {/* Subtelna linia na dole */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-gold/20 to-transparent" />
       
-      <div className="relative w-full max-w-7xl mx-auto px-4 h-[clamp(3.5rem,8vw,5rem)] flex items-center justify-between">
+      <div className="relative w-full max-w-7xl mx-auto px-6 h-[clamp(4rem,8vw,5rem)] flex items-center justify-between">
         {/* Logo */}
         <motion.button 
           onClick={onLogoClick}
-          className="flex items-center gap-[clamp(0.4rem,1.5vw,1rem)] group cursor-pointer"
+          className="flex items-center gap-4 group cursor-pointer"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.6, ease }}
           aria-label="Powrót do strony głównej"
         >
-          {/* Logo container with glow */}
+          {/* Logo image */}
           <div className="relative flex-shrink-0">
-            <div className="absolute inset-0 bg-brand-gold/20 blur-xl rounded-full scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <img 
               src="/images/logo.png" 
               alt="Acro Clinic" 
-              className="relative object-contain"
-              style={{ height: 'clamp(1.5rem, 4vw, 2.5rem)', width: 'clamp(1.5rem, 4vw, 2.5rem)' }}
+              className="relative object-contain h-8 w-8 md:h-10 md:w-10 opacity-90 group-hover:opacity-100 transition-opacity duration-300"
             />
           </div>
           
-          {/* Text with decorative elements */}
+          {/* Text - elegancka typografia */}
           <div className="flex flex-col min-w-0">
             <span 
-              className="font-[family-name:var(--font-heading)] font-black leading-none whitespace-nowrap"
-              style={{ fontSize: 'clamp(0.75rem, 2vw, 1.25rem)', letterSpacing: 'clamp(0.05em, 0.4vw, 0.15em)' }}
+              className="text-xl md:text-2xl font-light tracking-wide"
+              style={{ fontFamily: "'Playfair Display', serif" }}
             >
-              <span className="text-white group-hover:text-white/90 transition-colors">ACRO</span>
-              <span className="text-brand-gold" style={{ marginLeft: 'clamp(0.2rem, 0.4vw, 0.4rem)' }}>CLINIC</span>
-            </span>
-            <span 
-              className="text-white/30 uppercase hidden min-[480px]:block"
-              style={{ fontSize: 'clamp(0.4rem, 0.8vw, 0.5rem)', letterSpacing: 'clamp(0.1em, 0.4vw, 0.3em)', marginTop: 'clamp(0.1rem, 0.2vw, 0.2rem)' }}
-            >
-              Premium Sportswear
+              <span className="text-white/90 group-hover:text-white transition-colors duration-300">Acro</span>
+              <span className="text-brand-gold italic ml-1">Clinic</span>
             </span>
           </div>
         </motion.button>
 
-        {/* Icons */}
+        {/* Icons - eleganckie, minimalistyczne */}
         <motion.div 
-          className="flex items-center"
-          style={{ gap: 'clamp(0.2rem, 0.75vw, 0.4rem)' }}
+          className="flex items-center gap-1"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.6, ease }}
@@ -79,54 +69,29 @@ export function Navigation({ cartCount, wishlistCount = 0, onCartClick, onWishli
           {/* User button */}
           <button 
             onClick={onUserClick}
-            className="relative group rounded-full hover:bg-white/5 transition-all duration-300"
-            style={{ padding: 'clamp(0.375rem, 1vw, 0.625rem)' }}
+            className="relative group p-3 transition-all duration-300"
             aria-label="Konto użytkownika"
           >
-            <User 
-              className="text-white/60 group-hover:text-brand-gold transition-colors duration-300" 
-              style={{ width: 'clamp(1rem, 2vw, 1.25rem)', height: 'clamp(1rem, 2vw, 1.25rem)' }}
-            />
+            <User className="w-5 h-5 text-white/50 group-hover:text-brand-gold transition-colors duration-300" />
             {isAuthenticated && (
-              <span 
-                className="absolute flex items-center justify-center bg-brand-gold rounded-full shadow-[0_0_10px_rgba(212,175,55,0.5)]"
-                style={{ 
-                  top: 'clamp(0rem, 0.3vw, 0.25rem)', 
-                  right: 'clamp(0rem, 0.3vw, 0.25rem)',
-                  height: 'clamp(0.4rem, 0.7vw, 0.5rem)',
-                  width: 'clamp(0.4rem, 0.7vw, 0.5rem)'
-                }}
-              />
+              <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-brand-gold rounded-full" />
             )}
           </button>
 
           {/* Separator */}
-          <div 
-            className="bg-white/10"
-            style={{ width: '1px', height: 'clamp(0.75rem, 2vw, 1.25rem)', margin: '0 clamp(0.2rem, 0.5vw, 0.375rem)' }}
-          />
+          <div className="w-px h-4 bg-white/10 mx-1" />
 
           {/* Wishlist button */}
           <button 
             onClick={onWishlistClick}
-            className="relative group rounded-full hover:bg-white/5 transition-all duration-300"
-            style={{ padding: 'clamp(0.375rem, 1vw, 0.625rem)' }}
+            className="relative group p-3 transition-all duration-300"
             aria-label="Ulubione"
           >
-            <Heart 
-              className="text-white/60 group-hover:text-brand-gold transition-colors duration-300" 
-              style={{ width: 'clamp(1rem, 2vw, 1.25rem)', height: 'clamp(1rem, 2vw, 1.25rem)' }}
-            />
+            <Heart className="w-5 h-5 text-white/50 group-hover:text-brand-gold transition-colors duration-300" />
             {wishlistCount > 0 && (
               <span 
-                className="absolute flex items-center justify-center bg-brand-gold text-black font-bold rounded-full shadow-[0_0_10px_rgba(212,175,55,0.5)]"
-                style={{ 
-                  top: 'clamp(0rem, 0.3vw, 0.25rem)', 
-                  right: 'clamp(0rem, 0.3vw, 0.25rem)',
-                  height: 'clamp(0.75rem, 1.5vw, 1rem)',
-                  width: 'clamp(0.75rem, 1.5vw, 1rem)',
-                  fontSize: 'clamp(0.4rem, 0.8vw, 0.5rem)'
-                }}
+                className="absolute top-1.5 right-1.5 flex items-center justify-center w-4 h-4 bg-brand-gold text-[10px] text-black font-medium rounded-full"
+                style={{ fontFamily: "'Lato', sans-serif" }}
               >
                 {wishlistCount}
               </span>
@@ -136,24 +101,14 @@ export function Navigation({ cartCount, wishlistCount = 0, onCartClick, onWishli
           {/* Cart button */}
           <button 
             onClick={onCartClick}
-            className="relative group rounded-full hover:bg-white/5 transition-all duration-300"
-            style={{ padding: 'clamp(0.375rem, 1vw, 0.625rem)' }}
+            className="relative group p-3 transition-all duration-300"
             aria-label="Koszyk"
           >
-            <ShoppingCart 
-              className="text-white/60 group-hover:text-brand-gold transition-colors duration-300"
-              style={{ width: 'clamp(1rem, 2vw, 1.25rem)', height: 'clamp(1rem, 2vw, 1.25rem)' }}
-            />
+            <ShoppingCart className="w-5 h-5 text-white/50 group-hover:text-brand-gold transition-colors duration-300" />
             {cartCount > 0 && (
               <span 
-                className="absolute flex items-center justify-center bg-brand-gold text-black font-bold rounded-full shadow-[0_0_10px_rgba(212,175,55,0.5)]"
-                style={{ 
-                  top: 'clamp(0rem, 0.3vw, 0.25rem)', 
-                  right: 'clamp(0rem, 0.3vw, 0.25rem)',
-                  height: 'clamp(0.75rem, 1.5vw, 1rem)',
-                  width: 'clamp(0.75rem, 1.5vw, 1rem)',
-                  fontSize: 'clamp(0.4rem, 0.8vw, 0.5rem)'
-                }}
+                className="absolute top-1.5 right-1.5 flex items-center justify-center w-4 h-4 bg-brand-gold text-[10px] text-black font-medium rounded-full"
+                style={{ fontFamily: "'Lato', sans-serif" }}
               >
                 {cartCount}
               </span>

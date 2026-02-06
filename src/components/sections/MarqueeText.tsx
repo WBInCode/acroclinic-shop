@@ -1,22 +1,22 @@
 import { motion } from 'framer-motion'
 
 export function MarqueeText() {
-  const text = "ACRO CLINIC • PREMIUM EQUIPMENT • PROFESSIONAL GEAR • "
+  const text = "ACRO CLINIC  ◆  PREMIUM EQUIPMENT  ◆  PROFESSIONAL GEAR  ◆  "
   
   return (
     <motion.div 
-      className="relative overflow-hidden py-8 my-16 border-y border-white/10"
+      className="relative overflow-hidden py-10 my-20 border-y border-white/[0.06]"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
     >
       <div className="flex whitespace-nowrap">
         <motion.div
           className="flex"
           animate={{ x: ['0%', '-50%'] }}
           transition={{
-            duration: 25,
+            duration: 30,
             repeat: Infinity,
             ease: 'linear',
           }}
@@ -24,7 +24,8 @@ export function MarqueeText() {
           {[1, 2, 3, 4].map((i) => (
             <span 
               key={i}
-              className="font-[family-name:var(--font-heading)] font-light text-2xl md:text-4xl text-white/20 tracking-[0.1em] uppercase px-4"
+              className="text-2xl md:text-3xl text-white/[0.08] tracking-[0.3em] uppercase px-8"
+              style={{ fontFamily: "'Playfair Display', serif", fontWeight: 300 }}
             >
               {text}
             </span>
@@ -34,3 +35,4 @@ export function MarqueeText() {
     </motion.div>
   )
 }
+

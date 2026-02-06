@@ -81,7 +81,7 @@ export function OrderConfirmationPage({ orderNumber, paymentStatus = 'pending', 
     >
       <div className="container mx-auto px-4 max-w-2xl">
         <motion.div
-          className="bg-white/[0.02] border border-white/10 p-8 md:p-12 text-center"
+          className="bg-[#0c0c0c] rounded-2xl p-8 md:p-12 text-center"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease }}
@@ -171,7 +171,7 @@ export function OrderConfirmationPage({ orderNumber, paymentStatus = 'pending', 
                 Możesz spróbować ponownie.
               </p>
 
-              <div className="bg-white/5 border border-white/10 p-6 mb-8">
+              <div className="bg-[#0a0a0a] rounded-xl p-6 mb-8">
                 <p className="text-white/60 text-sm font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
                   Numer zamówienia
                 </p>

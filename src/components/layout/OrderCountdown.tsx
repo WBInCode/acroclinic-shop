@@ -51,58 +51,91 @@ export function OrderCountdown() {
   const formatNumber = (num: number) => num.toString().padStart(2, '0')
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[60] bg-gradient-to-r from-brand-gold/20 via-brand-gold/10 to-brand-gold/20 border-b border-brand-gold/30 backdrop-blur-sm">
+    <div className="fixed top-0 left-0 right-0 z-[60] bg-[#0a0a0a]/95 backdrop-blur-md border-b border-brand-gold/10">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-center py-2 md:py-3">
+        <div className="flex items-center justify-center py-3 md:py-4">
           {/* Main countdown section */}
-          <div className="flex-1 flex items-center justify-center gap-2 md:gap-6">
-            <div className="flex items-center gap-2 text-brand-gold">
-              <Clock className="w-4 h-4 md:w-5 md:h-5 animate-pulse" />
-              <span className="text-[10px] md:text-xs uppercase tracking-wider font-bold hidden sm:inline">
-                Zamówienia na odzież do:
-              </span>
-              <span className="text-[10px] md:text-xs uppercase tracking-wider font-bold sm:hidden">
-                Do zamknięcia:
+          <div className="flex-1 flex items-center justify-center gap-3 md:gap-8">
+            <div className="flex items-center gap-2 text-brand-gold/70">
+              <Clock className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              <span 
+                className="text-[10px] md:text-xs tracking-[0.15em] uppercase hidden sm:inline"
+                style={{ fontFamily: "'Lato', sans-serif", fontWeight: 400 }}
+              >
+                Zamówienia do
               </span>
             </div>
 
-            {/* Timer display */}
-            <div className="flex items-center gap-1 md:gap-2">
+            {/* Timer display - elegancki */}
+            <div className="flex items-center gap-3 md:gap-4">
               <div className="flex flex-col items-center">
-                <span className="font-mono text-lg md:text-2xl font-bold text-white tabular-nums">
+                <span 
+                  className="text-xl md:text-2xl text-white font-light tabular-nums"
+                  style={{ fontFamily: "'Playfair Display', serif" }}
+                >
                   {formatNumber(timeLeft.days)}
                 </span>
-                <span className="text-[8px] md:text-[10px] text-white/60 uppercase">dni</span>
+                <span 
+                  className="text-[8px] md:text-[9px] text-white/30 uppercase tracking-wider"
+                  style={{ fontFamily: "'Lato', sans-serif" }}
+                >
+                  dni
+                </span>
               </div>
-              <span className="text-brand-gold text-lg md:text-2xl font-bold">:</span>
+              <span className="text-brand-gold/40 text-lg">:</span>
               <div className="flex flex-col items-center">
-                <span className="font-mono text-lg md:text-2xl font-bold text-white tabular-nums">
+                <span 
+                  className="text-xl md:text-2xl text-white font-light tabular-nums"
+                  style={{ fontFamily: "'Playfair Display', serif" }}
+                >
                   {formatNumber(timeLeft.hours)}
                 </span>
-                <span className="text-[8px] md:text-[10px] text-white/60 uppercase">godz</span>
+                <span 
+                  className="text-[8px] md:text-[9px] text-white/30 uppercase tracking-wider"
+                  style={{ fontFamily: "'Lato', sans-serif" }}
+                >
+                  godz
+                </span>
               </div>
-              <span className="text-brand-gold text-lg md:text-2xl font-bold">:</span>
+              <span className="text-brand-gold/40 text-lg">:</span>
               <div className="flex flex-col items-center">
-                <span className="font-mono text-lg md:text-2xl font-bold text-white tabular-nums">
+                <span 
+                  className="text-xl md:text-2xl text-white font-light tabular-nums"
+                  style={{ fontFamily: "'Playfair Display', serif" }}
+                >
                   {formatNumber(timeLeft.minutes)}
                 </span>
-                <span className="text-[8px] md:text-[10px] text-white/60 uppercase">min</span>
+                <span 
+                  className="text-[8px] md:text-[9px] text-white/30 uppercase tracking-wider"
+                  style={{ fontFamily: "'Lato', sans-serif" }}
+                >
+                  min
+                </span>
               </div>
-              <span className="text-brand-gold text-lg md:text-2xl font-bold hidden md:inline">:</span>
+              <span className="text-brand-gold/40 text-lg hidden md:inline">:</span>
               <div className="hidden md:flex flex-col items-center">
-                <span className="font-mono text-lg md:text-2xl font-bold text-white tabular-nums">
+                <span 
+                  className="text-xl md:text-2xl text-white font-light tabular-nums"
+                  style={{ fontFamily: "'Playfair Display', serif" }}
+                >
                   {formatNumber(timeLeft.seconds)}
                 </span>
-                <span className="text-[8px] md:text-[10px] text-white/60 uppercase">sek</span>
+                <span 
+                  className="text-[8px] md:text-[9px] text-white/30 uppercase tracking-wider"
+                  style={{ fontFamily: "'Lato', sans-serif" }}
+                >
+                  sek
+                </span>
               </div>
             </div>
 
             {/* Info button */}
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="ml-2 text-[10px] md:text-xs text-brand-gold/80 hover:text-brand-gold underline underline-offset-2 transition-colors"
+              className="ml-4 text-[10px] md:text-xs text-white/30 hover:text-brand-gold/70 transition-colors duration-300"
+              style={{ fontFamily: "'Lato', sans-serif" }}
             >
-              {isExpanded ? 'Zwiń' : 'Więcej info'}
+              {isExpanded ? 'Zwiń' : 'Info'}
             </button>
           </div>
         </div>
@@ -117,34 +150,43 @@ export function OrderCountdown() {
               transition={{ duration: 0.3 }}
               className="overflow-hidden"
             >
-              <div className="pb-4 pt-2 border-t border-brand-gold/20">
-                <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+              <div className="pb-6 pt-4 border-t border-white/[0.06]">
+                <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
                   {/* Clothing info */}
-                  <div className="flex items-start gap-3 bg-white/5 rounded-lg p-4">
-                    <div className="p-2 bg-brand-gold/20 rounded-lg shrink-0">
-                      <Package className="w-5 h-5 text-brand-gold" />
-                    </div>
+                  <div className="flex items-start gap-4 p-5 bg-white/[0.02] border border-white/[0.06] rounded-2xl">
+                    <Package className="w-5 h-5 text-brand-gold/60 shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="font-bold text-white text-sm mb-1">Odzież sportowa - szycie na zamówienie</h4>
-                      <p className="text-white/60 text-xs leading-relaxed">
-                        Nasza odzież jest <span className="text-brand-gold font-semibold">szyta specjalnie na zamówienie</span> z możliwością personalizacji. 
-                        Zamówienia zbieramy do <span className="text-brand-gold font-semibold">11 dnia każdego miesiąca</span>, 
-                        po czym wszystkie są przekazywane do produkcji. 
-                        Czas realizacji: około 2 tygodnie od daty produkcji.
+                      <h4 
+                        className="text-white/80 text-sm mb-2"
+                        style={{ fontFamily: "'Playfair Display', serif" }}
+                      >
+                        Odzież sportowa
+                      </h4>
+                      <p 
+                        className="text-white/40 text-xs leading-relaxed"
+                        style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300 }}
+                      >
+                        Szyta na zamówienie. Zbieramy do <span className="text-brand-gold/70">11 dnia każdego miesiąca</span>. 
+                        Realizacja: ~2 tygodnie.
                       </p>
                     </div>
                   </div>
 
                   {/* Accessories info */}
-                  <div className="flex items-start gap-3 bg-white/5 rounded-lg p-4">
-                    <div className="p-2 bg-green-500/20 rounded-lg shrink-0">
-                      <Truck className="w-5 h-5 text-green-400" />
-                    </div>
+                  <div className="flex items-start gap-4 p-5 bg-white/[0.02] border border-white/[0.06] rounded-2xl">
+                    <Truck className="w-5 h-5 text-brand-gold/60 shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="font-bold text-white text-sm mb-1">Akcesoria</h4>
-                      <p className="text-white/60 text-xs leading-relaxed">
-                        Akcesoria (kostki do jogi, gumy, itp.) są <span className="text-green-400 font-semibold">wysyłane od razu</span> po złożeniu zamówienia. 
-                        Standardowy czas dostawy: 1-3 dni robocze.
+                      <h4 
+                        className="text-white/80 text-sm mb-2"
+                        style={{ fontFamily: "'Playfair Display', serif" }}
+                      >
+                        Akcesoria
+                      </h4>
+                      <p 
+                        className="text-white/40 text-xs leading-relaxed"
+                        style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300 }}
+                      >
+                        Wysyłane natychmiast po złożeniu zamówienia. Dostawa: 1-3 dni robocze.
                       </p>
                     </div>
                   </div>
@@ -157,3 +199,4 @@ export function OrderCountdown() {
     </div>
   )
 }
+

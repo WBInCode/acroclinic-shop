@@ -509,7 +509,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                 className="space-y-6"
               >
                 {/* Wybór metody dostawy */}
-                <div className="bg-white/[0.02] border border-white/10 p-6 md:p-8">
+                <div className="bg-[#0c0c0c] rounded-2xl p-6 md:p-8">
                   <h2 className="font-[family-name:var(--font-heading)] font-bold text-lg text-white uppercase tracking-wide mb-6 flex items-center gap-3">
                     <Truck className="w-5 h-5 text-brand-gold" />
                     Metoda dostawy
@@ -520,7 +520,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                     <button
                       type="button"
                       onClick={() => setDeliveryMethod('courier')}
-                      className={`p-4 border-2 transition-all duration-300 text-left ${
+                      className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
                         deliveryMethod === 'courier'
                           ? 'border-brand-gold bg-brand-gold/10'
                           : 'border-white/10 hover:border-white/30'
@@ -563,7 +563,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                 </div>
 
                 {/* Dane kontaktowe */}
-                <div className="bg-white/[0.02] border border-white/10 p-6 md:p-8">
+                <div className="bg-[#0c0c0c] rounded-2xl p-6 md:p-8">
                   <h2 className="font-[family-name:var(--font-heading)] font-bold text-lg text-white uppercase tracking-wide mb-6 flex items-center gap-3">
                     <MapPin className="w-5 h-5 text-brand-gold" />
                     {deliveryMethod === 'courier' ? 'Adres dostawy' : 'Dane odbiorcy'}
@@ -828,7 +828,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                 </div>
 
                 {/* Faktura VAT */}
-                <div className="bg-white/[0.02] border border-white/10 p-6 md:p-8">
+                <div className="bg-[#0c0c0c] rounded-2xl p-6 md:p-8">
                   <label className="flex items-center gap-3 cursor-pointer">
                     <input
                       type="checkbox"
@@ -1119,7 +1119,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, ease }}
-                className="bg-white/[0.02] border border-white/10 p-6 md:p-8"
+                className="bg-[#0c0c0c] rounded-2xl p-6 md:p-8"
               >
                 <h2 className="font-[family-name:var(--font-heading)] font-bold text-lg text-white uppercase tracking-wide mb-6 flex items-center gap-3">
                   <CreditCard className="w-5 h-5 text-brand-gold" />
@@ -1127,7 +1127,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                 </h2>
 
                 {errors.payment && (
-                  <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-4 mb-6 text-sm">
+                  <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl mb-6 text-sm">
                     {errors.payment}
                   </div>
                 )}
@@ -1208,7 +1208,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5, ease }}
-                className="bg-white/[0.02] border border-white/10 p-12 flex flex-col items-center justify-center text-center"
+                className="bg-[#0c0c0c] rounded-2xl p-12 flex flex-col items-center justify-center text-center"
               >
                 <Loader2 className="w-16 h-16 text-brand-gold animate-spin mb-6" />
                 <h2 className="font-[family-name:var(--font-heading)] font-bold text-xl text-white uppercase tracking-wide mb-2">
@@ -1228,7 +1228,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease, delay: 0.2 }}
           >
-            <div className="sticky top-24 p-6 md:p-8 bg-white/[0.02] border border-white/10">
+            <div className="sticky top-24 p-6 md:p-8 bg-[#0c0c0c] rounded-2xl">
               <h2 className="font-[family-name:var(--font-heading)] font-bold text-lg text-white uppercase tracking-wide mb-6">
                 Twoje zamówienie
               </h2>
@@ -1237,8 +1237,8 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
               <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
                 {items.map((item) => (
                   <div key={item.id + (item.selectedSize || '')} className="flex gap-3">
-                    <div className="w-16 h-16 bg-white/[0.02] flex-shrink-0 overflow-hidden">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    <div className="w-16 h-16 bg-[#0a0a0a] flex-shrink-0 overflow-hidden rounded-lg p-1">
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm font-[family-name:var(--font-heading)] truncate">{item.name}</p>
@@ -1247,8 +1247,9 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                         {item.selectedSize && <span> • {item.selectedSize}</span>}
                       </p>
                     </div>
-                    <p className="text-brand-gold text-sm font-[family-name:var(--font-heading)] font-bold">
-                      {(item.price * item.quantity).toFixed(2)} PLN
+                    <p className="text-sm font-[family-name:var(--font-heading)] font-bold flex items-baseline gap-0.5">
+                      <span className="text-brand-gold">{(item.price * item.quantity).toFixed(2)}</span>
+                      <span className="text-brand-gold/80 text-xs">PLN</span>
                     </p>
                   </div>
                 ))}
@@ -1270,8 +1271,9 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
               <div className="border-t border-white/10 pt-4 mt-4">
                 <div className="flex justify-between items-baseline">
                   <span className="font-[family-name:var(--font-heading)] font-bold text-white uppercase">Razem</span>
-                  <span className="font-[family-name:var(--font-heading)] font-bold text-2xl text-brand-gold">
-                    {total.toFixed(2)} PLN
+                  <span className="font-[family-name:var(--font-heading)] font-bold text-2xl flex items-baseline gap-1">
+                    <span className="text-brand-gold">{total.toFixed(2)}</span>
+                    <span className="text-brand-gold/80 text-base">PLN</span>
                   </span>
                 </div>
               </div>

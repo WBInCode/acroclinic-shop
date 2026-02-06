@@ -34,7 +34,10 @@ app.use(helmet({
 // CORS configuration
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:5000',
-  process.env.ADMIN_URL || 'http://localhost:5001', // Admin panel
+  'http://localhost:5001',
+  'http://localhost:5002',
+  'http://localhost:5003',
+  process.env.ADMIN_URL || 'http://localhost:5173', // Admin panel
 ].filter(Boolean);
 
 // Add any additional origins from env

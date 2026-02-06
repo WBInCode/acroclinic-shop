@@ -73,7 +73,7 @@ export function CartPage({ items, onContinueShopping, onUpdateQuantity, onRemove
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease }}
           >
-            <div className="w-24 h-24 md:w-28 md:h-28 flex items-center justify-center border-2 border-white/10 rounded-lg mb-8">
+            <div className="w-24 h-24 md:w-28 md:h-28 flex items-center justify-center border-2 border-white/10 rounded-2xl mb-8">
               <ShoppingBag className="w-12 h-12 md:w-14 md:h-14 text-white/20" />
             </div>
             <h2 className="font-[family-name:var(--font-heading)] font-bold text-xl md:text-2xl text-white mb-3">
@@ -101,14 +101,14 @@ export function CartPage({ items, onContinueShopping, onUpdateQuantity, onRemove
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20, height: 0 }}
                     transition={{ duration: 0.4, ease, delay: index * 0.05 }}
-                    className="flex gap-4 md:gap-6 p-4 md:p-6 bg-white/[0.02] border border-white/10 hover:border-brand-gold/30 transition-colors"
+                    className="flex gap-4 md:gap-6 p-4 md:p-6 rounded-2xl bg-[#0c0c0c] hover:bg-[#0e0e0e] transition-colors"
                   >
                     {/* Image */}
-                    <div className="w-24 h-24 md:w-32 md:h-32 flex-shrink-0 overflow-hidden bg-white/[0.02]">
+                    <div className="w-24 h-24 md:w-32 md:h-32 flex-shrink-0 overflow-hidden rounded-xl bg-[#0a0a0a] p-2">
                       <img
                         src={item.image}
                         alt={item.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover rounded-lg"
                       />
                     </div>
 
@@ -155,8 +155,9 @@ export function CartPage({ items, onContinueShopping, onUpdateQuantity, onRemove
                         </div>
 
                         {/* Price */}
-                        <p className="font-[family-name:var(--font-heading)] font-bold text-lg text-brand-gold">
-                          {(item.price * item.quantity).toFixed(2)} PLN
+                        <p className="font-[family-name:var(--font-heading)] font-bold text-lg flex items-baseline gap-1">
+                          <span className="text-brand-gold">{(item.price * item.quantity).toFixed(2)}</span>
+                          <span className="text-brand-gold/80 text-sm">PLN</span>
                         </p>
                       </div>
                     </div>
@@ -185,7 +186,7 @@ export function CartPage({ items, onContinueShopping, onUpdateQuantity, onRemove
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease, delay: 0.2 }}
             >
-              <div className="sticky top-24 p-6 md:p-8 bg-white/[0.02] border border-white/10">
+              <div className="sticky top-24 p-6 md:p-8 rounded-2xl bg-white/[0.02] border border-white/10">
                 <h2 className="font-[family-name:var(--font-heading)] font-bold text-lg text-white uppercase tracking-wide mb-6">
                   Podsumowanie
                 </h2>

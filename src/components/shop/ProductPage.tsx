@@ -70,36 +70,34 @@ export function ProductPage({ product, onBack, onAddToCart, onToggleWishlist, is
             transition={{ duration: 0.8, ease, delay: 0.1 }}
           >
             {/* Main image */}
-            <div className="relative aspect-square overflow-hidden bg-white/[0.02] border border-white/10 mb-4">
-              <AnimatePresence mode="wait">
-                <motion.img
-                  key={activeImage}
-                  src={images[activeImage]}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                  initial={{ opacity: 0, scale: 1.1 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.4, ease }}
-                />
-              </AnimatePresence>
+            <div className="relative aspect-square overflow-hidden rounded-2xl bg-[#0c0c0c] p-4 mb-4">
+              <div className="relative w-full h-full rounded-xl overflow-hidden">
+                <AnimatePresence mode="wait">
+                  <motion.img
+                    key={activeImage}
+                    src={images[activeImage]}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                    initial={{ opacity: 0, scale: 1.05 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                    transition={{ duration: 0.4, ease }}
+                  />
+                </AnimatePresence>
+              </div>
               
               {/* Badge */}
               {product.badge && (
                 <div className="absolute top-6 left-6 z-10">
-                  <span className={`px-4 py-2 text-xs font-bold uppercase tracking-wider ${
+                  <span className={`px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider ${
                     product.badge === 'NEW' 
                       ? 'bg-brand-gold text-black' 
-                      : 'bg-white/10 text-white border border-white/20'
-                  }`}>
+                      : 'bg-black/60 text-white backdrop-blur-sm'
+                  }`} style={{ fontFamily: "'Lato', sans-serif" }}>
                     {product.badge}
                   </span>
                 </div>
               )}
-
-              {/* Decorative corner */}
-              <div className="absolute top-0 right-0 w-16 h-16 border-t-2 border-r-2 border-brand-gold/30" />
-              <div className="absolute bottom-0 left-0 w-16 h-16 border-b-2 border-l-2 border-brand-gold/30" />
             </div>
 
             {/* Thumbnails */}
@@ -108,13 +106,13 @@ export function ProductPage({ product, onBack, onAddToCart, onToggleWishlist, is
                 <motion.button
                   key={idx}
                   onClick={() => setActiveImage(idx)}
-                  className={`relative w-20 h-20 overflow-hidden border-2 transition-colors ${
-                    activeImage === idx ? 'border-brand-gold' : 'border-white/10 hover:border-white/30'
+                  className={`relative w-20 h-20 overflow-hidden rounded-xl bg-[#0c0c0c] p-1 transition-all ${
+                    activeImage === idx ? 'ring-2 ring-brand-gold' : 'ring-1 ring-white/10 hover:ring-white/30'
                   }`}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <img src={img} alt="" className="w-full h-full object-cover" />
+                  <img src={img} alt="" className="w-full h-full object-cover rounded-lg" />
                 </motion.button>
               ))}
             </div>
@@ -138,10 +136,11 @@ export function ProductPage({ product, onBack, onAddToCart, onToggleWishlist, is
             </h1>
 
             {/* Price */}
-            <div className="mb-8">
+            <div className="mb-8 flex items-baseline gap-1">
               <span className="font-[family-name:var(--font-heading)] font-bold text-4xl text-brand-gold">
-                {product.price} PLN
+                {product.price}
               </span>
+              <span className="font-[family-name:var(--font-heading)] text-xl text-brand-gold/80">PLN</span>
             </div>
 
             {/* Description */}
@@ -203,11 +202,11 @@ export function ProductPage({ product, onBack, onAddToCart, onToggleWishlist, is
                 className="btn-primary flex-1"
               >
                 <ShoppingCart className="w-5 h-5" />
-                Dodaj do koszyka
+                <span>Dodaj do koszyka</span>
               </button>
               <button
                 onClick={handleToggleWishlist}
-                className={`w-14 h-14 flex items-center justify-center border-2 transition-all duration-300 ${
+                className={`w-14 h-14 flex items-center justify-center rounded-xl border-2 transition-all duration-300 ${
                   isInWishlist
                     ? 'bg-red-500/20 border-red-500 text-red-500'
                     : 'border-white/20 text-white/60 hover:border-brand-gold hover:text-brand-gold'

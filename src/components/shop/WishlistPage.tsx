@@ -63,7 +63,7 @@ export function WishlistPage({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease }}
           >
-            <div className="w-24 h-24 md:w-28 md:h-28 flex items-center justify-center border-2 border-white/10 rounded-lg mb-8">
+            <div className="w-24 h-24 md:w-28 md:h-28 flex items-center justify-center border-2 border-white/10 rounded-2xl mb-8">
               <Heart className="w-12 h-12 md:w-14 md:h-14 text-white/20" />
             </div>
             <h2 className="font-[family-name:var(--font-heading)] font-bold text-xl md:text-2xl text-white mb-3">
@@ -88,12 +88,12 @@ export function WishlistPage({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.4, ease, delay: index * 0.05 }}
-                  className="group relative bg-white/[0.02] border border-white/10 hover:border-brand-gold/30 transition-all duration-300"
+                  className="group relative rounded-2xl bg-[#0c0c0c] overflow-hidden"
                 >
                   {/* Remove button */}
                   <button
                     onClick={() => onRemoveItem(item.id)}
-                    className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center bg-black/60 backdrop-blur-sm text-white/60 hover:text-red-500 hover:bg-black/80 transition-all duration-300 rounded-full"
+                    className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center bg-black/60 backdrop-blur-sm text-white/60 hover:text-red-500 hover:bg-black/80 transition-all duration-300 rounded-full"
                     aria-label="Usuń z listy życzeń"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -101,12 +101,12 @@ export function WishlistPage({
 
                   {/* Badge */}
                   {item.badge && (
-                    <div className="absolute top-3 left-3 z-10">
-                      <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${
+                    <div className="absolute top-4 left-4 z-10">
+                      <span className={`px-3 py-1.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
                         item.badge === 'NEW' 
                           ? 'bg-brand-gold text-black' 
-                          : 'bg-white text-black'
-                      }`}>
+                          : 'bg-black/60 text-white backdrop-blur-sm'
+                      }`} style={{ fontFamily: "'Lato', sans-serif" }}>
                         {item.badge}
                       </span>
                     </div>
@@ -114,18 +114,20 @@ export function WishlistPage({
 
                   {/* Image */}
                   <div 
-                    className="aspect-square overflow-hidden cursor-pointer"
+                    className="p-3"
                     onClick={() => onProductClick(item)}
                   >
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
+                    <div className="aspect-square overflow-hidden cursor-pointer rounded-xl">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
                   </div>
 
                   {/* Content */}
-                  <div className="p-4">
+                  <div className="p-5 pt-2 bg-[#0a0a0a]">
                     <p className="text-[10px] text-white/40 font-[family-name:var(--font-body)] uppercase tracking-widest mb-1">
                       {item.category === 'clothing' ? 'Odzież' : 'Akcesoria'}
                     </p>
@@ -137,8 +139,9 @@ export function WishlistPage({
                     </h3>
                     
                     <div className="flex items-center justify-between gap-3">
-                      <span className="font-[family-name:var(--font-heading)] font-bold text-lg text-brand-gold">
-                        {item.price.toFixed(2)} PLN
+                      <span className="font-[family-name:var(--font-heading)] font-bold text-lg flex items-baseline gap-1">
+                        <span className="text-brand-gold">{item.price.toFixed(2)}</span>
+                        <span className="text-brand-gold/80 text-sm">PLN</span>
                       </span>
                       <button
                         onClick={() => onAddToCart(item)}

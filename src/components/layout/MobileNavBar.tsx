@@ -1,5 +1,4 @@
 import { Home, Heart, ShoppingCart, User } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 
 interface MobileNavBarProps {
   cartCount: number
@@ -32,7 +31,7 @@ export function MobileNavBar({ cartCount, wishlistCount = 0, activeTab, onTabCha
   }
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md border-t border-[#1a1a1a] transition-transform duration-300">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-md border-t border-white/[0.06]">
       <div className="grid grid-cols-4 h-16">
         {navItems.map((item) => {
           const Icon = item.icon
@@ -42,32 +41,28 @@ export function MobileNavBar({ cartCount, wishlistCount = 0, activeTab, onTabCha
             <button
               key={item.id}
               onClick={() => handleTabClick(item.id)}
-              className="relative flex flex-col items-center justify-center gap-1 transition-colors"
+              className="relative flex flex-col items-center justify-center gap-1 transition-all duration-300"
             >
               <div className="relative">
                 <Icon 
-                  className={`w-5 h-5 transition-colors ${
-                    isActive ? 'text-brand-gold' : 'text-white'
+                  className={`w-5 h-5 transition-colors duration-300 ${
+                    isActive ? 'text-brand-gold' : 'text-white/40'
                   }`} 
                 />
                 {item.badge && item.badge > 0 && (
-                  <Badge 
-                    className="absolute -top-2 -right-2 h-4 w-4 flex items-center justify-center p-0 bg-brand-gold text-black text-[10px] font-bold border-none"
-                  >
+                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 flex items-center justify-center bg-brand-gold text-black text-[9px] font-medium rounded-full">
                     {item.badge}
-                  </Badge>
+                  </span>
                 )}
               </div>
               <span 
-                className={`text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-brand-gold' : 'text-white/60'
+                className={`text-[9px] tracking-wider uppercase transition-colors duration-300 ${
+                  isActive ? 'text-brand-gold' : 'text-white/30'
                 }`}
+                style={{ fontFamily: "'Lato', sans-serif" }}
               >
                 {item.label}
               </span>
-              {isActive && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-brand-gold rounded-full" />
-              )}
             </button>
           )
         })}
@@ -75,3 +70,4 @@ export function MobileNavBar({ cartCount, wishlistCount = 0, activeTab, onTabCha
     </div>
   )
 }
+

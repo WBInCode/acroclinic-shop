@@ -490,12 +490,12 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
                       return (
                         <div 
                           key={order.id}
-                          className="bg-white/5 rounded-lg border border-white/10 p-4"
+                          className="bg-[#0c0c0c] rounded-2xl p-5"
                         >
                           <div className="flex items-start justify-between mb-3">
                             <div>
-                              <p className="text-white font-medium">#{order.orderNumber}</p>
-                              <p className="text-sm text-white/50">
+                              <p className="text-white font-medium font-[family-name:var(--font-heading)]">#{order.orderNumber}</p>
+                              <p className="text-sm text-white/50 font-[family-name:var(--font-body)]">
                                 {new Date(order.createdAt).toLocaleDateString('pl-PL', {
                                   year: 'numeric',
                                   month: 'long',
@@ -505,7 +505,7 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
                             </div>
                             <div className={`flex items-center gap-2 ${status.color}`}>
                               <StatusIcon className="w-4 h-4" />
-                              <span className="text-sm font-medium">{status.label}</span>
+                              <span className="text-sm font-medium font-[family-name:var(--font-body)]">{status.label}</span>
                             </div>
                           </div>
 
@@ -513,29 +513,32 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
                             {order.items.slice(0, 2).map((item) => (
                               <div key={item.id} className="flex items-center gap-3">
                                 {item.image && (
-                                  <img 
-                                    src={item.image} 
-                                    alt={item.name}
-                                    className="w-10 h-10 object-cover rounded"
-                                  />
+                                  <div className="w-12 h-12 bg-[#0a0a0a] rounded-lg p-1 flex-shrink-0">
+                                    <img 
+                                      src={item.image} 
+                                      alt={item.name}
+                                      className="w-full h-full object-cover rounded"
+                                    />
+                                  </div>
                                 )}
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-sm text-white truncate">{item.name}</p>
-                                  <p className="text-xs text-white/50">{item.quantity} szt.</p>
+                                  <p className="text-sm text-white truncate font-[family-name:var(--font-heading)]">{item.name}</p>
+                                  <p className="text-xs text-white/50 font-[family-name:var(--font-body)]">{item.quantity} szt.</p>
                                 </div>
-                                <p className="text-sm text-white/70">{item.price.toFixed(2)} zł</p>
+                                <p className="text-sm text-white/70 font-[family-name:var(--font-heading)]">{item.price.toFixed(2)} zł</p>
                               </div>
                             ))}
                             {order.items.length > 2 && (
-                              <p className="text-xs text-white/50">
+                              <p className="text-xs text-white/50 font-[family-name:var(--font-body)]">
                                 + {order.items.length - 2} więcej produktów
                               </p>
                             )}
                           </div>
 
                           <div className="flex items-center justify-between pt-3 border-t border-white/10">
-                            <p className="text-white font-semibold">
-                              {order.total.toFixed(2)} zł
+                            <p className="text-white font-semibold font-[family-name:var(--font-heading)] flex items-baseline gap-1">
+                              <span className="text-brand-gold">{order.total.toFixed(2)}</span>
+                              <span className="text-brand-gold/80 text-sm">zł</span>
                             </p>
                             <Button
                               variant="ghost"

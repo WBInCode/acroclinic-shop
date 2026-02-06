@@ -3,8 +3,8 @@ import { CategoryPills, type Category } from './CategoryPills'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 
-// Spójne animacje
-const transition = { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
+// Eleganckie animacje
+const transition = { duration: 0.6, ease: [0.4, 0, 0.2, 1] }
 
 interface ProductGridProps {
   products: Product[]
@@ -26,26 +26,41 @@ export function ProductGrid({ products, onAddToCart, onProductClick, onToggleWis
   return (
     <section 
       id="products"
-      className="container mx-auto px-4 py-24 relative"
+      className="container mx-auto px-6 py-32 relative"
     >
       <motion.div 
-        className="text-center mb-16"
-        initial={{ opacity: 0, y: 40 }}
+        className="text-center mb-20"
+        initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={transition}
       >
-        <span className="text-xs uppercase tracking-[0.3em] text-brand-gold/60 font-[family-name:var(--font-body)] block mb-4">Produkty</span>
-        <h2 className="font-[family-name:var(--font-heading)] font-bold text-3xl md:text-4xl text-white mb-4 tracking-tight uppercase">
-          NASZA <span className="text-brand-gold">KOLEKCJA</span>
+        {/* Elegancki nagłówek sekcji */}
+        <span 
+          className="text-xs tracking-[0.4em] uppercase text-brand-gold/50 block mb-6"
+          style={{ fontFamily: "'Lato', sans-serif" }}
+        >
+          Kolekcja
+        </span>
+        <h2 
+          className="text-4xl md:text-5xl text-white font-light mb-6"
+          style={{ fontFamily: "'Playfair Display', serif" }}
+        >
+          Nasza <span className="text-brand-gold italic">Kolekcja</span>
         </h2>
+        
+        {/* Elegancka linia z ornamentem */}
         <motion.div
-          className="w-16 h-px bg-gradient-to-r from-transparent via-brand-gold to-transparent mx-auto mt-6"
-          initial={{ scaleX: 0 }}
-          whileInView={{ scaleX: 1 }}
+          className="flex items-center justify-center gap-4"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ ...transition, delay: 0.2 }}
-        />
+        >
+          <div className="w-16 h-px bg-gradient-to-r from-transparent to-brand-gold/30" />
+          <div className="w-1.5 h-1.5 rotate-45 border border-brand-gold/40" />
+          <div className="w-16 h-px bg-gradient-to-l from-transparent to-brand-gold/30" />
+        </motion.div>
       </motion.div>
 
       <motion.div
@@ -62,12 +77,15 @@ export function ProductGrid({ products, onAddToCart, onProductClick, onToggleWis
 
       {filteredProducts.length === 0 ? (
         <div className="text-center py-20">
-          <p className="text-white/40 text-base font-[family-name:var(--font-body)]">
+          <p 
+            className="text-white/30 text-base"
+            style={{ fontFamily: "'Lato', sans-serif" }}
+          >
             Brak produktów w tej kategorii
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-5">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
           {filteredProducts.map((product, index) => (
             <ProductCard
               key={product.id}
@@ -84,3 +102,4 @@ export function ProductGrid({ products, onAddToCart, onProductClick, onToggleWis
     </section>
   )
 }
+

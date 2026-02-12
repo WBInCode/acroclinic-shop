@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Trash2, Plus, Minus, ShoppingBag, Truck, Shield, CreditCard } from 'lucide-react'
+import { ArrowLeft, Trash2, Plus, Minus, ShoppingBag, Truck, Shield, CreditCard, Lock } from 'lucide-react'
 import type { Product } from './ProductCard'
+import { PayULogo } from '@/components/ui/PayULogo'
 
 // Spójne animacje
 const ease = [0.22, 1, 0.36, 1] as const
@@ -24,10 +25,12 @@ const getItemKey = (item: CartItem) => item.selectedSize ? `${item.id}-${item.se
 
 export function CartPage({ items, onContinueShopping, onUpdateQuantity, onRemoveItem, onClearCart, onCheckout }: CartPageProps) {
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const shipping = subtotal > 300 ? 0 : 19.99
+  const shipping = subtotal > 300 ? 0 : 19.90
   const total = subtotal + shipping
 
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
+
+  const hasOutOfStockItems = items.some(item => item.stock === 0)
 
   return (
     <motion.div
@@ -93,75 +96,85 @@ export function CartPage({ items, onContinueShopping, onUpdateQuantity, onRemove
               <AnimatePresence mode="popLayout">
                 {items.map((item, index) => {
                   const itemKey = getItemKey(item)
+                  const isOutOfStock = item.stock === 0
                   return (
-                  <motion.div
-                    key={itemKey}
-                    layout
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20, height: 0 }}
-                    transition={{ duration: 0.4, ease, delay: index * 0.05 }}
-                    className="flex gap-4 md:gap-6 p-4 md:p-6 rounded-2xl bg-[#0c0c0c] hover:bg-[#0e0e0e] transition-colors"
-                  >
-                    {/* Image */}
-                    <div className="w-24 h-24 md:w-32 md:h-32 flex-shrink-0 overflow-hidden rounded-xl bg-[#0a0a0a] p-2">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    </div>
+                    <motion.div
+                      key={itemKey}
+                      layout
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20, height: 0 }}
+                      transition={{ duration: 0.4, ease, delay: index * 0.05 }}
+                      className={`flex gap-4 md:gap-6 p-4 md:p-6 rounded-2xl bg-[#0c0c0c] transition-colors ${isOutOfStock ? 'opacity-75 grayscale' : 'hover:bg-[#0e0e0e]'}`}
+                    >
+                      {/* Image */}
+                      <div className="w-24 h-24 md:w-32 md:h-32 flex-shrink-0 overflow-hidden rounded-xl bg-[#0a0a0a] p-2 relative">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                        {/* Out of stock sash */}
+                        {isOutOfStock && (
+                          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] bg-neutral-900/95 text-white py-1 -rotate-45 flex items-center justify-center z-20 border-y border-white/10 shadow-xl backdrop-blur-sm pointer-events-none">
+                            <span className="text-[10px] font-bold tracking-[0.2em] uppercase opacity-90" style={{ fontFamily: "'Lato', sans-serif" }}>
+                              Niedostępny
+                            </span>
+                          </div>
+                        )}
+                      </div>
 
-                    {/* Info */}
-                    <div className="flex-1 flex flex-col">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h3 className="font-[family-name:var(--font-heading)] font-bold text-sm md:text-base text-white uppercase">
-                            {item.name}
-                          </h3>
-                          <p className="text-xs text-white/40 font-[family-name:var(--font-body)] uppercase tracking-wider mt-1">
-                            {item.category === 'clothing' ? 'Odzież' : 'Akcesoria'}
-                            {item.selectedSize && <span className="ml-2">• Rozmiar: <span className="text-brand-gold">{item.selectedSize}</span></span>}
+                      {/* Info */}
+                      <div className="flex-1 flex flex-col">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <h3 className="font-[family-name:var(--font-heading)] font-bold text-sm md:text-base text-white uppercase">
+                              {item.name}
+                            </h3>
+                            <p className="text-xs text-white/40 font-[family-name:var(--font-body)] uppercase tracking-wider mt-1">
+                              {item.category === 'clothing' ? 'Odzież' : 'Akcesoria'}
+                              {item.selectedSize && <span className="ml-2">• Rozmiar: <span className="text-brand-gold">{item.selectedSize}</span></span>}
+                              {isOutOfStock && <span className="ml-2 text-red-500 font-bold">• PRODUKT NIEDOSTĘPNY</span>}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => onRemoveItem(itemKey)}
+                            className="text-white/40 hover:text-red-500 transition-colors p-2"
+                            aria-label="Usuń"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        <div className="mt-auto flex flex-wrap items-center justify-between gap-4">
+                          {/* Quantity controls */}
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => onUpdateQuantity(itemKey, Math.max(1, item.quantity - 1))}
+                              className="btn-qty w-8 h-8 text-sm"
+                              disabled={item.quantity <= 1}
+                            >
+                              <Minus className="w-3 h-3" />
+                            </button>
+                            <span className="w-8 text-center font-[family-name:var(--font-heading)] font-bold text-white">
+                              {item.quantity}
+                            </span>
+                            <button
+                              onClick={() => onUpdateQuantity(itemKey, item.quantity + 1)}
+                              className="btn-qty w-8 h-8 text-sm"
+                            >
+                              <Plus className="w-3 h-3" />
+                            </button>
+                          </div>
+
+                          {/* Price */}
+                          <p className="font-[family-name:var(--font-heading)] font-bold text-lg flex items-baseline gap-1">
+                            <span className="text-brand-gold">{(item.price * item.quantity).toFixed(2)}</span>
+                            <span className="text-brand-gold/80 text-sm">PLN</span>
                           </p>
                         </div>
-                        <button
-                          onClick={() => onRemoveItem(itemKey)}
-                          className="text-white/40 hover:text-red-500 transition-colors p-2"
-                          aria-label="Usuń"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
                       </div>
-
-                      <div className="mt-auto flex flex-wrap items-center justify-between gap-4">
-                        {/* Quantity controls */}
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => onUpdateQuantity(itemKey, Math.max(1, item.quantity - 1))}
-                            className="btn-qty w-8 h-8 text-sm"
-                            disabled={item.quantity <= 1}
-                          >
-                            <Minus className="w-3 h-3" />
-                          </button>
-                          <span className="w-8 text-center font-[family-name:var(--font-heading)] font-bold text-white">
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() => onUpdateQuantity(itemKey, item.quantity + 1)}
-                            className="btn-qty w-8 h-8 text-sm"
-                          >
-                            <Plus className="w-3 h-3" />
-                          </button>
-                        </div>
-
-                        {/* Price */}
-                        <p className="font-[family-name:var(--font-heading)] font-bold text-lg flex items-baseline gap-1">
-                          <span className="text-brand-gold">{(item.price * item.quantity).toFixed(2)}</span>
-                          <span className="text-brand-gold/80 text-sm">PLN</span>
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
+                    </motion.div>
                   )
                 })}
               </AnimatePresence>
@@ -202,11 +215,7 @@ export function CartPage({ items, onContinueShopping, onUpdateQuantity, onRemove
                       {shipping === 0 ? 'GRATIS' : `${shipping.toFixed(2)} PLN`}
                     </span>
                   </div>
-                  {shipping > 0 && (
-                    <p className="text-xs text-white/40 font-[family-name:var(--font-body)]">
-                      Darmowa dostawa od 300 PLN
-                    </p>
-                  )}
+
                 </div>
 
                 <div className="border-t border-white/10 pt-4 mb-6">
@@ -218,32 +227,46 @@ export function CartPage({ items, onContinueShopping, onUpdateQuantity, onRemove
                   </div>
                 </div>
 
-                <button 
+                <button
                   onClick={onCheckout}
-                  disabled={items.length === 0}
-                  className="btn-primary btn-full mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <CreditCard className="w-4 h-4" />
-                  Przejdź do płatności
+                  disabled={items.length === 0 || hasOutOfStockItems}
+                  className="btn-primary btn-full mb-4 disabled:opacity-50 disabled:cursor-not-allowed text-center justify-center">
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  {hasOutOfStockItems ? 'Usuń niedostępne produkty' : 'Przejdź do płatności'}
                 </button>
+
+                {hasOutOfStockItems && (
+                  <p className="text-red-500 text-xs text-center mb-4 font-[family-name:var(--font-body)]">
+                    Niektóre produkty w koszyku są niedostępne. Usuń je, aby kontynuować.
+                  </p>
+                )}
 
                 <button onClick={onContinueShopping} className="btn-secondary btn-full">
                   Kontynuuj zakupy
                 </button>
 
                 {/* Trust badges */}
-                <div className="grid grid-cols-2 gap-4 mt-8 pt-6 border-t border-white/10">
-                  <div className="text-center">
-                    <Truck className="w-5 h-5 text-brand-gold mx-auto mb-2" />
-                    <span className="text-[10px] text-white/40 font-[family-name:var(--font-body)] uppercase tracking-wider block">
-                      Darmowa dostawa od 300 PLN
-                    </span>
+                <div className="mt-8 pt-6 border-t border-white/10">
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="text-center">
+                      <Shield className="w-5 h-5 text-brand-gold mx-auto mb-2" />
+                      <span className="text-[10px] text-white/40 font-[family-name:var(--font-body)] uppercase tracking-wider block">
+                        Bezpieczne płatności
+                      </span>
+                    </div>
+                    <div className="text-center">
+                      <Lock className="w-5 h-5 text-brand-gold mx-auto mb-2" />
+                      <span className="text-[10px] text-white/40 font-[family-name:var(--font-body)] uppercase tracking-wider block">
+                        Szyfrowane SSL
+                      </span>
+                    </div>
                   </div>
-                  <div className="text-center">
-                    <Shield className="w-5 h-5 text-brand-gold mx-auto mb-2" />
-                    <span className="text-[10px] text-white/40 font-[family-name:var(--font-body)] uppercase tracking-wider block">
-                      Bezpieczne płatności
-                    </span>
+
+                  {/* Payment Icons */}
+                  <div className="flex justify-center items-center">
+                    <div className="bg-white/10 rounded px-3 py-1.5">
+                      <PayULogo size="sm" className="text-white/70" />
+                    </div>
                   </div>
                 </div>
               </div>

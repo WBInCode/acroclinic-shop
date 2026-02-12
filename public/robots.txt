@@ -1,0 +1,9 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://acroclinic.pl/sitemap.xml
+
+# Disallow admin and API paths
+Disallow: /api/

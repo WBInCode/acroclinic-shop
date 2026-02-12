@@ -35,7 +35,7 @@ async function apiFetch<T>(
   options: RequestInit = {}
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
-  
+
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     ...options.headers,
@@ -68,12 +68,12 @@ async function apiFetch<T>(
         headers,
         credentials: 'include',
       });
-      
+
       if (!retryResponse.ok) {
         const error = await retryResponse.json().catch(() => ({}));
         throw new ApiError(error.error || 'Request failed', retryResponse.status, error.code);
       }
-      
+
       return retryResponse.json();
     } else {
       // Logout user
@@ -507,7 +507,7 @@ export interface CreateAddressData {
   isDefault?: boolean;
 }
 
-export interface UpdateAddressData extends Partial<CreateAddressData> {}
+export interface UpdateAddressData extends Partial<CreateAddressData> { }
 
 export const addressApi = {
   async getAddresses(): Promise<{ addresses: Address[] }> {
@@ -545,6 +545,28 @@ export const addressApi = {
   async setDefaultAddress(id: string): Promise<{ message: string; address: Address }> {
     return apiFetch(`/addresses/${id}/set-default`, {
       method: 'POST',
+    });
+  },
+};
+
+// ==================== NEWSLETTER API ====================
+
+export const newsletterApi = {
+  async subscribe(email: string): Promise<{ success: boolean; message: string }> {
+    return apiFetch('/newsletter/subscribe', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  async getStatus(email: string): Promise<{ subscribed: boolean; status: string | null }> {
+    return apiFetch(`/newsletter/status/${encodeURIComponent(email)}`);
+  },
+
+  async unsubscribe(email: string): Promise<{ success: boolean; message: string }> {
+    return apiFetch('/newsletter/unsubscribe', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
     });
   },
 };

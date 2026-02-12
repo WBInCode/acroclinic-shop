@@ -180,18 +180,35 @@ router.post('/', optionalAuth, async (req: Request, res: Response, next: NextFun
       where: { key: 'shipping' },
     });
     const shippingConfig = (shippingSettings?.value as any) || {
-      freeShippingThreshold: 200,
-      standardShippingCost: 15.99,
+      standardShippingCost: 19.90,
     };
 
-    const shippingCost = subtotal >= shippingConfig.freeShippingThreshold 
-      ? 0 
+    const shippingCost = subtotal >= shippingConfig.freeShippingThreshold
+      ? 0
       : shippingConfig.standardShippingCost;
 
     const total = subtotal + shippingCost;
 
     // Utwórz zamówienie
     const order = await prisma.$transaction(async (tx) => {
+      // Pobierz kategorie produktów w koszyku
+      const productsWithCategories = await tx.product.findMany({
+        where: { id: { in: cart.items.map(i => i.productId) } },
+        include: { category: true },
+      });
+
+      const productCategoryMap = new Map(
+        productsWithCategories.map(p => [p.id, p.category?.slug || 'unknown'])
+      );
+
+      // Określ shipmentType
+      const hasClothing = cart.items.some(i => productCategoryMap.get(i.productId) === 'clothing');
+      const hasAccessories = cart.items.some(i => productCategoryMap.get(i.productId) !== 'clothing');
+      const isMixed = hasClothing && hasAccessories;
+
+      // Jeśli nie jest mieszane, wymuś STANDARD
+      const finalShipmentType = isMixed ? (data.shipmentType || 'STANDARD') : 'STANDARD';
+
       // Utwórz zamówienie
       const newOrder = await tx.order.create({
         data: {
@@ -200,6 +217,7 @@ router.post('/', optionalAuth, async (req: Request, res: Response, next: NextFun
           guestEmail: userId ? null : data.email, // Zapisz email tylko dla gości
           status: 'PENDING',
           paymentStatus: 'PENDING',
+          shipmentType: finalShipmentType,
           shippingFirstName: data.shippingAddress.firstName,
           shippingLastName: data.shippingAddress.lastName,
           shippingStreet: data.shippingAddress.street,
@@ -235,6 +253,28 @@ router.post('/', optionalAuth, async (req: Request, res: Response, next: NextFun
           items: true,
         },
       });
+
+      // Utwórz rekordy paragonów w zależności od shipmentType
+      if (finalShipmentType === 'SPLIT') {
+        // Dwa paragony: jeden dla akcesoriów (wystawiony od razu po płatności),
+        // drugi dla ciuchów (oczekujący na uszycie)
+        await tx.receipt.createMany({
+          data: [
+            { orderId: newOrder.id, type: 'accessories', status: 'PENDING' },
+            { orderId: newOrder.id, type: 'clothing', status: 'PENDING' },
+          ],
+        });
+      } else if (finalShipmentType === 'COMBINED') {
+        // Jeden paragon - wystawiony dopiero po skompletowaniu (ciuchy ze szwalni)
+        await tx.receipt.create({
+          data: { orderId: newOrder.id, type: 'full', status: 'PENDING' },
+        });
+      } else {
+        // STANDARD - jeden paragon, wystawiony od razu po płatności
+        await tx.receipt.create({
+          data: { orderId: newOrder.id, type: 'full', status: 'PENDING' },
+        });
+      }
 
       // Zmniejsz stan magazynowy
       for (const item of cart.items) {

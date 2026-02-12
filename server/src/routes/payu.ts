@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import { prisma } from '../lib/prisma.js';
 import { optionalAuth } from '../middleware/auth.js';
 import { createError } from '../middleware/errorHandler.js';
-import { generateInvoiceForOrder, getInvoicePdf } from '../lib/fakturownia.js';
+import { generateInvoiceForOrder, generatePartialInvoiceForOrder, getInvoicePdf } from '../lib/fakturownia.js';
 import { sendOrderConfirmationEmail } from '../lib/email.js';
 
 const router = Router();
@@ -181,7 +181,7 @@ router.post('/notify', async (req: Request, res: Response, next: NextFunction) =
       }, {});
 
       const expectedSignature = calculateSignature(body);
-      
+
       if (signatureParts.signature !== expectedSignature) {
         console.warn('Invalid PayU signature');
         // W produkcji można odrzucić, ale dla testów akceptujemy
@@ -265,18 +265,33 @@ router.post('/notify', async (req: Request, res: Response, next: NextFunction) =
 
     console.log(`PayU notification processed: Order ${order.orderNumber}, Status: ${status}`);
 
-    // Jeśli płatność zakończona sukcesem - generuj fakturę i wyślij email
+    // Jeśli płatność zakończona sukcesem - generuj fakturę/paragon i wyślij email
     if (paymentStatus === 'COMPLETED') {
       try {
-        // Generuj fakturę/paragon w Fakturownia.pl
-        const invoice = await generateInvoiceForOrder(order.id);
-        
+        let invoice: any = null;
+
+        // Logika paragonów zależna od shipmentType
+        if (updatedOrder.shipmentType === 'SPLIT') {
+          // SPLIT: Wystaw paragon TYLKO dla akcesoriów teraz.
+          // Paragon dla ciuchów będzie wystawiony gdy produkt dojedzie ze szwalni.
+          console.log(`Split shipment: generating accessories invoice for order ${updatedOrder.orderNumber}`);
+          invoice = await generatePartialInvoiceForOrder(order.id, 'accessories');
+        } else if (updatedOrder.shipmentType === 'COMBINED') {
+          // COMBINED: NIE wystawiaj paragonu teraz.
+          // Paragon będzie wystawiony gdy ciuchy dojadą ze szwalni (cały order razem).
+          console.log(`Combined shipment: deferring invoice for order ${updatedOrder.orderNumber}`);
+          invoice = null;
+        } else {
+          // STANDARD: Normalny paragon od razu
+          invoice = await generateInvoiceForOrder(order.id);
+        }
+
         // Pobierz PDF faktury (jeśli udało się wygenerować)
         let invoicePdf: Buffer | null = null;
         if (invoice?.id) {
           invoicePdf = await getInvoicePdf(invoice.id.toString());
         }
-        
+
         // Wyślij email z potwierdzeniem zamówienia
         const customerEmail = updatedOrder.user?.email || updatedOrder.guestEmail;
         if (customerEmail) {
@@ -352,7 +367,7 @@ router.get('/status/:orderId', optionalAuth, async (req: Request, res: Response,
         );
 
         const payuStatus = response.data.orders?.[0]?.status;
-        
+
         if (payuStatus === 'COMPLETED') {
           await prisma.order.update({
             where: { id: order.id },

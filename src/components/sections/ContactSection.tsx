@@ -64,39 +64,43 @@ export function ContactSection({ onContactClick }: ContactSectionProps) {
         </motion.p>
 
         <motion.div 
-          className="flex flex-col md:flex-row items-center justify-center gap-10 mb-14"
+          className="flex flex-col md:flex-row items-center justify-center gap-10 mb-14 relative"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ ...transition, delay: 0.5 }}
         >
-          <a
-            href="tel:570034367"
-            className="flex items-center gap-3 group"
-          >
-            <Phone className="w-4 h-4 text-brand-gold/60" />
-            <span 
-              className="text-white/70 group-hover:text-brand-gold transition-colors duration-300 text-lg tracking-wide"
-              style={{ fontFamily: "'Playfair Display', serif" }}
+          <div className="w-full md:flex-1 md:flex md:justify-end">
+            <a
+              href="tel:570034367"
+              className="flex items-center gap-3 group justify-center md:justify-end"
             >
-              570 034 367
-            </span>
-          </a>
+              <Phone className="w-4 h-4 text-brand-gold/60" />
+              <span 
+                className="text-white/70 group-hover:text-brand-gold transition-colors duration-300 text-lg tracking-wide"
+                style={{ fontFamily: "'Playfair Display', serif" }}
+              >
+                570 034 367
+              </span>
+            </a>
+          </div>
 
-          <div className="hidden md:block w-px h-6 bg-white/10" />
+          <div className="hidden md:block absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-px h-6 bg-white/10" />
 
-          <a
-            href="mailto:support@wb-partners.pl"
-            className="flex items-center gap-3 group"
-          >
-            <Mail className="w-4 h-4 text-brand-gold/60" />
-            <span 
-              className="text-white/50 group-hover:text-white/80 transition-colors duration-300 text-sm tracking-wide"
-              style={{ fontFamily: "'Lato', sans-serif" }}
+          <div className="w-full md:flex-1 md:flex md:justify-start">
+            <a
+              href="mailto:support@wb-partners.pl"
+              className="flex items-center gap-3 group justify-center md:justify-start"
             >
-              support@wb-partners.pl
-            </span>
-          </a>
+              <Mail className="w-4 h-4 text-brand-gold/60" />
+              <span 
+                className="text-white/50 group-hover:text-white/80 transition-colors duration-300 text-sm tracking-wide"
+                style={{ fontFamily: "'Lato', sans-serif" }}
+              >
+                support@wb-partners.pl
+              </span>
+            </a>
+          </div>
         </motion.div>
 
         <motion.div

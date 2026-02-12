@@ -12,12 +12,12 @@ interface WishlistPageProps {
   onProductClick: (product: Product) => void
 }
 
-export function WishlistPage({ 
-  items, 
-  onContinueShopping, 
-  onRemoveItem, 
+export function WishlistPage({
+  items,
+  onContinueShopping,
+  onRemoveItem,
   onAddToCart,
-  onProductClick 
+  onProductClick
 }: WishlistPageProps) {
   return (
     <motion.div
@@ -80,80 +80,96 @@ export function WishlistPage({
           /* Wishlist grid */
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             <AnimatePresence mode="popLayout">
-              {items.map((item, index) => (
-                <motion.div
-                  key={item.id}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.4, ease, delay: index * 0.05 }}
-                  className="group relative rounded-2xl bg-[#0c0c0c] overflow-hidden"
-                >
-                  {/* Remove button */}
-                  <button
-                    onClick={() => onRemoveItem(item.id)}
-                    className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center bg-black/60 backdrop-blur-sm text-white/60 hover:text-red-500 hover:bg-black/80 transition-all duration-300 rounded-full"
-                    aria-label="Usuń z listy życzeń"
+              {items.map((item, index) => {
+                const isOutOfStock = item.stock === 0
+
+                return (
+                  <motion.div
+                    key={item.id}
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.4, ease, delay: index * 0.05 }}
+                    className={`group relative rounded-2xl bg-[#0c0c0c] overflow-hidden transition-all duration-300 ${isOutOfStock ? 'opacity-75 grayscale' : ''}`}
                   >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                    {/* Remove button */}
+                    <button
+                      onClick={() => onRemoveItem(item.id)}
+                      className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center bg-black/60 backdrop-blur-sm text-white/60 hover:text-red-500 hover:bg-black/80 transition-all duration-300 rounded-full"
+                      aria-label="Usuń z listy życzeń"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
 
-                  {/* Badge */}
-                  {item.badge && (
-                    <div className="absolute top-4 left-4 z-10">
-                      <span className={`px-3 py-1.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
-                        item.badge === 'NEW' 
-                          ? 'bg-brand-gold text-black' 
-                          : 'bg-black/60 text-white backdrop-blur-sm'
-                      }`} style={{ fontFamily: "'Lato', sans-serif" }}>
-                        {item.badge}
-                      </span>
-                    </div>
-                  )}
+                    {/* Badge */}
+                    {item.badge && (
+                      <div className="absolute top-4 left-4 z-10">
+                        <span className={`px-3 py-1.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${item.badge === 'NEW'
+                            ? 'bg-brand-gold text-black'
+                            : 'bg-black/60 text-white backdrop-blur-sm'
+                          }`} style={{ fontFamily: "'Lato', sans-serif" }}>
+                          {item.badge}
+                        </span>
+                      </div>
+                    )}
 
-                  {/* Image */}
-                  <div 
-                    className="p-3"
-                    onClick={() => onProductClick(item)}
-                  >
-                    <div className="aspect-square overflow-hidden cursor-pointer rounded-xl">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    </div>
-                  </div>
+                    {/* Out of stock sash */}
+                    {isOutOfStock && (
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] bg-neutral-900/95 text-white py-2 -rotate-45 flex items-center justify-center z-20 border-y border-white/10 shadow-xl backdrop-blur-sm pointer-events-none">
+                        <span className="text-[10px] font-bold tracking-[0.3em] uppercase opacity-90" style={{ fontFamily: "'Lato', sans-serif" }}>
+                          Niedostępny
+                        </span>
+                      </div>
+                    )}
 
-                  {/* Content */}
-                  <div className="p-5 pt-2 bg-[#0a0a0a]">
-                    <p className="text-[10px] text-white/40 font-[family-name:var(--font-body)] uppercase tracking-widest mb-1">
-                      {item.category === 'clothing' ? 'Odzież' : 'Akcesoria'}
-                    </p>
-                    <h3 
-                      className="font-[family-name:var(--font-heading)] font-bold text-sm text-white uppercase mb-3 cursor-pointer hover:text-brand-gold transition-colors"
+                    {/* Image */}
+                    <div
+                      className="p-3"
                       onClick={() => onProductClick(item)}
                     >
-                      {item.name}
-                    </h3>
-                    
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="font-[family-name:var(--font-heading)] font-bold text-lg flex items-baseline gap-1">
-                        <span className="text-brand-gold">{item.price.toFixed(2)}</span>
-                        <span className="text-brand-gold/80 text-sm">PLN</span>
-                      </span>
-                      <button
-                        onClick={() => onAddToCart(item)}
-                        className="btn-primary btn-sm flex items-center gap-2"
-                      >
-                        <ShoppingCart className="w-3.5 h-3.5" />
-                        <span className="hidden sm:inline">Dodaj</span>
-                      </button>
+                      <div className="aspect-square overflow-hidden cursor-pointer rounded-xl">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+
+                    {/* Content */}
+                    <div className="p-5 pt-2 bg-[#0a0a0a]">
+                      <p className="text-[10px] text-white/40 font-[family-name:var(--font-body)] uppercase tracking-widest mb-1">
+                        {item.category === 'clothing' ? 'Odzież' : 'Akcesoria'}
+                      </p>
+                      <h3
+                        className="font-[family-name:var(--font-heading)] font-bold text-sm text-white uppercase mb-3 cursor-pointer hover:text-brand-gold transition-colors"
+                        onClick={() => onProductClick(item)}
+                      >
+                        {item.name}
+                      </h3>
+
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="font-[family-name:var(--font-heading)] font-bold text-lg flex items-baseline gap-1">
+                          <span className="text-brand-gold">{item.price.toFixed(2)}</span>
+                          <span className="text-brand-gold/80 text-sm">PLN</span>
+                        </span>
+                        <button
+                          onClick={() => onAddToCart(item)}
+                          disabled={isOutOfStock}
+                          className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-all ${isOutOfStock
+                              ? 'bg-white/10 text-white/40 cursor-not-allowed'
+                              : 'btn-primary btn-sm'
+                            }`}
+                        >
+                          <ShoppingCart className="w-3.5 h-3.5" />
+                          <span className="hidden sm:inline">{isOutOfStock ? 'Brak' : 'Dodaj'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )
+              })}
             </AnimatePresence>
           </div>
         )}

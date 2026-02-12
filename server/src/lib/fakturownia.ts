@@ -5,8 +5,8 @@ import { prisma } from './prisma.js';
 const FAKTUROWNIA_API_TOKEN = process.env.FAKTUROWNIA_API_TOKEN;
 const FAKTUROWNIA_SUBDOMAIN = process.env.FAKTUROWNIA_SUBDOMAIN; // np. "acroclinic" dla acroclinic.fakturownia.pl
 
-const FAKTUROWNIA_BASE_URL = FAKTUROWNIA_SUBDOMAIN 
-  ? `https://${FAKTUROWNIA_SUBDOMAIN}.fakturownia.pl/` 
+const FAKTUROWNIA_BASE_URL = FAKTUROWNIA_SUBDOMAIN
+  ? `https://${FAKTUROWNIA_SUBDOMAIN}.fakturownia.pl/`
   : null;
 
 interface OrderItem {
@@ -55,7 +55,7 @@ export async function createInvoice(data: InvoiceData): Promise<FakturowniaInvoi
   try {
     // Określ typ dokumentu: faktura VAT (jeśli jest NIP) lub paragon
     const isCompany = !!data.nip && data.nip.length === 10;
-    
+
     // Przygotuj pozycje faktury
     const positions = data.items.map(item => ({
       name: item.name + (item.size ? ` (rozmiar: ${item.size})` : ''),
@@ -75,8 +75,8 @@ export async function createInvoice(data: InvoiceData): Promise<FakturowniaInvoi
     }
 
     // Dane nabywcy
-    const buyerName = isCompany 
-      ? data.companyName 
+    const buyerName = isCompany
+      ? data.companyName
       : `${data.customerFirstName} ${data.customerLastName}`;
 
     // Przygotuj dane faktury/paragonu
@@ -241,4 +241,127 @@ export async function generateInvoiceForOrder(orderId: string): Promise<Fakturow
     paymentMethod: order.paymentMethod || 'ONLINE',
     paidAt: order.paidAt || new Date(),
   });
+}
+
+/**
+ * Generuje paragon/fakturę CZĘŚCIOWĄ dla zamówienia (np. tylko akcesoria lub tylko ciuchy)
+ * @param orderId - ID zamówienia
+ * @param receiptType - 'accessories' | 'clothing' | 'full'
+ */
+export async function generatePartialInvoiceForOrder(
+  orderId: string,
+  receiptType: 'accessories' | 'clothing' | 'full'
+): Promise<FakturowniaInvoice | null> {
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: {
+      items: {
+        include: {
+          product: {
+            include: { category: true },
+          },
+        },
+      },
+      user: true,
+      receipts: true,
+    },
+  });
+
+  if (!order) {
+    console.error('Order not found:', orderId);
+    return null;
+  }
+
+  // Znajdź odpowiedni receipt
+  const receipt = order.receipts.find(r => r.type === receiptType);
+  if (!receipt) {
+    console.error(`Receipt type "${receiptType}" not found for order:`, orderId);
+    return null;
+  }
+
+  // Już wystawiony?
+  if (receipt.status === 'ISSUED' && receipt.invoiceNumber) {
+    console.log(`Receipt "${receiptType}" already issued for order:`, order.orderNumber);
+    return {
+      id: parseInt(receipt.invoiceId || '0'),
+      number: receipt.invoiceNumber,
+      view_url: receipt.invoiceUrl || '',
+      pdf_url: receipt.invoiceUrl || '',
+    };
+  }
+
+  // Filtruj pozycje wg kategorii
+  let filteredItems = order.items;
+  if (receiptType === 'accessories') {
+    filteredItems = order.items.filter(item => item.product.category?.slug !== 'clothing');
+  } else if (receiptType === 'clothing') {
+    filteredItems = order.items.filter(item => item.product.category?.slug === 'clothing');
+  }
+
+  if (filteredItems.length === 0) {
+    console.warn(`No items for receipt type "${receiptType}" in order:`, order.orderNumber);
+    return null;
+  }
+
+  // Oblicz subtotal dla tej części
+  const partialSubtotal = filteredItems.reduce(
+    (sum, item) => sum + Number(item.price) * item.quantity,
+    0
+  );
+
+  // Koszt wysyłki: przy SPLIT, dolicz do akcesoriów (pierwsza paczka).
+  // Przy COMBINED lub STANDARD - dolicz normalnie.
+  let partialShippingCost = 0;
+  if (receiptType === 'full') {
+    partialShippingCost = Number(order.shippingCost);
+  } else if (receiptType === 'accessories') {
+    // Akcesoria idą jako pierwsza paczka - doliczamy wysyłkę
+    partialShippingCost = Number(order.shippingCost);
+  }
+  // Ciuchy (druga paczka) - brak dodatkowej opłaty za wysyłkę
+
+  const partialTotal = partialSubtotal + partialShippingCost;
+
+  // Suffix do numeru paragonu
+  const orderNumberSuffix = receiptType === 'full' ? '' : `-${receiptType.toUpperCase().slice(0, 3)}`;
+
+  const invoice = await createInvoice({
+    orderId: order.id,
+    orderNumber: `${order.orderNumber}${orderNumberSuffix}`,
+    customerEmail: order.user?.email || order.guestEmail || 'guest@acroclinic.pl',
+    customerFirstName: order.shippingFirstName,
+    customerLastName: order.shippingLastName,
+    customerPhone: order.shippingPhone || undefined,
+    companyName: order.billingCompanyName,
+    nip: order.billingNip,
+    street: order.billingStreet || order.shippingStreet,
+    city: order.billingCity || order.shippingCity,
+    postalCode: order.billingPostalCode || order.shippingPostalCode,
+    country: order.shippingCountry || 'Polska',
+    items: filteredItems.map(item => ({
+      name: item.name,
+      quantity: item.quantity,
+      price: Number(item.price),
+      size: (item as any).size || null,
+    })),
+    shippingCost: partialShippingCost,
+    total: partialTotal,
+    paymentMethod: order.paymentMethod || 'ONLINE',
+    paidAt: order.paidAt || new Date(),
+  });
+
+  // Zaktualizuj receipt w bazie
+  if (invoice) {
+    await prisma.receipt.update({
+      where: { id: receipt.id },
+      data: {
+        invoiceNumber: invoice.number,
+        invoiceId: invoice.id.toString(),
+        invoiceUrl: invoice.pdf_url,
+        status: 'ISSUED',
+      },
+    });
+  }
+
+  return invoice;
 }

@@ -13,7 +13,7 @@ export function TermsPage({ onBack }: TermsPageProps) {
       icon: FileText,
       title: '1. Postanowienia ogólne',
       content: [
-        'Sklep internetowy Acro Clinic prowadzony jest przez firmę Acro Clinic Sp. z o.o. z siedzibą w Warszawie.',
+        'Sklep internetowy Acro Clinic prowadzony jest przez firmę WB Partners Sp. z o.o. z siedzibą w Rzeszowie.',
         'Regulamin określa zasady korzystania ze sklepu, składania zamówień, dostawy oraz reklamacji.',
         'Korzystanie ze sklepu oznacza akceptację niniejszego regulaminu.'
       ]
@@ -43,9 +43,8 @@ export function TermsPage({ onBack }: TermsPageProps) {
       title: '4. Dostawa',
       content: [
         'Dostawa realizowana jest na terenie całej Polski.',
-        'Czas realizacji zamówienia wynosi od 1 do 5 dni roboczych.',
-        'Koszt dostawy zależy od wybranej formy i jest podawany przy składaniu zamówienia.',
-        'Darmowa dostawa dla zamówień powyżej 300 PLN.'
+        'Czas realizacji zamówienia wynosi od 1 do 5 dni roboczych w przypadku akcesorii. W przypadku sprzętu sportowego czas realizacji może wynosić do 21 dni roboczych ze względu na realizacje ciuchów w szwalni.',
+        'Koszt dostawy jest podawany przy składaniu zamówienia.'
       ]
     },
     {

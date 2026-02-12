@@ -66,19 +66,8 @@ export function ContactPage({ onBack }: ContactPageProps) {
       title: 'Telefon',
       value: '570 034 367',
       href: 'tel:570034367'
-    },
-    {
-      icon: MapPin,
-      title: 'Lokalizacja',
-      value: 'Kościuszki, Kolbuszowa 36-100',
-      href: 'https://maps.google.com/?q=Kościuszki,Kolbuszowa,Poland'
-    },
-    {
-      icon: Clock,
-      title: 'Zajęcia',
-      value: 'Akrobatyka i Taniec',
-      href: '#'
     }
+    
   ]
 
   return (
@@ -238,14 +227,6 @@ export function ContactPage({ onBack }: ContactPageProps) {
                   </div>
                 </motion.a>
               ))}
-            </div>
-
-            {/* Map placeholder */}
-            <div className="aspect-video bg-white/[0.02] border border-white/10 flex items-center justify-center">
-              <div className="text-center">
-                <MapPin className="w-8 h-8 text-brand-gold/40 mx-auto mb-3" />
-                <p className="text-white/30 text-sm font-[family-name:var(--font-body)]">Mapa lokalizacji</p>
-              </div>
             </div>
           </motion.div>
         </div>

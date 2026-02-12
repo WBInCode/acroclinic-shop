@@ -17,8 +17,9 @@ export const errorHandler = (
 
   // Zod validation errors
   if (err instanceof ZodError) {
+    const firstError = err.errors[0];
     res.status(400).json({
-      error: 'Błąd walidacji danych',
+      error: firstError ? firstError.message : 'Błąd walidacji danych',
       details: err.errors.map((e) => ({
         field: e.path.join('.'),
         message: e.message,
@@ -68,8 +69,8 @@ export const errorHandler = (
 
   // Default server error
   res.status(500).json({
-    error: process.env.NODE_ENV === 'development' 
-      ? err.message 
+    error: process.env.NODE_ENV === 'development'
+      ? err.message
       : 'Wewnętrzny błąd serwera',
   });
 };

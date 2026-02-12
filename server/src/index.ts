@@ -15,6 +15,7 @@ import { wishlistRouter } from './routes/wishlist.js';
 import { adminRouter } from './routes/admin.js';
 import addressesRouter from './routes/addresses.js';
 import { contactRouter } from './routes/contact.js';
+import { newsletterRouter } from './routes/newsletter.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { prisma } from './lib/prisma.js';
 
@@ -51,7 +52,7 @@ app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    
+
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -101,8 +102,8 @@ if (process.env.NODE_ENV === 'development') {
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
+  res.json({
+    status: 'ok',
     timestamp: new Date().toISOString(),
     version: '1.0.0',
   });
@@ -118,6 +119,7 @@ app.use('/api/wishlist', wishlistRouter);
 app.use('/api/addresses', addressesRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/contact', contactRouter);
+app.use('/api/newsletter', newsletterRouter);
 
 // 404 handler
 app.use('/api/*', (req, res) => {

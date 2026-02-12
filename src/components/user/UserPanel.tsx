@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
-import { 
-  ArrowLeft, 
-  Package, 
-  User as UserIcon, 
-  Settings, 
-  LogOut, 
-  Mail, 
-  Phone, 
+import {
+  ArrowLeft,
+  Package,
+  User as UserIcon,
+  Settings,
+  LogOut,
+  Mail,
+  Phone,
   ChevronRight,
   Clock,
   CheckCircle,
@@ -21,12 +21,14 @@ import {
   Pencil,
   Trash2,
   Star,
-  Building2
+  Building2,
+  Bell,
+  BellOff
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
-import { authApi, addressApi, type User, type Address, type AddressType, type CreateAddressData } from '@/lib/api'
+import { authApi, addressApi, newsletterApi, type User, type Address, type AddressType, type CreateAddressData } from '@/lib/api'
 
 const ease = [0.22, 1, 0.36, 1] as const
 
@@ -76,13 +78,18 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
   const [orders, setOrders] = useState<Order[]>([])
   const [isLoadingOrders, setIsLoadingOrders] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
-  
+
   // Settings form
   const [firstName, setFirstName] = useState(user.firstName || '')
   const [lastName, setLastName] = useState(user.lastName || '')
   const [phone, setPhone] = useState(user.phone || '')
   const [isSaving, setIsSaving] = useState(false)
-  
+
+  // Newsletter
+  const [isNewsletterSubscribed, setIsNewsletterSubscribed] = useState(false)
+  const [isLoadingNewsletter, setIsLoadingNewsletter] = useState(false)
+  const [isTogglingNewsletter, setIsTogglingNewsletter] = useState(false)
+
   // Contact form
   const [contactOrderNumber, setContactOrderNumber] = useState('')
   const [contactMessage, setContactMessage] = useState('')
@@ -117,7 +124,40 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
     if (activeTab === 'addresses') {
       fetchAddresses()
     }
+    if (activeTab === 'settings') {
+      fetchNewsletterStatus()
+    }
   }, [activeTab])
+
+  const fetchNewsletterStatus = async () => {
+    setIsLoadingNewsletter(true)
+    try {
+      const data = await newsletterApi.getStatus(user.email)
+      setIsNewsletterSubscribed(data.subscribed)
+    } catch (error) {
+      console.error('Error checking newsletter status:', error)
+    } finally {
+      setIsLoadingNewsletter(false)
+    }
+  }
+
+  const handleToggleNewsletter = async () => {
+    setIsTogglingNewsletter(true)
+    try {
+      if (isNewsletterSubscribed) {
+        await newsletterApi.unsubscribe(user.email)
+        setIsNewsletterSubscribed(false)
+        toast.success('Wypisano z newslettera')
+      } else {
+        await newsletterApi.subscribe(user.email)
+        toast.success('Sprawdź swoją skrzynkę email, aby potwierdzić subskrypcję.')
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Wystąpił błąd')
+    } finally {
+      setIsTogglingNewsletter(false)
+    }
+  }
 
   const fetchAddresses = async () => {
     setIsLoadingAddresses(true)
@@ -176,8 +216,8 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
   }
 
   const handleContactSubmit = () => {
-    const subject = contactOrderNumber 
-      ? `Zapytanie dot. zamówienia ${contactOrderNumber}` 
+    const subject = contactOrderNumber
+      ? `Zapytanie dot. zamówienia ${contactOrderNumber}`
       : 'Zapytanie ze sklepu Acro Clinic'
     const body = encodeURIComponent(contactMessage)
     window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${body}`
@@ -207,7 +247,7 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
 
   const handleAddressInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target
-    
+
     if (name === 'postalCode') {
       let formatted = value.replace(/\D/g, '')
       if (formatted.length > 2) {
@@ -227,7 +267,7 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
 
   const validateAddressForm = (): boolean => {
     const errors: Record<string, string> = {}
-    
+
     if (!addressFormData.firstName || addressFormData.firstName.length < 2) {
       errors.firstName = 'Imię musi mieć minimum 2 znaki'
     }
@@ -373,11 +413,10 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
-                    isActive 
-                      ? 'bg-brand-gold/20 text-brand-gold border border-brand-gold/30' 
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${isActive
+                      ? 'bg-brand-gold/20 text-brand-gold border border-brand-gold/30'
                       : 'text-white/70 hover:bg-white/5 hover:text-white border border-transparent'
-                  }`}
+                    }`}
                 >
                   <Icon className="w-5 h-5" />
                   <span className="font-medium">{item.label}</span>
@@ -401,14 +440,14 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
             {/* Contact info */}
             <div className="pt-6 space-y-3">
               <p className="text-xs uppercase tracking-wider text-white/40">Kontakt z obsługą</p>
-              <a 
+              <a
                 href={`mailto:${SUPPORT_EMAIL}`}
                 className="flex items-center gap-2 text-sm text-white/60 hover:text-brand-gold transition-colors"
               >
                 <Mail className="w-4 h-4" />
                 {SUPPORT_EMAIL}
               </a>
-              <a 
+              <a
                 href={`tel:+48${SUPPORT_PHONE.replace(/\s/g, '')}`}
                 className="flex items-center gap-2 text-sm text-white/60 hover:text-brand-gold transition-colors"
               >
@@ -429,7 +468,7 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
             {activeTab === 'overview' && (
               <div className="space-y-6">
                 <h2 className="text-xl font-semibold text-white">Przegląd konta</h2>
-                
+
                 <div className="grid gap-4">
                   <div className="bg-white/5 rounded-lg p-4 border border-white/10">
                     <p className="text-sm text-white/50 mb-1">Email</p>
@@ -438,8 +477,8 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
                   <div className="bg-white/5 rounded-lg p-4 border border-white/10">
                     <p className="text-sm text-white/50 mb-1">Imię i nazwisko</p>
                     <p className="text-white">
-                      {user.firstName || user.lastName 
-                        ? `${user.firstName || ''} ${user.lastName || ''}`.trim() 
+                      {user.firstName || user.lastName
+                        ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
                         : '—'}
                     </p>
                   </div>
@@ -450,8 +489,8 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
                 </div>
 
                 <div className="pt-4">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="border-brand-gold/50 text-brand-gold hover:bg-brand-gold/10"
                     onClick={() => setActiveTab('orders')}
                   >
@@ -475,7 +514,7 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
                   <div className="text-center py-12">
                     <Package className="w-12 h-12 text-white/20 mx-auto mb-4" />
                     <p className="text-white/60">Nie masz jeszcze żadnych zamówień</p>
-                    <Button 
+                    <Button
                       className="mt-4"
                       onClick={onBack}
                     >
@@ -488,7 +527,7 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
                       const status = statusLabels[order.status] || statusLabels.PENDING
                       const StatusIcon = status.icon
                       return (
-                        <div 
+                        <div
                           key={order.id}
                           className="bg-[#0c0c0c] rounded-2xl p-5"
                         >
@@ -514,8 +553,8 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
                               <div key={item.id} className="flex items-center gap-3">
                                 {item.image && (
                                   <div className="w-12 h-12 bg-[#0a0a0a] rounded-lg p-1 flex-shrink-0">
-                                    <img 
-                                      src={item.image} 
+                                    <img
+                                      src={item.image}
                                       alt={item.name}
                                       className="w-full h-full object-cover rounded"
                                     />
@@ -604,11 +643,10 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
                       <button
                         type="button"
                         onClick={() => setAddressFormData(prev => ({ ...prev, type: 'SHIPPING' }))}
-                        className={`p-4 border-2 rounded-lg transition-all text-left ${
-                          addressFormData.type === 'SHIPPING'
+                        className={`p-4 border-2 rounded-lg transition-all text-left ${addressFormData.type === 'SHIPPING'
                             ? 'border-brand-gold bg-brand-gold/10'
                             : 'border-white/10 hover:border-white/30'
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center gap-2 mb-1">
                           <Truck className={`w-5 h-5 ${addressFormData.type === 'SHIPPING' ? 'text-brand-gold' : 'text-white/60'}`} />
@@ -619,11 +657,10 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
                       <button
                         type="button"
                         onClick={() => setAddressFormData(prev => ({ ...prev, type: 'BILLING' }))}
-                        className={`p-4 border-2 rounded-lg transition-all text-left ${
-                          addressFormData.type === 'BILLING'
+                        className={`p-4 border-2 rounded-lg transition-all text-left ${addressFormData.type === 'BILLING'
                             ? 'border-brand-gold bg-brand-gold/10'
                             : 'border-white/10 hover:border-white/30'
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center gap-2 mb-1">
                           <Building2 className={`w-5 h-5 ${addressFormData.type === 'BILLING' ? 'text-brand-gold' : 'text-white/60'}`} />
@@ -851,7 +888,7 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
                           Adresy dostawy
                         </h3>
                         {addresses.filter(a => a.type === 'SHIPPING').map(address => (
-                          <div 
+                          <div
                             key={address.id}
                             className={`bg-white/5 rounded-lg border p-4 ${address.isDefault ? 'border-brand-gold/50' : 'border-white/10'}`}
                           >
@@ -922,7 +959,7 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
                           Dane do faktur
                         </h3>
                         {addresses.filter(a => a.type === 'BILLING').map(address => (
-                          <div 
+                          <div
                             key={address.id}
                             className={`bg-white/5 rounded-lg border p-4 ${address.isDefault ? 'border-brand-gold/50' : 'border-white/10'}`}
                           >
@@ -1051,6 +1088,54 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
                     Zapisz zmiany
                   </Button>
                 </div>
+
+                {/* Newsletter */}
+                <div className="mt-8 pt-6 border-t border-white/10">
+                  <h3 className="text-lg font-semibold text-white mb-4">Newsletter</h3>
+                  <div className="bg-white/5 rounded-lg border border-white/10 p-5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        {isLoadingNewsletter ? (
+                          <Loader2 className="w-5 h-5 animate-spin text-white/40" />
+                        ) : isNewsletterSubscribed ? (
+                          <div className="w-9 h-9 rounded-full bg-brand-gold/15 flex items-center justify-center">
+                            <Bell className="w-4 h-4 text-brand-gold" />
+                          </div>
+                        ) : (
+                          <div className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center">
+                            <BellOff className="w-4 h-4 text-white/40" />
+                          </div>
+                        )}
+                        <div>
+                          <p className="text-white font-medium text-sm">
+                            {isLoadingNewsletter ? 'Sprawdzanie...' : isNewsletterSubscribed ? 'Subskrybujesz newsletter' : 'Newsletter wyłączony'}
+                          </p>
+                          <p className="text-white/40 text-xs">
+                            {isNewsletterSubscribed ? 'Otrzymujesz informacje o nowościach i ofertach' : 'Nie otrzymujesz emaili marketingowych'}
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleToggleNewsletter}
+                        disabled={isTogglingNewsletter || isLoadingNewsletter}
+                        className={isNewsletterSubscribed
+                          ? 'border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300'
+                          : 'border-brand-gold/30 text-brand-gold hover:bg-brand-gold/10'
+                        }
+                      >
+                        {isTogglingNewsletter ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : isNewsletterSubscribed ? (
+                          <><BellOff className="w-4 h-4" /> Wypisz się</>
+                        ) : (
+                          <><Bell className="w-4 h-4" /> Zapisz się</>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -1062,14 +1147,14 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
                 <div className="bg-brand-gold/10 border border-brand-gold/30 rounded-lg p-4">
                   <p className="text-brand-gold font-medium mb-2">Dane kontaktowe</p>
                   <div className="space-y-2">
-                    <a 
+                    <a
                       href={`mailto:${SUPPORT_EMAIL}`}
                       className="flex items-center gap-2 text-white hover:text-brand-gold transition-colors"
                     >
                       <Mail className="w-4 h-4" />
                       {SUPPORT_EMAIL}
                     </a>
-                    <a 
+                    <a
                       href={`tel:+48${SUPPORT_PHONE.replace(/\s/g, '')}`}
                       className="flex items-center gap-2 text-white hover:text-brand-gold transition-colors"
                     >
@@ -1085,12 +1170,13 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
                   </p>
 
                   <div className="space-y-2">
-                    <label className="text-sm text-white/60">Numer zamówienia (opcjonalnie)</label>
+                    <label className="text-sm text-white/60">Numer zamówienia *</label>
                     <Input
                       value={contactOrderNumber}
                       onChange={(e) => setContactOrderNumber(e.target.value)}
                       placeholder="np. ORD-20260205-XXXX"
                       className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
+                      required
                     />
                   </div>
 

@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion'
-import { ArrowLeft, CreditCard, Truck, Shield, Lock, CheckCircle, Loader2, Package, MapPin, Search, ChevronDown, Star, Building2, Save } from 'lucide-react'
+import { ArrowLeft, CreditCard, Truck, Shield, Lock, CheckCircle, Loader2, Package, MapPin, Search, ChevronDown, Star, Building2, Save, Scissors, PackageCheck } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import type { CartItem } from './CartPage'
 import { addressApi, type User, type Address, getAccessToken } from '@/lib/api'
+import { PayULogo } from '@/components/ui/PayULogo'
 
 // Token GeoWidget InPost
 const INPOST_GEOWIDGET_TOKEN = 'eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzQlpXVzFNZzVlQnpDYU1XU3JvTlBjRWFveFpXcW9Ua2FuZVB3X291LWxvIn0.eyJleHAiOjIwODU1NTk0MzQsImlhdCI6MTc3MDE5OTQzNCwianRpIjoiZGExNDkzYjgtMjUxOC00M2ZjLWJmNzYtYmNkODZkMDcxZDIzIiwiaXNzIjoiaHR0cHM6Ly9sb2dpbi5pbnBvc3QucGwvYXV0aC9yZWFsbXMvZXh0ZXJuYWwiLCJzdWIiOiJmOjEyNDc1MDUxLTFjMDMtNGU1OS1iYTBjLTJiNDU2OTVlZjUzNTp3V2VfRW1yNU9XYmpRbnpuMmxSOU5Ubk5ncF9CWDZxaGZDWG5uQ1dyNko0IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoic2hpcHgiLCJzZXNzaW9uX3N0YXRlIjoiZGMyNGJkYjYtZmRlOC00YWQ1LTgyNDMtNmI4OWIwYzBlMzJmIiwic2NvcGUiOiJvcGVuaWQgYXBpOmFwaXBvaW50cyIsInNpZCI6ImRjMjRiZGI2LWZkZTgtNGFkNS04MjQzLTZiODliMGMwZTMyZiIsImFsbG93ZWRfcmVmZXJyZXJzIjoiIiwidXVpZCI6ImI3OTNjZTJhLThiZTItNDNhYS1iNjMzLTNkYjA1ZWE4MTRkYiJ9.HDBqjOx5BX_yeT4MYgWD-urqzFdPNiaC9cJq9vMdUjZUukuJlEF4D64Qhg5qj7UnJx91vuqL6i5clMe7Ecd-Mrc34m49Eec_OlJ9RKckz-CGiTty13jlZKEyTLqNRKdBrt19L0rGihotOW_eTWZ8DrhMxR-_Y0xpxk7mMJEQ-TWRoNnKB6xuYznaBQRaRhhJKzC-NWv2U4FFNrNQkKo4eu4HnHmpGKOkLoAxyB6RQwF7_s-NxqJgh17-uK0syS86VnwD8As3bNji6VQ_vqN78yXYc1-2WIiP1UonnK661_JlR0OV8tCnUAopRXo4B4yJDjRqJkyAjTLG1h23dfzm5w'
@@ -12,6 +13,7 @@ const ease = [0.22, 1, 0.36, 1] as const
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
 type DeliveryMethod = 'courier' | 'parcel-locker'
+type ShipmentType = 'STANDARD' | 'SPLIT' | 'COMBINED'
 
 interface CheckoutPageProps {
   items: CartItem[]
@@ -78,6 +80,18 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
     email: '',
   })
 
+  // Split shipment state
+  const isMixedCart = items.some(item => item.category === 'clothing') && items.some(item => item.category === 'accessories')
+  const [shipmentType, setShipmentType] = useState<ShipmentType>('STANDARD')
+
+  // Redirect if out of stock
+  useEffect(() => {
+    const hasOutOfStock = items.some(item => item.stock === 0)
+    if (hasOutOfStock) {
+      onBack()
+    }
+  }, [items, onBack])
+
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const shippingCost = 19.90
   const shipping = subtotal > 300 ? 0 : shippingCost
@@ -107,13 +121,13 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
       const addresses = data.addresses || []
       setSavedAddresses(addresses.filter(a => a.type === 'SHIPPING'))
       setSavedBillingAddresses(addresses.filter(a => a.type === 'BILLING'))
-      
+
       // Auto-select default shipping address
       const defaultShipping = addresses.find(a => a.type === 'SHIPPING' && a.isDefault)
       if (defaultShipping) {
         selectAddress(defaultShipping)
       }
-      
+
       // Auto-select default billing address
       const defaultBilling = addresses.find(a => a.type === 'BILLING' && a.isDefault)
       if (defaultBilling) {
@@ -167,7 +181,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
 
   const handleBillingInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    
+
     if (name === 'postalCode') {
       let formatted = value.replace(/\D/g, '')
       if (formatted.length > 2) {
@@ -211,11 +225,11 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
     const script = document.createElement('script')
     script.src = 'https://geowidget.inpost.pl/inpost-geowidget.js'
     script.defer = true
-    
+
     script.onload = () => {
       setGeoWidgetLoaded(true)
     }
-    
+
     document.body.appendChild(script)
   }, [geoWidgetLoaded])
 
@@ -227,7 +241,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
         setShippingData(prev => ({
           ...prev,
           parcelLockerCode: point.name,
-          parcelLockerAddress: point.address?.line1 
+          parcelLockerAddress: point.address?.line1
             ? `${point.address.line1}${point.address.line2 ? ', ' + point.address.line2 : ''}`
             : point.address_details?.city || ''
         }))
@@ -245,7 +259,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
     }
   }, [])
 
-  const validateShippingForm = (): boolean => {
+  const validateShippingForm = (): FormErrors => {
     const newErrors: FormErrors = {}
 
     if (!shippingData.firstName || shippingData.firstName.length < 2) {
@@ -279,13 +293,16 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
       }
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    if (isMixedCart && shipmentType === 'STANDARD') {
+      newErrors.shipmentType = 'Wybierz opcję wysyłki'
+    }
+
+    return newErrors
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    
+
     // Format postal code
     if (name === 'postalCode') {
       let formatted = value.replace(/\D/g, '')
@@ -309,7 +326,10 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
   }
 
   const handleContinueToPayment = async () => {
-    if (validateShippingForm()) {
+    const formErrors = validateShippingForm()
+    setErrors(formErrors)
+
+    if (Object.keys(formErrors).length === 0) {
       // Save address to account if requested
       if (saveAddressToAccount && user && !selectedAddressId && deliveryMethod === 'courier') {
         try {
@@ -329,6 +349,16 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
       }
       setStep('payment')
       window.scrollTo({ top: 0, behavior: 'smooth' })
+    } else {
+      // Auto-scroll to first error
+      const firstErrorKey = Object.keys(formErrors)[0]
+      const element = document.querySelector(`[name="${firstErrorKey}"]`) || document.getElementById(`field-${firstErrorKey}`)
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        if (element instanceof HTMLInputElement) {
+          element.focus()
+        }
+      }
     }
   }
 
@@ -341,7 +371,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
       const sessionId = localStorage.getItem('sessionId') || crypto.randomUUID()
       localStorage.setItem('sessionId', sessionId)
       const token = getAccessToken()
-      
+
       const authHeaders: Record<string, string> = {
         'Content-Type': 'application/json',
         'X-Session-ID': sessionId,
@@ -396,6 +426,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
             postalCode: billingData.postalCode || undefined,
             email: billingData.email || undefined,
           } : undefined,
+          shipmentType: isMixedCart ? shipmentType : 'STANDARD',
         }),
       })
 
@@ -433,7 +464,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
       console.error('Payment error:', error)
       setIsLoading(false)
       setStep('payment')
-      setErrors({ 
+      setErrors({
         payment: error instanceof Error ? error.message : 'Wystąpił błąd podczas płatności. Spróbuj ponownie.'
       })
     }
@@ -445,7 +476,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, ease }}
-      className="min-h-screen pt-36 pb-32"
+      className="min-h-screen pt-48 pb-32"
     >
       <div className="container mx-auto px-4 max-w-6xl">
         {/* Back button */}
@@ -486,9 +517,9 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
               </div>
               <span className="text-sm font-[family-name:var(--font-body)] uppercase tracking-wider hidden md:block">Dostawa</span>
             </div>
-            
+
             <div className={`w-16 h-px ${step !== 'shipping' ? 'bg-brand-gold' : 'bg-white/20'}`} />
-            
+
             <div className={`flex items-center gap-2 ${step === 'payment' || step === 'processing' ? 'text-brand-gold' : 'text-white/40'}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'payment' ? 'bg-brand-gold text-black' : step === 'processing' ? 'bg-green-500 text-white' : 'bg-white/10 text-white/40'}`}>
                 {step === 'processing' ? <CheckCircle className="w-4 h-4" /> : '2'}
@@ -509,7 +540,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                 className="space-y-6"
               >
                 {/* Wybór metody dostawy */}
-                <div className="bg-[#0c0c0c] rounded-2xl p-6 md:p-8">
+                <div className="bg-[#0c0c0c] rounded-none p-6 md:p-8">
                   <h2 className="font-[family-name:var(--font-heading)] font-bold text-lg text-white uppercase tracking-wide mb-6 flex items-center gap-3">
                     <Truck className="w-5 h-5 text-brand-gold" />
                     Metoda dostawy
@@ -520,11 +551,10 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                     <button
                       type="button"
                       onClick={() => setDeliveryMethod('courier')}
-                      className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
-                        deliveryMethod === 'courier'
-                          ? 'border-brand-gold bg-brand-gold/10'
-                          : 'border-white/10 hover:border-white/30'
-                      }`}
+                      className={`p-4  border-2 transition-all duration-300 text-left ${deliveryMethod === 'courier'
+                        ? 'border-brand-gold bg-brand-gold/10'
+                        : 'border-white/10 hover:border-white/30'
+                        }`}
                     >
                       <div className="flex items-center gap-3 mb-2">
                         <Truck className={`w-6 h-6 ${deliveryMethod === 'courier' ? 'text-brand-gold' : 'text-white/60'}`} />
@@ -542,11 +572,10 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                     <button
                       type="button"
                       onClick={() => setDeliveryMethod('parcel-locker')}
-                      className={`p-4 border-2 transition-all duration-300 text-left ${
-                        deliveryMethod === 'parcel-locker'
-                          ? 'border-brand-gold bg-brand-gold/10'
-                          : 'border-white/10 hover:border-white/30'
-                      }`}
+                      className={`p-4 border-2 transition-all duration-300 text-left ${deliveryMethod === 'parcel-locker'
+                        ? 'border-brand-gold bg-brand-gold/10'
+                        : 'border-white/10 hover:border-white/30'
+                        }`}
                     >
                       <div className="flex items-center gap-3 mb-2">
                         <Package className={`w-6 h-6 ${deliveryMethod === 'parcel-locker' ? 'text-brand-gold' : 'text-white/60'}`} />
@@ -562,8 +591,68 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                   </div>
                 </div>
 
+                {/* Opcja dzielenia przesyłki - tylko dla mieszanego koszyka */}
+                {isMixedCart && (
+                  <div id="field-shipmentType" className="bg-[#0c0c0c] p-6 md:p-8">
+                    <h2 className="font-[family-name:var(--font-heading)] font-bold text-lg text-white uppercase tracking-wide mb-2 flex items-center gap-3">
+                      <PackageCheck className="w-5 h-5 text-brand-gold" />
+                      Opcja wysyłki
+                    </h2>
+                    <p className="text-white/50 text-sm font-[family-name:var(--font-body)] mb-6">
+                      Twoje zamówienie zawiera zarówno odzież (szytą na zamówienie) jak i akcesoria. Wybierz sposób wysyłki:
+                    </p>
+
+                    <div className="space-y-3">
+                      {/* SPLIT */}
+                      <button
+                        type="button"
+                        onClick={() => setShipmentType('SPLIT')}
+                        className={`w-full p-4 border-2 transition-all duration-300 text-left  ${shipmentType === 'SPLIT'
+                          ? 'border-brand-gold bg-brand-gold/10'
+                          : 'border-white/10 hover:border-white/30'
+                          }`}
+                      >
+                        <div className="flex items-center gap-3 mb-1">
+                          <Scissors className={`w-5 h-5 ${shipmentType === 'SPLIT' ? 'text-brand-gold' : 'text-white/60'
+                            }`} />
+                          <span className="font-[family-name:var(--font-heading)] font-bold text-white">Podziel przesyłkę</span>
+                          <span className="ml-auto text-xs text-brand-gold font-[family-name:var(--font-body)] uppercase tracking-wider">Szybciej akcesoria</span>
+                        </div>
+                        <p className="text-white/50 text-sm font-[family-name:var(--font-body)] ml-8">
+                          Akcesoria zostaną wysłane natychmiast, a odzież po uszyciu. Otrzymasz dwa osobne paragony.
+                        </p>
+                      </button>
+
+                      {/* COMBINED */}
+                      <button
+                        type="button"
+                        onClick={() => setShipmentType('COMBINED')}
+                        className={`w-full p-4 border-2 transition-all duration-300 text-left  ${shipmentType === 'COMBINED'
+                          ? 'border-brand-gold bg-brand-gold/10'
+                          : 'border-white/10 hover:border-white/30'
+                          }`}
+                      >
+                        <div className="flex items-center gap-3 mb-1">
+                          <Package className={`w-5 h-5 ${shipmentType === 'COMBINED' ? 'text-brand-gold' : 'text-white/60'
+                            }`} />
+                          <span className="font-[family-name:var(--font-heading)] font-bold text-white">Wysyłka razem</span>
+                          <span className="ml-auto text-xs text-white/40 font-[family-name:var(--font-body)] uppercase tracking-wider">Jedna paczka</span>
+                        </div>
+                        <p className="text-white/50 text-sm font-[family-name:var(--font-body)] ml-8">
+                          Poczekaj na uszycie odzieży — cały order w jednej paczce z jednym paragonem.
+                        </p>
+                      </button>
+                    </div>
+                    {errors.shipmentType && (
+                      <div className="bg-red-500/10 border border-red-500/30 text-red-500 p-3 rounded-none mt-4 text-sm font-bold text-center">
+                        {errors.shipmentType}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Dane kontaktowe */}
-                <div className="bg-[#0c0c0c] rounded-2xl p-6 md:p-8">
+                <div className="bg-[#0c0c0c] rounded-none p-6 md:p-8">
                   <h2 className="font-[family-name:var(--font-heading)] font-bold text-lg text-white uppercase tracking-wide mb-6 flex items-center gap-3">
                     <MapPin className="w-5 h-5 text-brand-gold" />
                     {deliveryMethod === 'courier' ? 'Adres dostawy' : 'Dane odbiorcy'}
@@ -604,7 +693,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                           )}
                           <ChevronDown className={`w-5 h-5 text-white/60 transition-transform ${showAddressSelector ? 'rotate-180' : ''}`} />
                         </button>
-                        
+
                         {showAddressSelector && (
                           <div className="absolute z-10 w-full mt-1 bg-[#1a1a1a] border border-white/20 max-h-60 overflow-y-auto">
                             <button
@@ -630,9 +719,8 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                                 key={addr.id}
                                 type="button"
                                 onClick={() => selectAddress(addr)}
-                                className={`w-full p-3 text-left hover:bg-white/10 border-b border-white/5 ${
-                                  selectedAddressId === addr.id ? 'bg-brand-gold/10' : ''
-                                }`}
+                                className={`w-full p-3 text-left hover:bg-white/10 border-b border-white/5 ${selectedAddressId === addr.id ? 'bg-brand-gold/10' : ''
+                                  }`}
                               >
                                 <div className="flex items-center gap-2 mb-1">
                                   {addr.label && <span className="text-brand-gold text-sm font-medium">{addr.label}</span>}
@@ -653,162 +741,162 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                     </div>
                   )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
-                      Imię *
-                    </label>
-                    <input
-                      type="text"
-                      name="firstName"
-                      value={shippingData.firstName}
-                      onChange={handleInputChange}
-                      className={`checkout-input ${errors.firstName ? 'border-red-500' : ''}`}
-                      placeholder="Jan"
-                    />
-                    {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
-                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                        Imię *
+                      </label>
+                      <input
+                        type="text"
+                        name="firstName"
+                        value={shippingData.firstName}
+                        onChange={handleInputChange}
+                        className={`checkout-input ${errors.firstName ? 'border-red-500' : ''}`}
+                        placeholder="Jan"
+                      />
+                      {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
+                    </div>
 
-                  <div>
-                    <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
-                      Nazwisko *
-                    </label>
-                    <input
-                      type="text"
-                      name="lastName"
-                      value={shippingData.lastName}
-                      onChange={handleInputChange}
-                      className={`checkout-input ${errors.lastName ? 'border-red-500' : ''}`}
-                      placeholder="Kowalski"
-                    />
-                    {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
-                  </div>
+                    <div>
+                      <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                        Nazwisko *
+                      </label>
+                      <input
+                        type="text"
+                        name="lastName"
+                        value={shippingData.lastName}
+                        onChange={handleInputChange}
+                        className={`checkout-input ${errors.lastName ? 'border-red-500' : ''}`}
+                        placeholder="Kowalski"
+                      />
+                      {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
+                    </div>
 
-                  <div className="md:col-span-2">
-                    <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
-                      Email *
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={shippingData.email}
-                      onChange={handleInputChange}
-                      className={`checkout-input ${errors.email ? 'border-red-500' : ''}`}
-                      placeholder="jan@example.com"
-                    />
-                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
-                      Telefon *
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={shippingData.phone}
-                      onChange={handleInputChange}
-                      className={`checkout-input ${errors.phone ? 'border-red-500' : ''}`}
-                      placeholder="+48 123 456 789"
-                    />
-                    {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
-                  </div>
-
-                  {/* Pola dla kuriera */}
-                  {deliveryMethod === 'courier' && (
-                    <>
-                      <div className="md:col-span-2">
-                        <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
-                          Adres *
-                        </label>
-                        <input
-                          type="text"
-                          name="street"
-                          value={shippingData.street}
-                          onChange={handleInputChange}
-                          className={`checkout-input ${errors.street ? 'border-red-500' : ''}`}
-                          placeholder="ul. Przykładowa 10/5"
-                        />
-                        {errors.street && <p className="text-red-500 text-xs mt-1">{errors.street}</p>}
-                      </div>
-
-                      <div>
-                        <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
-                          Miasto *
-                        </label>
-                        <input
-                          type="text"
-                          name="city"
-                          value={shippingData.city}
-                          onChange={handleInputChange}
-                          className={`checkout-input ${errors.city ? 'border-red-500' : ''}`}
-                          placeholder="Warszawa"
-                        />
-                        {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
-                      </div>
-
-                      <div>
-                        <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
-                          Kod pocztowy *
-                        </label>
-                        <input
-                          type="text"
-                          name="postalCode"
-                          value={shippingData.postalCode}
-                          onChange={handleInputChange}
-                          className={`checkout-input ${errors.postalCode ? 'border-red-500' : ''}`}
-                          placeholder="00-000"
-                          maxLength={6}
-                        />
-                        {errors.postalCode && <p className="text-red-500 text-xs mt-1">{errors.postalCode}</p>}
-                      </div>
-                    </>
-                  )}
-
-                  {/* Pola dla paczkomatu */}
-                  {deliveryMethod === 'parcel-locker' && (
                     <div className="md:col-span-2">
                       <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
-                        Paczkomat InPost *
+                        Email *
                       </label>
-                      
-                      {/* Wybrany paczkomat lub przycisk wyboru */}
-                      {shippingData.parcelLockerCode ? (
-                        <div className="p-4 border-2 border-brand-gold bg-brand-gold/10">
-                          <div className="flex items-start justify-between gap-4">
-                            <div>
-                              <p className="text-white font-[family-name:var(--font-heading)] font-bold text-lg">
-                                {shippingData.parcelLockerCode}
-                              </p>
-                              {shippingData.parcelLockerAddress && (
-                                <p className="text-white/60 text-sm font-[family-name:var(--font-body)] mt-1">
-                                  {shippingData.parcelLockerAddress}
-                                </p>
-                              )}
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => setShowGeoWidget(true)}
-                              className="text-brand-gold text-sm hover:underline whitespace-nowrap"
-                            >
-                              Zmień
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => setShowGeoWidget(true)}
-                          className="w-full p-4 border-2 border-dashed border-white/20 hover:border-brand-gold/50 transition-colors flex items-center justify-center gap-3 text-white/60 hover:text-white"
-                        >
-                          <Search className="w-5 h-5" />
-                          <span className="font-[family-name:var(--font-body)]">Wybierz paczkomat na mapie</span>
-                        </button>
-                      )}
-                      {errors.parcelLockerCode && <p className="text-red-500 text-xs mt-2">{errors.parcelLockerCode}</p>}
+                      <input
+                        type="email"
+                        name="email"
+                        value={shippingData.email}
+                        onChange={handleInputChange}
+                        className={`checkout-input ${errors.email ? 'border-red-500' : ''}`}
+                        placeholder="jan@example.com"
+                      />
+                      {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                     </div>
-                  )}
-                </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                        Telefon *
+                      </label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={shippingData.phone}
+                        onChange={handleInputChange}
+                        className={`checkout-input ${errors.phone ? 'border-red-500' : ''}`}
+                        placeholder="+48 123 456 789"
+                      />
+                      {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                    </div>
+
+                    {/* Pola dla kuriera */}
+                    {deliveryMethod === 'courier' && (
+                      <>
+                        <div className="md:col-span-2">
+                          <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                            Adres *
+                          </label>
+                          <input
+                            type="text"
+                            name="street"
+                            value={shippingData.street}
+                            onChange={handleInputChange}
+                            className={`checkout-input ${errors.street ? 'border-red-500' : ''}`}
+                            placeholder="ul. Przykładowa 10/5"
+                          />
+                          {errors.street && <p className="text-red-500 text-xs mt-1">{errors.street}</p>}
+                        </div>
+
+                        <div>
+                          <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                            Miasto *
+                          </label>
+                          <input
+                            type="text"
+                            name="city"
+                            value={shippingData.city}
+                            onChange={handleInputChange}
+                            className={`checkout-input ${errors.city ? 'border-red-500' : ''}`}
+                            placeholder="Warszawa"
+                          />
+                          {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
+                        </div>
+
+                        <div>
+                          <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                            Kod pocztowy *
+                          </label>
+                          <input
+                            type="text"
+                            name="postalCode"
+                            value={shippingData.postalCode}
+                            onChange={handleInputChange}
+                            className={`checkout-input ${errors.postalCode ? 'border-red-500' : ''}`}
+                            placeholder="00-000"
+                            maxLength={6}
+                          />
+                          {errors.postalCode && <p className="text-red-500 text-xs mt-1">{errors.postalCode}</p>}
+                        </div>
+                      </>
+                    )}
+
+                    {/* Pola dla paczkomatu */}
+                    {deliveryMethod === 'parcel-locker' && (
+                      <div id="field-parcelLockerCode" className="md:col-span-2">
+                        <label className="block text-xs text-white/60 font-[family-name:var(--font-body)] uppercase tracking-wider mb-2">
+                          Paczkomat InPost *
+                        </label>
+
+                        {/* Wybrany paczkomat lub przycisk wyboru */}
+                        {shippingData.parcelLockerCode ? (
+                          <div className="p-4 border-2 border-brand-gold bg-brand-gold/10">
+                            <div className="flex items-start justify-between gap-4">
+                              <div>
+                                <p className="text-white font-[family-name:var(--font-heading)] font-bold text-lg">
+                                  {shippingData.parcelLockerCode}
+                                </p>
+                                {shippingData.parcelLockerAddress && (
+                                  <p className="text-white/60 text-sm font-[family-name:var(--font-body)] mt-1">
+                                    {shippingData.parcelLockerAddress}
+                                  </p>
+                                )}
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setShowGeoWidget(true)}
+                                className="text-brand-gold text-sm hover:underline whitespace-nowrap"
+                              >
+                                Zmień
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setShowGeoWidget(true)}
+                            className="w-full p-4 border-2 border-dashed border-white/20 hover:border-brand-gold/50 transition-colors flex items-center justify-center gap-3 text-white/60 hover:text-white"
+                          >
+                            <Search className="w-5 h-5" />
+                            <span className="font-[family-name:var(--font-body)]">Wybierz paczkomat na mapie</span>
+                          </button>
+                        )}
+                        {errors.parcelLockerCode && <p className="text-red-500 text-xs mt-2">{errors.parcelLockerCode}</p>}
+                      </div>
+                    )}
+                  </div>
 
                   {/* Checkbox - zapisz adres */}
                   {user && !selectedAddressId && deliveryMethod === 'courier' && (
@@ -817,7 +905,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                         type="checkbox"
                         checked={saveAddressToAccount}
                         onChange={(e) => setSaveAddressToAccount(e.target.checked)}
-                        className="w-5 h-5 rounded border-white/20 bg-white/10 text-brand-gold focus:ring-brand-gold/50"
+                        className="w-5 h-5 rounded-none border-white/20 bg-white/10 text-brand-gold focus:ring-brand-gold/50"
                       />
                       <span className="text-white/70 text-sm flex items-center gap-2">
                         <Save className="w-4 h-4" />
@@ -828,13 +916,13 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                 </div>
 
                 {/* Faktura VAT */}
-                <div className="bg-[#0c0c0c] rounded-2xl p-6 md:p-8">
+                <div className="bg-[#0c0c0c] rounded-none p-6 md:p-8">
                   <label className="flex items-center gap-3 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={wantInvoice}
                       onChange={(e) => setWantInvoice(e.target.checked)}
-                      className="w-5 h-5 rounded border-white/20 bg-white/10 text-brand-gold focus:ring-brand-gold/50"
+                      className="w-5 h-5 rounded-none border-white/20 bg-white/10 text-brand-gold focus:ring-brand-gold/50"
                     />
                     <span className="font-[family-name:var(--font-heading)] font-bold text-lg text-white uppercase tracking-wide flex items-center gap-3">
                       <Building2 className="w-5 h-5 text-brand-gold" />
@@ -877,7 +965,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                               )}
                               <ChevronDown className={`w-5 h-5 text-white/60 transition-transform ${showBillingAddressSelector ? 'rotate-180' : ''}`} />
                             </button>
-                            
+
                             {showBillingAddressSelector && (
                               <div className="absolute z-10 w-full mt-1 bg-[#1a1a1a] border border-white/20 max-h-60 overflow-y-auto">
                                 <button
@@ -905,9 +993,8 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                                     key={addr.id}
                                     type="button"
                                     onClick={() => selectBillingAddress(addr)}
-                                    className={`w-full p-3 text-left hover:bg-white/10 border-b border-white/5 ${
-                                      selectedBillingAddressId === addr.id ? 'bg-brand-gold/10' : ''
-                                    }`}
+                                    className={`w-full p-3 text-left hover:bg-white/10 border-b border-white/5 ${selectedBillingAddressId === addr.id ? 'bg-brand-gold/10' : ''
+                                      }`}
                                   >
                                     <div className="flex items-center gap-2 mb-1">
                                       {addr.label && <span className="text-brand-gold text-sm font-medium">{addr.label}</span>}
@@ -1048,6 +1135,8 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                   )}
                 </div>
 
+
+
                 <button
                   onClick={handleContinueToPayment}
                   className="btn-primary btn-full mt-8"
@@ -1062,7 +1151,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.95 }}
-                      className="relative w-full max-w-5xl h-[85vh] bg-white overflow-hidden rounded-lg"
+                      className="relative w-full max-w-5xl h-[85vh] bg-white overflow-hidden rounded-none"
                     >
                       {/* Header */}
                       <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-[#FFCD00]">
@@ -1076,9 +1165,9 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                           ×
                         </button>
                       </div>
-                      
+
                       {/* GeoWidget Container - używamy ref do dynamicznego tworzenia custom element */}
-                      <div 
+                      <div
                         className="w-full h-[calc(100%-60px)]"
                         ref={(container) => {
                           if (container && geoWidgetLoaded) {
@@ -1119,7 +1208,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, ease }}
-                className="bg-[#0c0c0c] rounded-2xl p-6 md:p-8"
+                className="bg-[#0c0c0c] rounded-none p-6 md:p-8"
               >
                 <h2 className="font-[family-name:var(--font-heading)] font-bold text-lg text-white uppercase tracking-wide mb-6 flex items-center gap-3">
                   <CreditCard className="w-5 h-5 text-brand-gold" />
@@ -1127,13 +1216,13 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                 </h2>
 
                 {errors.payment && (
-                  <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl mb-6 text-sm">
+                  <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-none mb-6 text-sm">
                     {errors.payment}
                   </div>
                 )}
 
                 <div className="space-y-4">
-                  <div className="flex items-center gap-4 p-4 border border-brand-gold bg-brand-gold/10 rounded-lg">
+                  <div className="flex items-center gap-4 p-4 border border-brand-gold bg-brand-gold/10 rounded-none">
                     <input type="radio" name="payment" checked readOnly className="accent-brand-gold" />
                     <div className="flex-1">
                       <p className="text-white font-[family-name:var(--font-heading)] font-bold">PayU</p>
@@ -1141,11 +1230,9 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                         Karta płatnicza, BLIK, przelew
                       </p>
                     </div>
-                    <img 
-                      src="https://static.payu.com/sites/all/files/payu_logo_2.png" 
-                      alt="PayU" 
-                      className="h-8 object-contain"
-                    />
+                    <div className="bg-white rounded px-3 py-1.5 flex items-center">
+                      <PayULogo size="sm" className="text-[#1a1a1a]" />
+                    </div>
                   </div>
                 </div>
 
@@ -1208,7 +1295,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5, ease }}
-                className="bg-[#0c0c0c] rounded-2xl p-12 flex flex-col items-center justify-center text-center"
+                className="bg-[#0c0c0c] rounded-none p-12 flex flex-col items-center justify-center text-center"
               >
                 <Loader2 className="w-16 h-16 text-brand-gold animate-spin mb-6" />
                 <h2 className="font-[family-name:var(--font-heading)] font-bold text-xl text-white uppercase tracking-wide mb-2">
@@ -1228,7 +1315,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease, delay: 0.2 }}
           >
-            <div className="sticky top-24 p-6 md:p-8 bg-[#0c0c0c] rounded-2xl">
+            <div className="sticky top-24 p-6 md:p-8 bg-[#0c0c0c] rounded-none">
               <h2 className="font-[family-name:var(--font-heading)] font-bold text-lg text-white uppercase tracking-wide mb-6">
                 Twoje zamówienie
               </h2>
@@ -1237,8 +1324,8 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
               <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
                 {items.map((item) => (
                   <div key={item.id + (item.selectedSize || '')} className="flex gap-3">
-                    <div className="w-16 h-16 bg-[#0a0a0a] flex-shrink-0 overflow-hidden rounded-lg p-1">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded" />
+                    <div className="w-16 h-16 bg-[#0a0a0a] flex-shrink-0 overflow-hidden rounded-none p-1">
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded-none" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm font-[family-name:var(--font-heading)] truncate">{item.name}</p>
@@ -1297,6 +1384,6 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
           </motion.div>
         </div>
       </div>
-    </motion.div>
+    </motion.div >
   )
 }

@@ -121,20 +121,23 @@
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.btn-primary::before {
+/* .btn-primary::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #e5c35a 0%, #d4af37 100%);
+  background: linear-gradient(135deg, #9d7b24 0%, #9b7821 100%);
   opacity: 0;
   transition: opacity 0.5s ease;
   z-index: 0;
-}
+} */
 
 .btn-primary:hover {
   box-shadow: 0 8px 32px rgba(212, 175, 55, 0.35);
   transform: translateY(-1px);
+  color: #ffffff;
 }
+
+
 
 .btn-primary:hover::before {
   opacity: 1;

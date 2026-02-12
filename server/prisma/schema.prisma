@@ -185,6 +185,12 @@ model CartItem {
 
 // ==================== ZAMÓWIENIA ====================
 
+enum ShipmentType {
+  STANDARD  // Tylko jedna kategoria - standardowa wysyłka
+  SPLIT     // Akcesoria osobno (szybciej), ciuchy po uszyciu
+  COMBINED  // Wszystko razem po uszyciu ciuchów
+}
+
 model Order {
   id              String      @id @default(cuid())
   orderNumber     String      @unique
@@ -192,6 +198,7 @@ model Order {
   guestEmail      String?     // Email gościa (bez rejestracji)
   addressId       String?
   status          OrderStatus @default(PENDING)
+  shipmentType    ShipmentType @default(STANDARD)
   paymentStatus   PaymentStatus @default(PENDING)
   paymentMethod   String?
   payuOrderId     String?     @unique
@@ -239,6 +246,7 @@ model Order {
   user     User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
   address  Address?    @relation(fields: [addressId], references: [id], onDelete: SetNull)
   items    OrderItem[]
+  receipts Receipt[]
   payments Payment[]
 
   @@map("orders")
@@ -297,6 +305,29 @@ model Payment {
   @@map("payments")
 }
 
+// ==================== PARAGONY / FAKTURY ====================
+
+model Receipt {
+  id              String   @id @default(cuid())
+  orderId         String
+  type            String   // 'accessories' | 'clothing' | 'full'
+  invoiceNumber   String?
+  invoiceId       String?
+  invoiceUrl      String?
+  status          ReceiptStatus @default(PENDING)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("receipts")
+}
+
+enum ReceiptStatus {
+  PENDING     // Oczekuje na realizację (np. ciuchy w szwalni)
+  ISSUED      // Wystawiony
+}
+
 // ==================== LISTA ŻYCZEŃ ====================
 
 model WishlistItem {
@@ -321,4 +352,25 @@ model Setting {
   updatedAt DateTime @updatedAt
 
   @@map("settings")
+}
+
+// ==================== NEWSLETTER ====================
+
+model NewsletterSubscriber {
+  id               String              @id @default(cuid())
+  email            String              @unique
+  status           NewsletterStatus    @default(PENDING)
+  confirmationToken String?            @unique
+  confirmedAt      DateTime?
+  unsubscribedAt   DateTime?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  @@map("newsletter_subscribers")
+}
+
+enum NewsletterStatus {
+  PENDING       // Oczekuje na potwierdzenie
+  CONFIRMED     // Potwierdzony
+  UNSUBSCRIBED  // Wypisany
 }

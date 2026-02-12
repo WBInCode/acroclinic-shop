@@ -83,6 +83,7 @@ export const createOrderSchema = z.object({
   note: z.string().optional(),
   wantInvoice: z.boolean().optional().default(false),
   billingAddress: billingAddressSchema.optional(),
+  shipmentType: z.enum(['STANDARD', 'SPLIT', 'COMBINED']).optional().default('STANDARD'),
 });
 
 // Wishlist schema

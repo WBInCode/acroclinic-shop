@@ -44,7 +44,7 @@ export function AboutPage({ onBack }: AboutPageProps) {
           <h1 className="font-[family-name:var(--font-heading)] font-bold text-4xl md:text-5xl text-white uppercase tracking-tight mb-6">
             O <span className="text-brand-gold">Nas</span>
           </h1>
-          <div className="w-24 h-px bg-gradient-to-r from-transparent via-brand-gold/60 to-transparent mx-auto" />
+          <div className="w-70 h-px bg-gradient-to-r from-transparent via-brand-gold/60 to-transparent mx-auto" />
         </motion.div>
 
         {/* Story section */}
@@ -55,7 +55,7 @@ export function AboutPage({ onBack }: AboutPageProps) {
           transition={{ duration: 0.8, ease, delay: 0.2 }}
         >
           <div className="relative p-8 md:p-12 bg-white/[0.02] border border-white/10">
-            <div className="absolute top-0 left-8 w-16 h-px bg-brand-gold" />
+            <div className="absolute top-0 left-0 w-16 h-px bg-brand-gold" />
             <div className="absolute top-0 left-0 w-px h-16 bg-brand-gold" />
             
             <h2 className="font-[family-name:var(--font-heading)] font-bold text-2xl text-white mb-6">
@@ -71,7 +71,7 @@ export function AboutPage({ onBack }: AboutPageProps) {
               Jako oficjalny partner WB Partners, oferujemy również wysokiej jakości sprzęt i akcesoria dla pasjonatów akrobatyki. Naszą misją jest wspieranie rozwoju każdego sportowca - od początkujących po zawodowców.
             </p>
             
-            <div className="absolute bottom-0 right-8 w-16 h-px bg-brand-gold" />
+            <div className="absolute bottom-0 right-0 w-16 h-px bg-brand-gold" />
             <div className="absolute bottom-0 right-0 w-px h-16 bg-brand-gold" />
           </div>
         </motion.div>

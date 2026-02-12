@@ -33,7 +33,7 @@ function GoldParticles() {
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ paddingTop: 'clamp(100px, 15vh, 200px)' }}>
       
       {/* Animowany gradient tła */}
       <motion.div 

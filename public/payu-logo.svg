@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="50" viewBox="0 0 120 50">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@900&amp;display=swap');
+    </style>
+  </defs>
+  <rect width="120" height="50" rx="6" fill="white"/>
+  <text x="10" y="38" font-family="'Nunito Sans', Arial, sans-serif" font-weight="900" font-size="34" letter-spacing="-1" fill="#1a1a1a">PayU</text>
+  <!-- Decorative dots -->
+  <rect x="100" y="8" width="5" height="5" rx="0.5" fill="#1a1a1a"/>
+  <rect x="107" y="8" width="3.5" height="3.5" rx="0.3" fill="#1a1a1a"/>
+  <rect x="107" y="13" width="2.5" height="2.5" rx="0.2" fill="#1a1a1a"/>
+</svg>

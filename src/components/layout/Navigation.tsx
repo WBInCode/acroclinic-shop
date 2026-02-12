@@ -17,7 +17,7 @@ const ease = [0.4, 0, 0.2, 1] as const
 export function Navigation({ cartCount, wishlistCount = 0, onCartClick, onWishlistClick, onLogoClick, onUserClick, isAuthenticated = false }: NavigationProps) {
   return (
     <motion.nav 
-      className="fixed left-0 right-0 z-50 top-[52px] md:top-[60px]"
+      className="fixed left-0 right-0 z-50 top-[64px] md:top-[72px]"
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease }}
@@ -43,7 +43,7 @@ export function Navigation({ cartCount, wishlistCount = 0, onCartClick, onWishli
             <img 
               src="/images/logo.png" 
               alt="Acro Clinic" 
-              className="relative object-contain h-8 w-8 md:h-10 md:w-10 opacity-90 group-hover:opacity-100 transition-opacity duration-300"
+              className="relative object-contain h-8 w-8 md:h-16 md:w-16 opacity-90 group-hover:opacity-100 transition-opacity duration-300"
             />
           </div>
           

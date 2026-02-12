@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, ShoppingCart, Shield, Truck, RotateCcw, Check, Heart } from 'lucide-react'
+import { ArrowLeft, ShoppingCart, Shield, Truck, RotateCcw, Check, Heart, ShieldCheck, Gem } from 'lucide-react'
 import { useState } from 'react'
 import type { Product } from './ProductCard'
 
@@ -18,17 +18,19 @@ export function ProductPage({ product, onBack, onAddToCart, onToggleWishlist, is
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [activeImage, setActiveImage] = useState(0)
-  
+
+  const isOutOfStock = product.stock === 0
+
   // Używaj danych z produktu (z API) z fallbackiem
   const description = product.description || 'Profesjonalny produkt dla wymagających sportowców.'
-  const features = product.features && product.features.length > 0 
-    ? product.features 
+  const features = product.features && product.features.length > 0
+    ? product.features
     : ['Najwyższa jakość', 'Trwałość', 'Komfort użytkowania']
   const materials = product.materials || 'Premium materials'
 
   // Użyj rzeczywistych zdjęć z produktu lub pojedyncze zdjęcie główne
-  const images = product.images && product.images.length > 0 
-    ? product.images 
+  const images = product.images && product.images.length > 0
+    ? product.images
     : [product.image]
 
   const handleAddToCart = () => {
@@ -47,13 +49,13 @@ export function ProductPage({ product, onBack, onAddToCart, onToggleWishlist, is
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, ease }}
-      className="min-h-screen pt-36 pb-32"
+      className="min-h-screen pt-48 pb-32" // Increased pt-40 -> pt-48
     >
       <div className="container mx-auto px-4">
         {/* Back button */}
         <motion.button
           onClick={onBack}
-          className="flex items-center gap-2 text-white/60 hover:text-brand-gold transition-colors mb-8 group"
+          className="flex items-center gap-2 text-white/60 hover:text-brand-gold transition-colors mb-12 group"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, ease }}
@@ -62,63 +64,144 @@ export function ProductPage({ product, onBack, onAddToCart, onToggleWishlist, is
           <span className="font-[family-name:var(--font-body)] text-sm uppercase tracking-wider">Wróć do sklepu</span>
         </motion.button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-          {/* Left: Images */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+          {/* Left: Images & Actions (Sticky) */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease, delay: 0.1 }}
+            className={`lg:sticky lg:top-48 lg:h-fit max-w-xl mx-auto w-full ${isOutOfStock ? 'grayscale opacity-75' : ''}`} // Increased top-36 -> top-48
           >
-            {/* Main image */}
-            <div className="relative aspect-square overflow-hidden rounded-2xl bg-[#0c0c0c] p-4 mb-4">
-              <div className="relative w-full h-full rounded-xl overflow-hidden">
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={activeImage}
-                    src={images[activeImage]}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                    initial={{ opacity: 0, scale: 1.05 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.98 }}
-                    transition={{ duration: 0.4, ease }}
-                  />
-                </AnimatePresence>
+            <div className="flex gap-4 mb-8">
+              {/* Thumbnails (Left side) */}
+              <div className="flex flex-col gap-3 w-20 flex-shrink-0">
+                {images.map((img, idx) => (
+                  <motion.button
+                    key={idx}
+                    onClick={() => setActiveImage(idx)}
+                    className={`relative w-full aspect-square overflow-hidden rounded-xl bg-[#0c0c0c] p-1 transition-all ${activeImage === idx ? 'ring-2 ring-brand-gold' : 'ring-1 ring-white/10 hover:ring-white/30'
+                      }`}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <img src={img} alt="" className="w-full h-full object-cover rounded-lg" />
+                  </motion.button>
+                ))}
               </div>
-              
-              {/* Badge */}
-              {product.badge && (
-                <div className="absolute top-6 left-6 z-10">
-                  <span className={`px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider ${
-                    product.badge === 'NEW' 
-                      ? 'bg-brand-gold text-black' 
-                      : 'bg-black/60 text-white backdrop-blur-sm'
-                  }`} style={{ fontFamily: "'Lato', sans-serif" }}>
-                    {product.badge}
-                  </span>
+
+              {/* Main image (Right side) */}
+              <div className="flex-1 relative aspect-square overflow-hidden rounded-2xl bg-[#0c0c0c] p-4">
+                <div className="relative w-full h-full rounded-xl overflow-hidden">
+                  <AnimatePresence mode="wait">
+                    <motion.img
+                      key={activeImage}
+                      src={images[activeImage]}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                      initial={{ opacity: 0, scale: 1.05 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.4, ease }}
+                    />
+                  </AnimatePresence>
                 </div>
-              )}
+
+                {/* Badge */}
+                {product.badge && (
+                  <div className="absolute top-6 left-6 z-10">
+                    <span className={`px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider ${product.badge === 'NEW'
+                      ? 'bg-brand-gold text-black'
+                      : 'bg-black/60 text-white backdrop-blur-sm'
+                      }`} style={{ fontFamily: "'Lato', sans-serif" }}>
+                      {product.badge}
+                    </span>
+                  </div>
+                )}
+
+                {/* Out of stock sash */}
+                {isOutOfStock && (
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] bg-neutral-900/95 text-white py-3 -rotate-45 flex items-center justify-center z-20 border-y border-white/10 shadow-xl backdrop-blur-sm pointer-events-none">
+                    <span className="text-sm font-bold tracking-[0.3em] uppercase opacity-90" style={{ fontFamily: "'Lato', sans-serif" }}>
+                      Niedostępny
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Thumbnails */}
-            <div className="flex gap-3">
-              {images.map((img, idx) => (
-                <motion.button
-                  key={idx}
-                  onClick={() => setActiveImage(idx)}
-                  className={`relative w-20 h-20 overflow-hidden rounded-xl bg-[#0c0c0c] p-1 transition-all ${
-                    activeImage === idx ? 'ring-2 ring-brand-gold' : 'ring-1 ring-white/10 hover:ring-white/30'
-                  }`}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+            {/* Actions Section (Below images) */}
+            <div className="bg-[#111] border border-white/5 rounded-2xl p-6 backdrop-blur-sm">
+              {/* Sizes */}
+              {product.sizes && product.sizes.length > 0 && (
+                <div className="mb-6">
+                  <span className="text-xs uppercase tracking-[0.2em] text-white/40 font-[family-name:var(--font-body)] block mb-4">
+                    Rozmiar
+                  </span>
+                  <div className="flex flex-wrap gap-3">
+                    {product.sizes.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setSelectedSize(size)}
+                        className={`btn-size ${selectedSize === size ? 'active' : ''}`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Quantity */}
+              <div className="mb-6">
+                <span className="text-xs uppercase tracking-[0.2em] text-white/40 font-[family-name:var(--font-body)] block mb-4">
+                  Ilość
+                </span>
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="btn-qty"
+                  >
+                    −
+                  </button>
+                  <span className="w-12 text-center font-[family-name:var(--font-heading)] font-bold text-xl text-white">
+                    {quantity}
+                  </span>
+                  <button
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="btn-qty"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* Add to cart and wishlist buttons */}
+              <div className="flex gap-3">
+                <button
+                  onClick={handleAddToCart}
+                  disabled={isOutOfStock}
+                  className={`flex-1 flex items-center justify-center gap-2 rounded-full font-semibold uppercase tracking-wider transition-all duration-300 ${isOutOfStock
+                    ? 'bg-white/10 text-white/40 cursor-not-allowed py-4 text-xs'
+                    : 'btn-primary'
+                    }`}
                 >
-                  <img src={img} alt="" className="w-full h-full object-cover rounded-lg" />
-                </motion.button>
-              ))}
+                  <ShoppingCart className="w-5 h-5" />
+                  <span>{isOutOfStock ? 'Tymczasowo niedostępny' : 'Dodaj do koszyka'}</span>
+                </button>
+                <button
+                  onClick={handleToggleWishlist}
+                  className={`w-14 h-14 flex items-center justify-center rounded-xl border-2 transition-all duration-300 ${isInWishlist
+                    ? 'bg-red-500/20 border-red-500 text-red-500'
+                    : 'border-white/10 text-white/40 hover:border-brand-gold hover:text-brand-gold'
+                    }`}
+                >
+                  <Heart className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} />
+                </button>
+              </div>
             </div>
           </motion.div>
 
-          {/* Right: Product info */}
+          {/* Right: Product info (Scrollable) */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
@@ -136,7 +219,7 @@ export function ProductPage({ product, onBack, onAddToCart, onToggleWishlist, is
             </h1>
 
             {/* Price */}
-            <div className="mb-8 flex items-baseline gap-1">
+            <div className="mb-12 flex items-baseline gap-1">
               <span className="font-[family-name:var(--font-heading)] font-bold text-4xl text-brand-gold">
                 {product.price}
               </span>
@@ -144,80 +227,16 @@ export function ProductPage({ product, onBack, onAddToCart, onToggleWishlist, is
             </div>
 
             {/* Description */}
-            <p className="text-white/60 font-[family-name:var(--font-body)] leading-relaxed mb-8">
-              {description}
-            </p>
-
-            {/* Divider */}
-            <div className="w-full h-px bg-white/10 mb-8" />
-
-            {/* Sizes */}
-            {product.sizes && product.sizes.length > 0 && (
-              <div className="mb-8">
-                <span className="text-xs uppercase tracking-[0.2em] text-white/40 font-[family-name:var(--font-body)] block mb-4">
-                  Rozmiar
-                </span>
-                <div className="flex flex-wrap gap-3">
-                  {product.sizes.map((size) => (
-                    <button
-                      key={size}
-                      onClick={() => setSelectedSize(size)}
-                      className={`btn-size ${selectedSize === size ? 'active' : ''}`}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Quantity */}
-            <div className="mb-8">
-              <span className="text-xs uppercase tracking-[0.2em] text-white/40 font-[family-name:var(--font-body)] block mb-4">
-                Ilość
-              </span>
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="btn-qty"
-                >
-                  −
-                </button>
-                <span className="w-12 text-center font-[family-name:var(--font-heading)] font-bold text-xl text-white">
-                  {quantity}
-                </span>
-                <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="btn-qty"
-                >
-                  +
-                </button>
-              </div>
+            <div className="prose prose-invert prose-lg max-w-none text-white/70 font-[family-name:var(--font-body)] leading-loose mb-12 whitespace-pre-line">
+              <p>{description}</p>
             </div>
 
-            {/* Add to cart and wishlist buttons */}
-            <div className="flex gap-3 mb-8">
-              <button
-                onClick={handleAddToCart}
-                className="btn-primary flex-1"
-              >
-                <ShoppingCart className="w-5 h-5" />
-                <span>Dodaj do koszyka</span>
-              </button>
-              <button
-                onClick={handleToggleWishlist}
-                className={`w-14 h-14 flex items-center justify-center rounded-xl border-2 transition-all duration-300 ${
-                  isInWishlist
-                    ? 'bg-red-500/20 border-red-500 text-red-500'
-                    : 'border-white/20 text-white/60 hover:border-brand-gold hover:text-brand-gold'
-                }`}
-              >
-                <Heart className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} />
-              </button>
-            </div>
+            {/* Separator */}
+            <div className="w-24 h-1 bg-brand-gold/20 mb-12" />
 
             {/* Features */}
-            <div className="space-y-3 mb-8">
+            <div className="space-y-4 mb-12">
+              <h3 className="text-lg font-bold text-white mb-4">Cechy produktu</h3>
               {features.map((feature, idx) => (
                 <motion.div
                   key={idx}
@@ -226,39 +245,47 @@ export function ProductPage({ product, onBack, onAddToCart, onToggleWishlist, is
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.4, ease, delay: 0.4 + idx * 0.1 }}
                 >
-                  <Check className="w-4 h-4 text-brand-gold" />
-                  <span className="font-[family-name:var(--font-body)] text-sm">{feature}</span>
+                  <div className="w-6 h-6 rounded-full bg-brand-gold/10 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3.5 h-3.5 text-brand-gold" />
+                  </div>
+                  <span className="font-[family-name:var(--font-body)]">{feature}</span>
                 </motion.div>
               ))}
             </div>
 
             {/* Materials */}
-            <div className="mb-8">
+            <div className="mb-12 p-6 bg-white/5 rounded-2xl border border-white/5">
               <span className="text-xs uppercase tracking-[0.2em] text-white/40 font-[family-name:var(--font-body)] block mb-2">
                 Materiały
               </span>
-              <span className="text-white/60 font-[family-name:var(--font-body)] text-sm">
+              <span className="text-white/80 font-[family-name:var(--font-body)] text-lg">
                 {materials}
               </span>
             </div>
 
             {/* Trust badges */}
-            <div className="grid grid-cols-3 gap-4 pt-8 border-t border-white/10">
-              <div className="text-center">
-                <Truck className="w-6 h-6 text-brand-gold mx-auto mb-2" />
-                <span className="text-[10px] uppercase tracking-wider text-white/40 font-[family-name:var(--font-body)]">
-                  Darmowa dostawa
+            <div className="grid grid-cols-3 gap-6 pt-8 border-t border-white/10">
+              <div className="text-center group">
+                <div className="w-12 h-12 mx-auto mb-3 bg-white/5 rounded-full flex items-center justify-center group-hover:bg-brand-gold/10 transition-colors">
+                  <Gem className="w-6 h-6 text-brand-gold" />
+                </div>
+                <span className="text-[10px] uppercase tracking-wider text-white/40 font-[family-name:var(--font-body)] block">
+                  Najlepsza jakość
                 </span>
               </div>
-              <div className="text-center">
-                <RotateCcw className="w-6 h-6 text-brand-gold mx-auto mb-2" />
-                <span className="text-[10px] uppercase tracking-wider text-white/40 font-[family-name:var(--font-body)]">
+              <div className="text-center group">
+                <div className="w-12 h-12 mx-auto mb-3 bg-white/5 rounded-full flex items-center justify-center group-hover:bg-brand-gold/10 transition-colors">
+                  <RotateCcw className="w-6 h-6 text-brand-gold" />
+                </div>
+                <span className="text-[10px] uppercase tracking-wider text-white/40 font-[family-name:var(--font-body)] block">
                   30 dni zwrotu
                 </span>
               </div>
-              <div className="text-center">
-                <Shield className="w-6 h-6 text-brand-gold mx-auto mb-2" />
-                <span className="text-[10px] uppercase tracking-wider text-white/40 font-[family-name:var(--font-body)]">
+              <div className="text-center group">
+                <div className="w-12 h-12 mx-auto mb-3 bg-white/5 rounded-full flex items-center justify-center group-hover:bg-brand-gold/10 transition-colors">
+                  <Shield className="w-6 h-6 text-brand-gold" />
+                </div>
+                <span className="text-[10px] uppercase tracking-wider text-white/40 font-[family-name:var(--font-body)] block">
                   Gwarancja
                 </span>
               </div>

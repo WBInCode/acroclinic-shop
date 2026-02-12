@@ -17,6 +17,7 @@ export interface Product {
   badge?: 'NEW' | 'LIMITED'
   category: 'clothing' | 'accessories'
   isBestseller?: boolean
+  stock?: number
 }
 
 interface ProductCardProps {
@@ -37,9 +38,13 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
   const [selectedSize, setSelectedSize] = useState<string>('')
   const [quantity, setQuantity] = useState(1)
 
+  const isOutOfStock = product.stock === 0
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation()
-    
+
+    if (isOutOfStock) return
+
     // Jeśli produkt jest odzieżą i ma rozmiary, pokaż modal
     if (product.category === 'clothing' && product.sizes && product.sizes.length > 0) {
       setShowSizeModal(true)
@@ -55,7 +60,7 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
     if (product.category === 'clothing' && !selectedSize) {
       return // Nie dodawaj jeśli nie wybrano rozmiaru
     }
-    
+
     onAddToCart(product, selectedSize || undefined, quantity)
     setShowSizeModal(false)
     setSelectedSize('')
@@ -87,8 +92,8 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
         transition={{ duration: 0.3 }}
       >
         {/* Product card - clean minimal design */}
-        <div className="rounded-2xl overflow-hidden bg-[#111] border border-white/[0.06] hover:border-brand-gold/20 transition-all duration-500">
-          
+        <div className={`rounded-2xl overflow-hidden bg-[#111] border border-white/[0.06] transition-all duration-500 ${isOutOfStock ? 'opacity-60 grayscale' : 'hover:border-brand-gold/20'}`}>
+
           {/* Image */}
           <div className="relative aspect-[3/4] overflow-hidden">
             <motion.img
@@ -98,11 +103,11 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
               animate={{ scale: isHovered ? 1.03 : 1 }}
               transition={{ duration: 0.5 }}
             />
-            
+
             {/* Badge */}
             {product.badge && (
               <div className="absolute top-4 left-4">
-                <span 
+                <span
                   className="px-3 py-1.5 bg-brand-gold text-black text-[10px] font-semibold tracking-wider uppercase rounded-full"
                   style={{ fontFamily: "'Lato', sans-serif" }}
                 >
@@ -113,15 +118,23 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
 
             {/* Wishlist */}
             <button
-              className={`absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full transition-all duration-300 ${
-                isInWishlist 
-                  ? 'bg-brand-gold text-black' 
-                  : 'bg-black/60 text-white hover:bg-brand-gold hover:text-black'
-              }`}
+              className={`absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full transition-all duration-300 ${isInWishlist
+                ? 'bg-brand-gold text-black'
+                : 'bg-black/60 text-white hover:bg-brand-gold hover:text-black'
+                }`}
               onClick={handleToggleWishlist}
             >
               <Heart className={`w-4 h-4 ${isInWishlist ? 'fill-current' : ''}`} />
             </button>
+
+            {/* Out of stock sash */}
+            {isOutOfStock && (
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] bg-neutral-900/95 text-white py-2 -rotate-45 flex items-center justify-center z-20 border-y border-white/10 shadow-xl backdrop-blur-sm pointer-events-none">
+                <span className="text-xs font-bold tracking-[0.3em] uppercase opacity-90" style={{ fontFamily: "'Lato', sans-serif" }}>
+                  Niedostępny
+                </span>
+              </div>
+            )}
 
             {/* Add to cart - appears on hover */}
             <motion.div
@@ -131,7 +144,11 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
               transition={{ duration: 0.25 }}
             >
               <button
-                className="w-full py-3 bg-brand-gold text-black text-xs font-semibold tracking-wider uppercase rounded-full transition-all hover:bg-brand-gold/80 hover:shadow-lg hover:shadow-brand-gold/30"
+                disabled={isOutOfStock}
+                className={`w-full py-3 text-black text-xs font-semibold tracking-wider uppercase rounded-full transition-all ${isOutOfStock
+                    ? 'hidden' // Hide button if banner is present to avoid clutter, or keep it?
+                    : 'bg-brand-gold hover:bg-brand-gold/80 hover:shadow-lg hover:shadow-brand-gold/30'
+                  }`}
                 style={{ fontFamily: "'Lato', sans-serif" }}
                 onClick={handleAddToCart}
               >
@@ -142,13 +159,13 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
 
           {/* Info */}
           <div className="p-4">
-            <h3 
+            <h3
               className="text-white text-sm mb-2 line-clamp-1"
               style={{ fontFamily: "'Lato', sans-serif" }}
             >
               {product.name}
             </h3>
-            <p 
+            <p
               className="text-brand-gold text-lg font-semibold"
               style={{ fontFamily: "'Playfair Display', serif" }}
             >
@@ -159,18 +176,22 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
 
         {/* Mobile button */}
         <button
-          className="md:hidden w-full mt-3 py-3 bg-brand-gold text-black text-xs font-semibold tracking-wider uppercase rounded-full"
+          disabled={isOutOfStock}
+          className={`md:hidden w-full mt-3 py-3 text-black text-xs font-semibold tracking-wider uppercase rounded-full ${isOutOfStock
+            ? 'bg-white/10 cursor-not-allowed text-white/40'
+            : 'bg-brand-gold'
+            }`}
           style={{ fontFamily: "'Lato', sans-serif" }}
           onClick={handleAddToCart}
         >
-          Dodaj do koszyka
+          {isOutOfStock ? 'Tymczasowo niedostępny' : 'Dodaj do koszyka'}
         </button>
       </motion.div>
 
       {/* Modal wyboru rozmiaru i ilości */}
       <AnimatePresence>
         {showSizeModal && (
-          <motion.div 
+          <motion.div
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -185,26 +206,26 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
               exit={{ opacity: 0, y: 20 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <button 
+              <button
                 onClick={() => setShowSizeModal(false)}
                 className="absolute top-6 right-6 text-white/40 hover:text-white transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
-              
-              <h3 
+
+              <h3
                 className="text-3xl text-white mb-2 font-light"
                 style={{ fontFamily: "'Playfair Display', serif" }}
               >
                 {product.name}
               </h3>
               <div className="w-12 h-px bg-brand-gold/40 mb-8" />
-          
+
               <div className="space-y-8">
                 {/* Wybór rozmiaru */}
                 {product.sizes && product.sizes.length > 0 && (
                   <div className="space-y-4">
-                    <label 
+                    <label
                       className="text-xs tracking-[0.2em] uppercase text-white/50"
                       style={{ fontFamily: "'Lato', sans-serif" }}
                     >
@@ -215,11 +236,10 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
                         <button
                           key={size}
                           onClick={() => setSelectedSize(size)}
-                          className={`w-12 h-12 border rounded-lg text-sm transition-all duration-300 ${
-                            selectedSize === size
-                              ? 'border-brand-gold bg-brand-gold/10 text-brand-gold'
-                              : 'border-white/10 text-white/50 hover:border-white/30 hover:text-white'
-                          }`}
+                          className={`w-12 h-12 border rounded-lg text-sm transition-all duration-300 ${selectedSize === size
+                            ? 'border-brand-gold bg-brand-gold/10 text-brand-gold'
+                            : 'border-white/10 text-white/50 hover:border-white/30 hover:text-white'
+                            }`}
                           style={{ fontFamily: "'Lato', sans-serif" }}
                         >
                           {size}
@@ -231,7 +251,7 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
 
                 {/* Wybór ilości */}
                 <div className="space-y-4">
-                  <label 
+                  <label
                     className="text-xs tracking-[0.2em] uppercase text-white/50"
                     style={{ fontFamily: "'Lato', sans-serif" }}
                   >
@@ -245,7 +265,7 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
                     >
                       −
                     </button>
-                    <span 
+                    <span
                       className="text-2xl w-16 text-center text-white"
                       style={{ fontFamily: "'Playfair Display', serif" }}
                     >
@@ -263,20 +283,20 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
                 {/* Podsumowanie */}
                 <div className="pt-6 border-t border-white/10">
                   <div className="flex justify-between items-center mb-6">
-                    <span 
+                    <span
                       className="text-white/40 text-sm"
                       style={{ fontFamily: "'Lato', sans-serif" }}
                     >
                       Razem
                     </span>
-                    <span 
+                    <span
                       className="text-3xl text-brand-gold font-light"
                       style={{ fontFamily: "'Playfair Display', serif" }}
                     >
                       {(product.price * quantity).toFixed(2)} PLN
                     </span>
                   </div>
-                  
+
                   <button
                     onClick={handleConfirmAddToCart}
                     disabled={product.category === 'clothing' && !selectedSize}

@@ -63,6 +63,17 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
   const [showAddressSelector, setShowAddressSelector] = useState(false)
   const [saveAddressToAccount, setSaveAddressToAccount] = useState(false)
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(false)
+  const [standardShippingCost, setStandardShippingCost] = useState(19.90)
+
+  useEffect(() => {
+    fetch(`${API_URL}/orders/config/shipping`)
+      .then(res => {
+        if (res.ok) return res.json()
+        throw new Error('Failed')
+      })
+      .then(data => setStandardShippingCost(Number(data.cost)))
+      .catch(() => { }) // Ignore error, stick to default
+  }, [])
 
   // Billing address state
   const [wantInvoice, setWantInvoice] = useState(false)
@@ -93,8 +104,8 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
   }, [items, onBack])
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const shippingCost = 19.90
-  const shipping = subtotal > 300 ? 0 : shippingCost
+  const shippingCost = standardShippingCost
+  const shipping = shippingCost
   const [showGeoWidget, setShowGeoWidget] = useState(false)
   const [geoWidgetLoaded, setGeoWidgetLoaded] = useState(false)
   const geoWidgetRef = useRef<HTMLElement | null>(null)

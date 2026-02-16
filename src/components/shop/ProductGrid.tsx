@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 
 // Eleganckie animacje
-const transition = { duration: 0.6, ease: [0.4, 0, 0.2, 1] }
+const transition = { duration: 0.6, ease: [0.4, 0, 0.2, 1] as const }
 
 interface ProductGridProps {
   products: Product[]
@@ -24,11 +24,11 @@ export function ProductGrid({ products, onAddToCart, onProductClick, onToggleWis
   })
 
   return (
-    <section 
+    <section
       id="products"
       className="container mx-auto px-6 py-32 relative"
     >
-      <motion.div 
+      <motion.div
         className="text-center mb-20"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -36,19 +36,19 @@ export function ProductGrid({ products, onAddToCart, onProductClick, onToggleWis
         transition={transition}
       >
         {/* Elegancki nagłówek sekcji */}
-        <span 
+        <span
           className="text-xs tracking-[0.4em] uppercase text-brand-gold/50 block mb-6"
           style={{ fontFamily: "'Lato', sans-serif" }}
         >
           Kolekcja
         </span>
-        <h2 
+        <h2
           className="text-4xl md:text-5xl text-white font-light mb-6"
           style={{ fontFamily: "'Playfair Display', serif" }}
         >
           Nasza <span className="text-brand-gold italic">Kolekcja</span>
         </h2>
-        
+
         {/* Elegancka linia z ornamentem */}
         <motion.div
           className="flex items-center justify-center gap-4"
@@ -77,7 +77,7 @@ export function ProductGrid({ products, onAddToCart, onProductClick, onToggleWis
 
       {filteredProducts.length === 0 ? (
         <div className="text-center py-20">
-          <p 
+          <p
             className="text-white/30 text-base"
             style={{ fontFamily: "'Lato', sans-serif" }}
           >
@@ -96,7 +96,7 @@ export function ProductGrid({ products, onAddToCart, onProductClick, onToggleWis
               isInWishlist={isInWishlist?.(product.id)}
               index={index}
             />
-          ))}  
+          ))}
         </div>
       )}
     </section>

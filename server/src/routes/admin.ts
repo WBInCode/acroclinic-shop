@@ -73,8 +73,8 @@ router.get('/dashboard', async (req: Request, res: Response, next: NextFunction)
 
     const currentRevenue = Number(monthlyRevenue._sum.total || 0);
     const previousRevenue = Number(lastMonthRevenue._sum.total || 0);
-    const revenueChange = previousRevenue > 0 
-      ? ((currentRevenue - previousRevenue) / previousRevenue) * 100 
+    const revenueChange = previousRevenue > 0
+      ? ((currentRevenue - previousRevenue) / previousRevenue) * 100
       : 0;
 
     res.json({
@@ -169,13 +169,13 @@ router.post('/products', async (req: Request, res: Response, next: NextFunction)
         ...productData,
         images: images
           ? {
-              create: images.map((img, index) => ({
-                url: img.url,
-                alt: img.alt,
-                isMain: img.isMain ?? index === 0,
-                position: img.position ?? index,
-              })),
-            }
+            create: images.map((img, index) => ({
+              url: img.url,
+              alt: img.alt,
+              isMain: img.isMain ?? index === 0,
+              position: img.position ?? index,
+            })),
+          }
           : undefined,
       },
       include: {
@@ -349,7 +349,7 @@ router.put('/orders/:id/status', async (req: Request, res: Response, next: NextF
     const { status } = req.body;
 
     const validStatuses = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED'];
-    
+
     if (!validStatuses.includes(status)) {
       throw createError('Nieprawidłowy status', 400, 'INVALID_STATUS');
     }
@@ -362,12 +362,44 @@ router.put('/orders/:id/status', async (req: Request, res: Response, next: NextF
       updateData.deliveredAt = new Date();
     }
 
-    const order = await prisma.order.update({
+    const currentOrder = await prisma.order.findUnique({
       where: { id },
-      data: updateData,
+      include: { items: true },
     });
 
-    res.json({ 
+    if (!currentOrder) {
+      throw createError('Zamówienie nie znalezione', 404, 'ORDER_NOT_FOUND');
+    }
+
+    let order;
+
+    // Jeśli anulujemy zamówienie, przywróć stan magazynowy
+    if (['CANCELLED', 'REFUNDED'].includes(status) && !['CANCELLED', 'REFUNDED'].includes(currentOrder.status)) {
+      order = await prisma.$transaction(async (tx) => {
+        const updatedOrder = await tx.order.update({
+          where: { id },
+          data: updateData,
+        });
+
+        for (const item of currentOrder.items) {
+          await tx.product.update({
+            where: { id: item.productId },
+            data: {
+              stock: { increment: item.quantity },
+            },
+          });
+        }
+
+        return updatedOrder;
+      });
+    } else {
+      order = await prisma.order.update({
+        where: { id },
+        data: updateData,
+      });
+    }
+
+    res.json({
       message: 'Status zamówienia został zaktualizowany',
       order: {
         id: order.id,
@@ -387,7 +419,7 @@ router.patch('/orders/:id/status', async (req: Request, res: Response, next: Nex
     const { status } = req.body;
 
     const validStatuses = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED'];
-    
+
     if (!validStatuses.includes(status)) {
       throw createError('Nieprawidłowy status', 400, 'INVALID_STATUS');
     }
@@ -400,12 +432,44 @@ router.patch('/orders/:id/status', async (req: Request, res: Response, next: Nex
       updateData.deliveredAt = new Date();
     }
 
-    const order = await prisma.order.update({
+    const currentOrder = await prisma.order.findUnique({
       where: { id },
-      data: updateData,
+      include: { items: true },
     });
 
-    res.json({ 
+    if (!currentOrder) {
+      throw createError('Zamówienie nie znalezione', 404, 'ORDER_NOT_FOUND');
+    }
+
+    let order;
+
+    // Jeśli anulujemy zamówienie, przywróć stan magazynowy
+    if (['CANCELLED', 'REFUNDED'].includes(status) && !['CANCELLED', 'REFUNDED'].includes(currentOrder.status)) {
+      order = await prisma.$transaction(async (tx) => {
+        const updatedOrder = await tx.order.update({
+          where: { id },
+          data: updateData,
+        });
+
+        for (const item of currentOrder.items) {
+          await tx.product.update({
+            where: { id: item.productId },
+            data: {
+              stock: { increment: item.quantity },
+            },
+          });
+        }
+
+        return updatedOrder;
+      });
+    } else {
+      order = await prisma.order.update({
+        where: { id },
+        data: updateData,
+      });
+    }
+
+    res.json({
       message: 'Status zamówienia został zaktualizowany',
       order: {
         id: order.id,

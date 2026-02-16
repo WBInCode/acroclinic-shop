@@ -3,15 +3,22 @@ import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { prisma } from '../lib/prisma.js';
-import { 
-  generateAccessToken, 
-  generateRefreshToken, 
-  verifyRefreshToken 
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken
 } from '../lib/jwt.js';
 import { forgotPasswordSchema, loginSchema, registerSchema, resetPasswordSchema } from '../lib/validators.js';
 import { authenticate } from '../middleware/auth.js';
 import { createError } from '../middleware/errorHandler.js';
 import { sendPasswordResetEmail, sendWelcomeEmail } from '../lib/email.js';
+import { z } from 'zod';
+
+const updateProfileSchema = z.object({
+  firstName: z.string().min(2, 'Imię musi mieć minimum 2 znaki').optional().or(z.literal('')),
+  lastName: z.string().min(2, 'Nazwisko musi mieć minimum 2 znaki').optional().or(z.literal('')),
+  phone: z.string().optional().or(z.literal('')),
+});
 
 const router = Router();
 
@@ -258,10 +265,10 @@ router.post('/refresh', async (req: Request, res: Response, next: NextFunction) 
     }
 
     // Generate new tokens
-    const tokenPayload = { 
-      userId: session.user.id, 
-      email: session.user.email, 
-      role: session.user.role 
+    const tokenPayload = {
+      userId: session.user.id,
+      email: session.user.email,
+      role: session.user.role
     };
     const newAccessToken = generateAccessToken(tokenPayload);
     const newRefreshToken = generateRefreshToken(tokenPayload);
@@ -342,14 +349,14 @@ router.get('/me', authenticate, async (req: Request, res: Response, next: NextFu
 // PUT /api/auth/me - Aktualizuj dane użytkownika
 router.put('/me', authenticate, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { firstName, lastName, phone } = req.body;
+    const data = updateProfileSchema.parse(req.body);
 
     const user = await prisma.user.update({
       where: { id: req.user!.userId },
       data: {
-        firstName,
-        lastName,
-        phone,
+        firstName: data.firstName || undefined,
+        lastName: data.lastName || undefined,
+        phone: data.phone || undefined,
       },
       select: {
         id: true,

@@ -76,6 +76,14 @@ async function getOrCreateCart(userId?: string, sessionId?: string) {
 
 // Format cart response
 function formatCartResponse(cart: any) {
+  if (!cart) {
+    return {
+      id: null,
+      items: [],
+      subtotal: 0,
+      itemCount: 0,
+    };
+  }
   const items = cart.items
     .filter((item: any) => item.product.isActive)
     .map((item: any) => ({
@@ -152,7 +160,7 @@ router.post('/items', optionalAuth, async (req: Request, res: Response, next: Ne
     if (existingItem) {
       // Aktualizuj ilość
       const newQuantity = existingItem.quantity + data.quantity;
-      
+
       if (product.stock < newQuantity) {
         throw createError('Niewystarczająca ilość w magazynie', 400, 'INSUFFICIENT_STOCK');
       }

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   ArrowLeft,
   Package,
@@ -117,19 +117,9 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
   const [isSavingAddress, setIsSavingAddress] = useState(false)
   const [addressErrors, setAddressErrors] = useState<Record<string, string>>({})
 
-  useEffect(() => {
-    if (activeTab === 'orders') {
-      fetchOrders()
-    }
-    if (activeTab === 'addresses') {
-      fetchAddresses()
-    }
-    if (activeTab === 'settings') {
-      fetchNewsletterStatus()
-    }
-  }, [activeTab])
 
-  const fetchNewsletterStatus = async () => {
+
+  const fetchNewsletterStatus = useCallback(async () => {
     setIsLoadingNewsletter(true)
     try {
       const data = await newsletterApi.getStatus(user.email)
@@ -139,7 +129,7 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
     } finally {
       setIsLoadingNewsletter(false)
     }
-  }
+  }, [user.email])
 
   const handleToggleNewsletter = async () => {
     setIsTogglingNewsletter(true)
@@ -159,7 +149,7 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
     }
   }
 
-  const fetchAddresses = async () => {
+  const fetchAddresses = useCallback(async () => {
     setIsLoadingAddresses(true)
     try {
       const data = await addressApi.getAddresses()
@@ -170,9 +160,9 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
     } finally {
       setIsLoadingAddresses(false)
     }
-  }
+  }, [])
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     setIsLoadingOrders(true)
     try {
       const response = await fetch(`${API_URL}/orders`, {
@@ -189,7 +179,19 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
     } finally {
       setIsLoadingOrders(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    if (activeTab === 'orders') {
+      fetchOrders()
+    }
+    if (activeTab === 'addresses') {
+      fetchAddresses()
+    }
+    if (activeTab === 'settings') {
+      fetchNewsletterStatus()
+    }
+  }, [activeTab, fetchOrders, fetchAddresses, fetchNewsletterStatus])
 
   const handleSaveSettings = async () => {
     setIsSaving(true)
@@ -414,8 +416,8 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${isActive
-                      ? 'bg-brand-gold/20 text-brand-gold border border-brand-gold/30'
-                      : 'text-white/70 hover:bg-white/5 hover:text-white border border-transparent'
+                    ? 'bg-brand-gold/20 text-brand-gold border border-brand-gold/30'
+                    : 'text-white/70 hover:bg-white/5 hover:text-white border border-transparent'
                     }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -644,8 +646,8 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
                         type="button"
                         onClick={() => setAddressFormData(prev => ({ ...prev, type: 'SHIPPING' }))}
                         className={`p-4 border-2 rounded-lg transition-all text-left ${addressFormData.type === 'SHIPPING'
-                            ? 'border-brand-gold bg-brand-gold/10'
-                            : 'border-white/10 hover:border-white/30'
+                          ? 'border-brand-gold bg-brand-gold/10'
+                          : 'border-white/10 hover:border-white/30'
                           }`}
                       >
                         <div className="flex items-center gap-2 mb-1">
@@ -658,8 +660,8 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
                         type="button"
                         onClick={() => setAddressFormData(prev => ({ ...prev, type: 'BILLING' }))}
                         className={`p-4 border-2 rounded-lg transition-all text-left ${addressFormData.type === 'BILLING'
-                            ? 'border-brand-gold bg-brand-gold/10'
-                            : 'border-white/10 hover:border-white/30'
+                          ? 'border-brand-gold bg-brand-gold/10'
+                          : 'border-white/10 hover:border-white/30'
                           }`}
                       >
                         <div className="flex items-center gap-2 mb-1">

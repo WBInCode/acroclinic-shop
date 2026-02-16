@@ -2,7 +2,7 @@ import { Phone, Mail, MessageCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 // Eleganckie animacje
-const transition = { duration: 0.6, ease: [0.4, 0, 0.2, 1] }
+const transition = { duration: 0.6, ease: [0.4, 0, 0.2, 1] as const }
 
 interface ContactSectionProps {
   onContactClick?: () => void
@@ -10,7 +10,7 @@ interface ContactSectionProps {
 
 export function ContactSection({ onContactClick }: ContactSectionProps) {
   return (
-    <motion.section 
+    <motion.section
       className="container mx-auto px-6 py-32"
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -18,7 +18,7 @@ export function ContactSection({ onContactClick }: ContactSectionProps) {
       transition={transition}
     >
       <div className="max-w-2xl mx-auto text-center">
-        <motion.span 
+        <motion.span
           className="text-xs tracking-[0.4em] uppercase text-brand-gold/50 block mb-6"
           style={{ fontFamily: "'Lato', sans-serif" }}
           initial={{ opacity: 0 }}
@@ -28,8 +28,8 @@ export function ContactSection({ onContactClick }: ContactSectionProps) {
         >
           Kontakt
         </motion.span>
-        
-        <motion.h2 
+
+        <motion.h2
           className="text-4xl md:text-5xl text-white font-light mb-8"
           style={{ fontFamily: "'Playfair Display', serif" }}
           initial={{ opacity: 0, y: 20 }}
@@ -39,7 +39,7 @@ export function ContactSection({ onContactClick }: ContactSectionProps) {
         >
           Potrzebujesz <span className="text-brand-gold italic">pomocy?</span>
         </motion.h2>
-        
+
         <motion.div
           className="flex items-center justify-center gap-4 mb-10"
           initial={{ opacity: 0 }}
@@ -52,7 +52,7 @@ export function ContactSection({ onContactClick }: ContactSectionProps) {
           <div className="w-12 h-px bg-gradient-to-l from-transparent to-brand-gold/30" />
         </motion.div>
 
-        <motion.p 
+        <motion.p
           className="text-white/40 text-base mb-14 font-light tracking-wide"
           style={{ fontFamily: "'Lato', sans-serif" }}
           initial={{ opacity: 0, y: 20 }}
@@ -63,7 +63,7 @@ export function ContactSection({ onContactClick }: ContactSectionProps) {
           Nasz zespół ekspertów jest gotowy, aby pomóc Ci wybrać idealne wyposażenie
         </motion.p>
 
-        <motion.div 
+        <motion.div
           className="flex flex-col md:flex-row items-center justify-center gap-10 mb-14 relative"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -76,7 +76,7 @@ export function ContactSection({ onContactClick }: ContactSectionProps) {
               className="flex items-center gap-3 group justify-center md:justify-end"
             >
               <Phone className="w-4 h-4 text-brand-gold/60" />
-              <span 
+              <span
                 className="text-white/70 group-hover:text-brand-gold transition-colors duration-300 text-lg tracking-wide"
                 style={{ fontFamily: "'Playfair Display', serif" }}
               >
@@ -93,7 +93,7 @@ export function ContactSection({ onContactClick }: ContactSectionProps) {
               className="flex items-center gap-3 group justify-center md:justify-start"
             >
               <Mail className="w-4 h-4 text-brand-gold/60" />
-              <span 
+              <span
                 className="text-white/50 group-hover:text-white/80 transition-colors duration-300 text-sm tracking-wide"
                 style={{ fontFamily: "'Lato', sans-serif" }}
               >
@@ -109,7 +109,7 @@ export function ContactSection({ onContactClick }: ContactSectionProps) {
           viewport={{ once: true }}
           transition={{ ...transition, delay: 0.6 }}
         >
-          <button 
+          <button
             onClick={onContactClick}
             className="btn-secondary inline-flex items-center gap-3"
           >

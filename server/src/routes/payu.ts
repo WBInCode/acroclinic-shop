@@ -12,7 +12,7 @@ const router = Router();
 // PayU Configuration
 const PAYU_CONFIG = {
   posId: process.env.PAYU_POS_ID || '',
-  md5Key: process.env.PAYU_MD5_KEY || '',
+  md5Key: process.env.PAYU_SECOND_KEY || '',
   clientId: process.env.PAYU_CLIENT_ID || '',
   clientSecret: process.env.PAYU_CLIENT_SECRET || '',
   baseUrl: process.env.PAYU_BASE_URL || 'https://secure.snd.payu.com',
@@ -77,6 +77,11 @@ router.post('/create', optionalAuth, async (req: Request, res: Response, next: N
 
     if (order.paymentStatus === 'COMPLETED') {
       throw createError('Zamówienie jest już opłacone', 400, 'ALREADY_PAID');
+    }
+
+    // Check ownership
+    if (order.userId && req.user?.userId !== order.userId) {
+      throw createError('Brak dostępu do zamówienia', 403, 'FORBIDDEN');
     }
 
     // Get OAuth token
@@ -240,6 +245,13 @@ router.post('/notify', async (req: Request, res: Response, next: NextFunction) =
         orderStatus = order.status as any;
     }
 
+    // Idempotency check
+    if (order.paymentStatus === 'COMPLETED' || order.paymentStatus === paymentStatus) {
+      console.log(`PayU notification ignored: Order ${order.orderNumber} is already ${order.paymentStatus}`);
+      res.status(200).json({ status: 'OK' });
+      return;
+    }
+
     // Update order
     const updatedOrder = await prisma.order.update({
       where: { id: order.id },
@@ -346,6 +358,7 @@ router.get('/status/:orderId', optionalAuth, async (req: Request, res: Response,
         paymentStatus: true,
         payuOrderId: true,
         total: true,
+        userId: true,
       },
     });
 
@@ -353,36 +366,13 @@ router.get('/status/:orderId', optionalAuth, async (req: Request, res: Response,
       throw createError('Zamówienie nie znalezione', 404, 'ORDER_NOT_FOUND');
     }
 
-    // If we have PayU order ID, check status directly
-    if (order.payuOrderId && order.paymentStatus === 'PROCESSING') {
-      try {
-        const accessToken = await getPayUToken();
-        const response = await axios.get(
-          `${PAYU_CONFIG.baseUrl}/api/v2_1/orders/${order.payuOrderId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-
-        const payuStatus = response.data.orders?.[0]?.status;
-
-        if (payuStatus === 'COMPLETED') {
-          await prisma.order.update({
-            where: { id: order.id },
-            data: {
-              paymentStatus: 'COMPLETED',
-              status: 'CONFIRMED',
-              paidAt: new Date(),
-            },
-          });
-          order.paymentStatus = 'COMPLETED';
-        }
-      } catch (error) {
-        console.error('Error checking PayU status:', error);
-      }
+    // Check ownership
+    if (order.userId && req.user?.userId !== order.userId) {
+      throw createError('Brak dostępu do zamówienia', 403, 'FORBIDDEN');
     }
+
+    // Status endpoint is now read-only - updates come via webhook only
+    /* Removed dangerous direct update logic */
 
     res.json({
       orderId: order.id,

@@ -1,0 +1,29 @@
+src/components/shop/ProductGrid.tsx(36,9): error TS2322: Type '{ duration: number; ease: number[]; }' is not assignable to type 'Transition<any> | undefined'.
+  Type '{ duration: number; ease: number[]; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+    Type '{ duration: number; ease: number[]; }' is not assignable to type 'ValueAnimationTransition<any>'.
+      Types of property 'ease' are incompatible.
+        Type 'number[]' is not assignable to type 'Easing | Easing[] | undefined'.
+          Type 'number[]' is not assignable to type 'EasingFunction | Easing[]'.
+            Type 'number[]' is not assignable to type 'Easing[]'.
+              Type 'number' is not assignable to type 'Easing'.
+src/components/shop/ProductGrid.tsx(58,11): error TS2322: Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'Transition<any> | undefined'.
+  Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+    Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'ValueAnimationTransition<any>'.
+      Types of property 'ease' are incompatible.
+        Type 'number[]' is not assignable to type 'Easing | Easing[] | undefined'.
+          Type 'number[]' is not assignable to type 'EasingFunction | Easing[]'.
+            Type 'number[]' is not assignable to type 'Easing[]'.
+              Type 'number' is not assignable to type 'Easing'.
+src/components/shop/ProductGrid.tsx(70,9): error TS2322: Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'Transition<any> | undefined'.
+  Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+    Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'ValueAnimationTransition<any>'.
+      Types of property 'ease' are incompatible.
+        Type 'number[]' is not assignable to type 'Easing | Easing[] | undefined'.
+          Type 'number[]' is not assignable to type 'EasingFunction | Easing[]'.
+            Type 'number[]' is not assignable to type 'Easing[]'.
+              Type 'number' is not assignable to type 'Easing'.
+src/main.tsx(15,6): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ProviderProps): HelmetProvider', gave the following error.
+    Type '{ children: Element; }' has no properties in common with type 'IntrinsicAttributes & IntrinsicClassAttributes<HelmetProvider> & Readonly<ProviderProps>'.
+  Overload 2 of 2, '(props: ProviderProps, context: any): HelmetProvider', gave the following error.
+    Type '{ children: Element; }' has no properties in common with type 'IntrinsicAttributes & IntrinsicClassAttributes<HelmetProvider> & Readonly<ProviderProps>'.

@@ -17,6 +17,15 @@ const contactLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+const escapeHtml = (unsafe: string) => {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
+
 // Validation schema
 const contactSchema = z.object({
   name: z.string().min(2, 'Imię musi mieć minimum 2 znaki'),
@@ -48,11 +57,11 @@ router.post('/', contactLimiter, async (req: Request, res: Response, next: NextF
       subject: `[Kontakt] ${data.subject}`,
       html: `
         <h2>Nowa wiadomość z formularza kontaktowego</h2>
-        <p><strong>Od:</strong> ${data.name} (${data.email})</p>
-        <p><strong>Temat:</strong> ${data.subject}</p>
+        <p><strong>Od:</strong> ${escapeHtml(data.name)} (${escapeHtml(data.email)})</p>
+        <p><strong>Temat:</strong> ${escapeHtml(data.subject)}</p>
         <hr />
         <p><strong>Wiadomość:</strong></p>
-        <p>${data.message.replace(/\n/g, '<br>')}</p>
+        <p>${escapeHtml(data.message).replace(/\n/g, '<br>')}</p>
       `,
     });
 

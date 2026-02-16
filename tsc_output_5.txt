@@ -1,0 +1,88 @@
+src/components/admin/AdminPanel.tsx(173,70): error TS2339: Property 'status' does not exist on type 'Response | { ok: boolean; json: () => Promise<{ products: never[]; }>; }'.
+  Property 'status' does not exist on type '{ ok: boolean; json: () => Promise<{ products: never[]; }>; }'.
+src/components/admin/AdminPanel.tsx(182,66): error TS2339: Property 'status' does not exist on type 'Response | { ok: boolean; json: () => Promise<{ orders: never[]; }>; }'.
+  Property 'status' does not exist on type '{ ok: boolean; json: () => Promise<{ orders: never[]; }>; }'.
+src/components/admin/AdminPanel.tsx(195,48): error TS2367: This comparison appears to be unintentional because the types '"FAILED" | "PENDING" | "REFUNDED" | "PAID"' and '"COMPLETED"' have no overlap.
+src/components/admin/AdminPanel.tsx(213,42): error TS2367: This comparison appears to be unintentional because the types '"FAILED" | "PENDING" | "REFUNDED" | "PAID"' and '"COMPLETED"' have no overlap.
+src/components/admin/AdminPanel.tsx(622,35): error TS2551: Property 'image' does not exist on type 'Product'. Did you mean 'images'?
+src/components/admin/AdminPanel.tsx(624,42): error TS2551: Property 'image' does not exist on type 'Product'. Did you mean 'images'?
+src/components/sections/ContactSection.tsx(18,7): error TS2322: Type '{ duration: number; ease: number[]; }' is not assignable to type 'Transition<any> | undefined'.
+  Type '{ duration: number; ease: number[]; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+    Type '{ duration: number; ease: number[]; }' is not assignable to type 'ValueAnimationTransition<any>'.
+      Types of property 'ease' are incompatible.
+        Type 'number[]' is not assignable to type 'Easing | Easing[] | undefined'.
+          Type 'number[]' is not assignable to type 'EasingFunction | Easing[]'.
+            Type 'number[]' is not assignable to type 'Easing[]'.
+              Type 'number' is not assignable to type 'Easing'.
+src/components/sections/ContactSection.tsx(27,11): error TS2322: Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'Transition<any> | undefined'.
+  Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+    Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'ValueAnimationTransition<any>'.
+      Types of property 'ease' are incompatible.
+        Type 'number[]' is not assignable to type 'Easing | Easing[] | undefined'.
+          Type 'number[]' is not assignable to type 'EasingFunction | Easing[]'.
+            Type 'number[]' is not assignable to type 'Easing[]'.
+              Type 'number' is not assignable to type 'Easing'.
+src/components/sections/ContactSection.tsx(38,11): error TS2322: Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'Transition<any> | undefined'.
+  Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+    Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'ValueAnimationTransition<any>'.
+      Types of property 'ease' are incompatible.
+        Type 'number[]' is not assignable to type 'Easing | Easing[] | undefined'.
+          Type 'number[]' is not assignable to type 'EasingFunction | Easing[]'.
+            Type 'number[]' is not assignable to type 'Easing[]'.
+              Type 'number' is not assignable to type 'Easing'.
+src/components/sections/ContactSection.tsx(48,11): error TS2322: Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'Transition<any> | undefined'.
+  Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+    Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'ValueAnimationTransition<any>'.
+      Types of property 'ease' are incompatible.
+        Type 'number[]' is not assignable to type 'Easing | Easing[] | undefined'.
+          Type 'number[]' is not assignable to type 'EasingFunction | Easing[]'.
+            Type 'number[]' is not assignable to type 'Easing[]'.
+              Type 'number' is not assignable to type 'Easing'.
+src/components/sections/ContactSection.tsx(61,11): error TS2322: Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'Transition<any> | undefined'.
+  Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+    Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'ValueAnimationTransition<any>'.
+      Types of property 'ease' are incompatible.
+        Type 'number[]' is not assignable to type 'Easing | Easing[] | undefined'.
+          Type 'number[]' is not assignable to type 'EasingFunction | Easing[]'.
+            Type 'number[]' is not assignable to type 'Easing[]'.
+              Type 'number' is not assignable to type 'Easing'.
+src/components/sections/ContactSection.tsx(71,11): error TS2322: Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'Transition<any> | undefined'.
+  Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+    Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'ValueAnimationTransition<any>'.
+      Types of property 'ease' are incompatible.
+        Type 'number[]' is not assignable to type 'Easing | Easing[] | undefined'.
+          Type 'number[]' is not assignable to type 'EasingFunction | Easing[]'.
+            Type 'number[]' is not assignable to type 'Easing[]'.
+              Type 'number' is not assignable to type 'Easing'.
+src/components/sections/ContactSection.tsx(110,11): error TS2322: Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'Transition<any> | undefined'.
+  Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+    Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'ValueAnimationTransition<any>'.
+      Types of property 'ease' are incompatible.
+        Type 'number[]' is not assignable to type 'Easing | Easing[] | undefined'.
+          Type 'number[]' is not assignable to type 'EasingFunction | Easing[]'.
+            Type 'number[]' is not assignable to type 'Easing[]'.
+              Type 'number' is not assignable to type 'Easing'.
+src/components/shop/ProductGrid.tsx(36,9): error TS2322: Type '{ duration: number; ease: number[]; }' is not assignable to type 'Transition<any> | undefined'.
+  Type '{ duration: number; ease: number[]; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+    Type '{ duration: number; ease: number[]; }' is not assignable to type 'ValueAnimationTransition<any>'.
+      Types of property 'ease' are incompatible.
+        Type 'number[]' is not assignable to type 'Easing | Easing[] | undefined'.
+          Type 'number[]' is not assignable to type 'EasingFunction | Easing[]'.
+            Type 'number[]' is not assignable to type 'Easing[]'.
+              Type 'number' is not assignable to type 'Easing'.
+src/components/shop/ProductGrid.tsx(58,11): error TS2322: Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'Transition<any> | undefined'.
+  Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+    Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'ValueAnimationTransition<any>'.
+      Types of property 'ease' are incompatible.
+        Type 'number[]' is not assignable to type 'Easing | Easing[] | undefined'.
+          Type 'number[]' is not assignable to type 'EasingFunction | Easing[]'.
+            Type 'number[]' is not assignable to type 'Easing[]'.
+              Type 'number' is not assignable to type 'Easing'.
+src/components/shop/ProductGrid.tsx(70,9): error TS2322: Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'Transition<any> | undefined'.
+  Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+    Type '{ delay: number; duration: number; ease: number[]; }' is not assignable to type 'ValueAnimationTransition<any>'.
+      Types of property 'ease' are incompatible.
+        Type 'number[]' is not assignable to type 'Easing | Easing[] | undefined'.
+          Type 'number[]' is not assignable to type 'EasingFunction | Easing[]'.
+            Type 'number[]' is not assignable to type 'Easing[]'.
+              Type 'number' is not assignable to type 'Easing'.

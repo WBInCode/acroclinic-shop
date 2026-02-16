@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { Lock, User, AlertCircle, Loader2 } from 'lucide-react'

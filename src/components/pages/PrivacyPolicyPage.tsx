@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ArrowLeft, Shield, Eye, Database, Cookie, UserCheck, Mail } from 'lucide-react'
+import { ArrowLeft, Shield, Eye, Database, Cookie, UserCheck, Mail, FileText, Clock, Users, Lock, RefreshCw } from 'lucide-react'
 
 const ease = [0.22, 1, 0.36, 1] as const
 
@@ -11,67 +11,122 @@ export function PrivacyPolicyPage({ onBack }: PrivacyPolicyPageProps) {
     const sections = [
         {
             icon: Shield,
-            title: '1. Administrator danych',
+            title: '1. Informacje ogólne',
             content: [
-                'Administratorem danych osobowych jest WB Partners Sp. z o.o. z siedzibą w Rzeszowie.',
-                'Kontakt z administratorem: support@wb-partners.pl.',
-                'Administrator przetwarza dane osobowe zgodnie z Rozporządzeniem Parlamentu Europejskiego i Rady (UE) 2016/679 (RODO).'
+                'Niniejsza Polityka Prywatności określa zasady przetwarzania i ochrony danych osobowych przekazanych przez Użytkowników w związku z korzystaniem z serwisu WB Trade.',
+                'Administratorem danych osobowych jest WB PARTNERS Sp. z o.o. z siedzibą w Rzeszowie, ul. Juliusza Słowackiego 24/11, 35-060 Rzeszów, wpisana do rejestru przedsiębiorców KRS pod numerem 0001151642, NIP: 5170455185, REGON: 540735769.'
             ]
         },
         {
             icon: Database,
             title: '2. Zakres zbieranych danych',
             content: [
-                'Imię i nazwisko — do realizacji zamówień i wystawienia dokumentów sprzedaży.',
-                'Adres e-mail — do komunikacji, realizacji zamówień i wysyłki newslettera (za zgodą).',
-                'Adres dostawy — do wysłania zamówionych produktów.',
-                'Numer telefonu — do kontaktu w sprawie zamówień i dostawy.',
-                'Dane do płatności — przetwarzane przez operatora płatności PayU (nie są przechowywane przez nas).'
+                'Zbieramy następujące dane osobowe:',
+                'Imię i nazwisko',
+                'Adres e-mail',
+                'Numer telefonu',
+                'Adres dostawy',
+                'Dane rozliczeniowe (w przypadku faktur)',
+                'Historia zamówień',
+                'Dane dotyczące aktywności w serwisie'
             ]
         },
         {
             icon: Eye,
             title: '3. Cel przetwarzania danych',
             content: [
-                'Realizacja zamówień składanych w sklepie internetowym (art. 6 ust. 1 lit. b RODO).',
-                'Obsługa konta użytkownika (art. 6 ust. 1 lit. b RODO).',
-                'Wysyłka newslettera — wyłącznie po wyrażeniu dobrowolnej zgody (art. 6 ust. 1 lit. a RODO).',
-                'Realizacja obowiązków prawnych, w tym podatkowych i rachunkowych (art. 6 ust. 1 lit. c RODO).',
-                'Dochodzenie roszczeń lub obrona przed roszczeniami (art. 6 ust. 1 lit. f RODO).'
+                'Dane osobowe przetwarzane są w celu:',
+                'Realizacji zamówień i umów sprzedaży',
+                'Obsługi reklamacji i zwrotów',
+                'Kontaktu z klientem w sprawach związanych z zamówieniem',
+                'Wysyłki newslettera (za zgodą użytkownika)',
+                'Prowadzenia analiz i statystyk',
+                'Wypełnienia obowiązków prawnych (np. podatkowych)'
+            ]
+        },
+        {
+            icon: FileText,
+            title: '4. Podstawa prawna przetwarzania',
+            content: [
+                'Przetwarzamy dane osobowe na podstawie:',
+                'Art. 6 ust. 1 lit. a RODO – zgoda użytkownika',
+                'Art. 6 ust. 1 lit. b RODO – niezbędność do wykonania umowy',
+                'Art. 6 ust. 1 lit. c RODO – wypełnienie obowiązku prawnego',
+                'Art. 6 ust. 1 lit. f RODO – prawnie uzasadniony interes administratora'
+            ]
+        },
+        {
+            icon: Clock,
+            title: '5. Okres przechowywania danych',
+            content: [
+                'Dane osobowe przechowywane są przez okres niezbędny do realizacji celów, dla których zostały zebrane, a następnie przez okres wymagany przepisami prawa (np. przepisami podatkowymi – 5 lat od końca roku, w którym powstał obowiązek podatkowy).',
+                'Dane przetwarzane na podstawie zgody przechowujemy do momentu jej wycofania.'
             ]
         },
         {
             icon: UserCheck,
-            title: '4. Prawa użytkownika',
+            title: '6. Prawa użytkownika',
             content: [
-                'Prawo dostępu do swoich danych osobowych.',
-                'Prawo do sprostowania (poprawienia) danych.',
-                'Prawo do usunięcia danych („prawo do bycia zapomnianym").',
-                'Prawo do ograniczenia przetwarzania.',
-                'Prawo do przenoszenia danych.',
-                'Prawo do cofnięcia zgody w dowolnym momencie (nie wpływa na zgodność z prawem przetwarzania dokonanego przed cofnięciem).',
-                'Prawo do wniesienia skargi do Prezesa Urzędu Ochrony Danych Osobowych.'
+                'Każdy użytkownik ma prawo do:',
+                'Dostępu do swoich danych osobowych',
+                'Sprostowania nieprawidłowych danych',
+                'Usunięcia danych („prawo do bycia zapomnianym")',
+                'Ograniczenia przetwarzania',
+                'Przenoszenia danych',
+                'Sprzeciwu wobec przetwarzania',
+                'Wycofania zgody w dowolnym momencie',
+                'Wniesienia skargi do organu nadzorczego (UODO)'
+            ]
+        },
+        {
+            icon: Users,
+            title: '7. Odbiorcy danych',
+            content: [
+                'Dane osobowe mogą być przekazywane następującym podmiotom:',
+                'Firmom kurierskim i pocztowym (w celu dostawy zamówień)',
+                'Operatorom płatności (w celu realizacji płatności)',
+                'Dostawcom usług IT i hostingu',
+                'Biurom rachunkowym i kancelariom prawnym',
+                'Organom państwowym (na podstawie przepisów prawa)'
             ]
         },
         {
             icon: Cookie,
-            title: '5. Pliki cookies',
+            title: '8. Pliki cookies',
             content: [
-                'Strona wykorzystuje pliki cookies w celu zapewnienia prawidłowego działania serwisu.',
-                'Cookies sesyjne — niezbędne do funkcjonowania koszyka i logowania. Usuwane po zamknięciu przeglądarki.',
-                'Cookies funkcjonalne — zapamiętują preferencje użytkownika (np. stan panelu bocznego).',
-                'Użytkownik może zarządzać plikami cookies w ustawieniach swojej przeglądarki.',
-                'Wyłączenie cookies może wpłynąć na funkcjonalność strony (np. brak możliwości logowania lub składania zamówień).'
+                'Serwis wykorzystuje pliki cookies w celu:',
+                'Utrzymania sesji użytkownika',
+                'Zapamiętania zawartości koszyka',
+                'Prowadzenia analiz statystycznych',
+                'Personalizacji treści i reklam',
+                'Użytkownik może w każdej chwili zmienić ustawienia przeglądarki dotyczące cookies. Szczegółowe informacje znajdują się w ustawieniach przeglądarki internetowej.'
+            ]
+        },
+        {
+            icon: Lock,
+            title: '9. Bezpieczeństwo danych',
+            content: [
+                'Stosujemy odpowiednie środki techniczne i organizacyjne w celu ochrony danych osobowych przed nieuprawnionym dostępem, utratą lub zniszczeniem.',
+                'Wykorzystujemy szyfrowanie SSL, kontrolę dostępu oraz regularne kopie zapasowe.'
             ]
         },
         {
             icon: Mail,
-            title: '6. Newsletter',
+            title: '10. Kontakt',
             content: [
-                'Subskrypcja newslettera jest dobrowolna i wymaga podwójnego potwierdzenia (double opt-in).',
-                'Newsletter wysyłany jest za pośrednictwem usługi Resend.',
-                'Użytkownik może w każdej chwili zrezygnować z newslettera klikając link rezygnacji w wiadomości e-mail lub poprzez panel użytkownika.',
-                'Po rezygnacji adres e-mail zostanie usunięty z bazy newsletterowej.'
+                'W sprawach związanych z ochroną danych osobowych można kontaktować się:',
+                'E-mail: support@wb-partners.pl',
+                'Telefon: +48 570 034 367',
+                'Adres: WB PARTNERS Sp. z o.o., ul. Juliusza Słowackiego 24/11, 35-060 Rzeszów'
+            ]
+        },
+        {
+            icon: RefreshCw,
+            title: '11. Zmiany polityki prywatności',
+            content: [
+                'Administrator zastrzega sobie prawo do wprowadzania zmian w Polityce Prywatności.',
+                'O wszelkich zmianach użytkownicy będą informowani poprzez publikację nowej wersji na stronie internetowej.',
+                'Korzystanie z serwisu po wprowadzeniu zmian oznacza ich akceptację.'
             ]
         }
     ]
@@ -82,7 +137,7 @@ export function PrivacyPolicyPage({ onBack }: PrivacyPolicyPageProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5, ease }}
-            className="min-h-screen pt-48 pb-32"
+            className="min-h-screen pt-64 pb-32"
         >
             <div className="container mx-auto px-4">
                 {/* Back button */}

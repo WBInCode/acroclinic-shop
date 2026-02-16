@@ -81,6 +81,7 @@ export async function createInvoice(data: InvoiceData): Promise<FakturowniaInvoi
 
     // Przygotuj dane faktury/paragonu
     const invoicePayload = {
+      api_token: FAKTUROWNIA_API_TOKEN,
       invoice: {
         kind: isCompany ? 'vat' : 'receipt', // 'vat' = faktura VAT, 'receipt' = paragon
         number: null, // automatyczna numeracja
@@ -98,19 +99,10 @@ export async function createInvoice(data: InvoiceData): Promise<FakturowniaInvoi
         buyer_country: 'PL',
         buyer_email: data.customerEmail,
         buyer_phone: data.customerPhone || undefined,
-        seller_name: 'Acro Clinic',
-        seller_tax_no: process.env.SELLER_NIP || '',
-        seller_street: process.env.SELLER_STREET || '',
-        seller_city: process.env.SELLER_CITY || '',
-        seller_post_code: process.env.SELLER_POSTAL_CODE || '',
-        seller_country: 'PL',
         positions,
         // Referencja do zamówienia
         oid: data.orderId,
         description: `Zamówienie ${data.orderNumber}`,
-        // Automatyczne wysłanie emaila z fakturą
-        send_email: true,
-        buyer_email_for_sending: data.customerEmail,
       },
     };
 
@@ -122,7 +114,6 @@ export async function createInvoice(data: InvoiceData): Promise<FakturowniaInvoi
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'X-API-KEY': FAKTUROWNIA_API_TOKEN,
         },
       }
     );
@@ -164,11 +155,8 @@ export async function getInvoicePdf(invoiceId: string): Promise<Buffer | null> {
 
   try {
     const response = await axios.get(
-      `${FAKTUROWNIA_BASE_URL}invoices/${invoiceId}.pdf`,
+      `${FAKTUROWNIA_BASE_URL}invoices/${invoiceId}.pdf?api_token=${FAKTUROWNIA_API_TOKEN}`,
       {
-        headers: {
-          'X-API-KEY': FAKTUROWNIA_API_TOKEN,
-        },
         responseType: 'arraybuffer',
       }
     );

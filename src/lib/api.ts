@@ -507,7 +507,7 @@ export interface CreateAddressData {
   isDefault?: boolean;
 }
 
-export interface UpdateAddressData extends Partial<CreateAddressData> { }
+export type UpdateAddressData = Partial<CreateAddressData>
 
 export const addressApi = {
   async getAddresses(): Promise<{ addresses: Address[] }> {

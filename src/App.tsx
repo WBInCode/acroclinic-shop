@@ -73,6 +73,42 @@ function App() {
   const [isAuthOpen, setIsAuthOpen] = useState(false)
   const [postAuthView, setPostAuthView] = useState<PageView | null>(null)
 
+  // Router implementation
+  const navigateTo = (view: PageView, state: any = null) => {
+    if (view === currentView && !state) return
+    const url = view === 'home' ? '/' : `/${view}`
+    window.history.pushState({ view, ...state }, '', url)
+    setCurrentView(view)
+    if (state?.product) {
+      setSelectedProduct(state.product)
+    } else if (view !== 'product') {
+      setSelectedProduct(null)
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  // Handle browser back button
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state?.view) {
+        setCurrentView(event.state.view)
+        if (event.state.product) {
+          setSelectedProduct(event.state.product)
+        }
+      } else {
+        // Fallback for initial load
+        const path = window.location.pathname.slice(1)
+        if (path && ['cart', 'checkout', 'wishlist', 'about', 'contact', 'terms', 'privacy', 'account'].includes(path)) {
+          setCurrentView(path as PageView)
+        } else {
+          setCurrentView('home')
+        }
+      }
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
   // Sprawdź URL dla potwierdzenia płatności PayU
   useEffect(() => {
     const url = new URL(window.location.href)
@@ -94,8 +130,15 @@ function App() {
         localStorage.removeItem('cart')
       }
 
-      // Wyczyść URL
-      window.history.replaceState({}, '', '/')
+      // Wyczyść URL ale zachowaj widok
+      window.history.replaceState({ view: 'order-confirmation' }, '', `/order/${orderNum}`)
+    } else {
+      // Initial routing check
+      const path = pathParts[1]
+      if (path && ['cart', 'checkout', 'wishlist', 'about', 'contact', 'terms', 'privacy', 'account'].includes(path)) {
+        setCurrentView(path as PageView)
+        setShowSplash(false)
+      }
     }
   }, [])
 
@@ -176,14 +219,11 @@ function App() {
   }
 
   const handleProductClick = (product: Product) => {
-    setSelectedProduct(product)
-    setCurrentView('product')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    navigateTo('product', { product })
   }
 
   const handleBackToShop = () => {
-    setSelectedProduct(null)
-    setCurrentView('home')
+    navigateTo('home')
   }
 
   const handleOpenCheckout = () => {
@@ -192,14 +232,12 @@ function App() {
       setIsAuthOpen(true)
       return
     }
-    setCurrentView('checkout')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    navigateTo('checkout')
   }
 
   const handleOpenAuth = () => {
     if (user) {
-      setCurrentView('account')
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      navigateTo('account')
     } else {
       setPostAuthView(null)
       setIsAuthOpen(true)
@@ -209,9 +247,8 @@ function App() {
   const handleAuthSuccess = (loggedUser: User) => {
     setUser(loggedUser)
     if (postAuthView) {
-      setCurrentView(postAuthView)
+      navigateTo(postAuthView)
       setPostAuthView(null)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 
@@ -223,8 +260,14 @@ function App() {
   }
 
   const handleLogout = async () => {
-    await authApi.logout()
-    setUser(null)
+    try {
+      await authApi.logout()
+    } catch (e) {
+      console.error('Logout failed:', e)
+    } finally {
+      setUser(null)
+      navigateTo('home')
+    }
   }
 
   const handleUserUpdate = (updatedUser: User) => {
@@ -234,18 +277,16 @@ function App() {
   const handleOrderComplete = (orderNum: string) => {
     setOrderNumber(orderNum)
     setPaymentStatus('pending')
-    setCurrentView('order-confirmation')
+    navigateTo('order-confirmation')
     setCartItems([])
   }
 
   const handleOpenCart = () => {
-    setCurrentView('cart')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    navigateTo('cart')
   }
 
   const handleOpenWishlist = () => {
-    setCurrentView('wishlist')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    navigateTo('wishlist')
   }
 
   const handleToggleWishlist = (product: Product) => {
@@ -283,24 +324,20 @@ function App() {
   const wishlistCount = wishlistItems?.length ?? 0
 
   const handleOpenAbout = () => {
-    setCurrentView('about')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    navigateTo('about')
   }
 
   const handleOpenContact = () => {
-    setCurrentView('contact')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    navigateTo('contact')
   }
 
   const handleOpenTerms = () => {
-    setCurrentView('terms')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    navigateTo('terms')
   }
 
   const handleOpenPrivacy = () => {
     setShowSplash(false)
-    setCurrentView('privacy')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    navigateTo('privacy')
   }
 
   const handleAddToCart = (product: Product, selectedSize?: string, quantity: number = 1) => {

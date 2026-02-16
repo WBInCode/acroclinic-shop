@@ -12,9 +12,17 @@ function generateOrderNumber(): string {
   const year = date.getFullYear().toString().slice(-2);
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
   const day = date.getDate().toString().padStart(2, '0');
-  const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+  const random = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
   return `AC${year}${month}${day}-${random}`;
 }
+
+// GET /api/orders/config/shipping - Pobierz koszt wysyłki
+router.get('/config/shipping', (req: Request, res: Response) => {
+  res.json({
+    cost: 19.90,
+    currency: 'PLN'
+  });
+});
 
 // GET /api/orders - Lista zamówień użytkownika
 router.get('/', authenticate, async (req: Request, res: Response, next: NextFunction) => {
@@ -155,155 +163,165 @@ router.post('/', optionalAuth, async (req: Request, res: Response, next: NextFun
       throw createError('Koszyk jest pusty', 400, 'EMPTY_CART');
     }
 
-    // Sprawdź dostępność produktów
-    for (const item of cart.items) {
-      if (!item.product.isActive) {
-        throw createError(`Produkt "${item.product.name}" nie jest już dostępny`, 400, 'PRODUCT_UNAVAILABLE');
-      }
-      if (item.product.stock < item.quantity) {
-        throw createError(
-          `Niewystarczająca ilość produktu "${item.product.name}" (dostępne: ${item.product.stock})`,
-          400,
-          'INSUFFICIENT_STOCK'
-        );
-      }
-    }
-
     // Oblicz kwoty
     const subtotal = cart.items.reduce(
       (sum, item) => sum + Number(item.product.price) * item.quantity,
       0
     );
 
-    // Pobierz ustawienia wysyłki
-    const shippingSettings = await prisma.setting.findUnique({
-      where: { key: 'shipping' },
-    });
-    const shippingConfig = (shippingSettings?.value as any) || {
-      standardShippingCost: 19.90,
-    };
-
-    const shippingCost = subtotal >= shippingConfig.freeShippingThreshold
-      ? 0
-      : shippingConfig.standardShippingCost;
-
+    // Stały koszt wysyłki 19.90 PLN (brak darmowej dostawy logic)
+    const shippingCost = 19.90;
     const total = subtotal + shippingCost;
 
-    // Utwórz zamówienie
-    const order = await prisma.$transaction(async (tx) => {
-      // Pobierz kategorie produktów w koszyku
-      const productsWithCategories = await tx.product.findMany({
-        where: { id: { in: cart.items.map(i => i.productId) } },
-        include: { category: true },
-      });
+    let attempts = 0;
+    const maxAttempts = 5;
 
-      const productCategoryMap = new Map(
-        productsWithCategories.map(p => [p.id, p.category?.slug || 'unknown'])
-      );
+    while (attempts < maxAttempts) {
+      try {
+        const orderNumber = generateOrderNumber();
 
-      // Określ shipmentType
-      const hasClothing = cart.items.some(i => productCategoryMap.get(i.productId) === 'clothing');
-      const hasAccessories = cart.items.some(i => productCategoryMap.get(i.productId) !== 'clothing');
-      const isMixed = hasClothing && hasAccessories;
+        // Utwórz zamówienie w transakcji
+        const order = await prisma.$transaction(async (tx) => {
+          // Check uniqueness of orderNumber
+          const existingOrder = await tx.order.findUnique({ where: { orderNumber } });
+          if (existingOrder) {
+            throw new Error('ORDER_NUMBER_COLLISION');
+          }
 
-      // Jeśli nie jest mieszane, wymuś STANDARD
-      const finalShipmentType = isMixed ? (data.shipmentType || 'STANDARD') : 'STANDARD';
+          // Walidacja stocku WEWNĄTRZ transakcji (Race condition fix)
+          for (const item of cart.items) {
+            const product = await tx.product.findUnique({ where: { id: item.productId } });
 
-      // Utwórz zamówienie
-      const newOrder = await tx.order.create({
-        data: {
-          orderNumber: generateOrderNumber(),
-          userId,
-          guestEmail: userId ? null : data.email, // Zapisz email tylko dla gości
-          status: 'PENDING',
-          paymentStatus: 'PENDING',
-          shipmentType: finalShipmentType,
-          shippingFirstName: data.shippingAddress.firstName,
-          shippingLastName: data.shippingAddress.lastName,
-          shippingStreet: data.shippingAddress.street,
-          shippingCity: data.shippingAddress.city,
-          shippingPostalCode: data.shippingAddress.postalCode,
-          shippingCountry: data.shippingAddress.country,
-          shippingPhone: data.shippingAddress.phone,
-          // Dane do faktury
-          wantInvoice: data.wantInvoice || false,
-          billingCompanyName: data.billingAddress?.companyName || null,
-          billingNip: data.billingAddress?.nip || null,
-          billingFirstName: data.billingAddress?.firstName || null,
-          billingLastName: data.billingAddress?.lastName || null,
-          billingStreet: data.billingAddress?.street || null,
-          billingCity: data.billingAddress?.city || null,
-          billingPostalCode: data.billingAddress?.postalCode || null,
-          billingEmail: data.billingAddress?.email || null,
-          subtotal,
-          shippingCost,
-          discount: 0,
-          total,
-          note: data.note,
-          items: {
-            create: cart.items.map((item) => ({
-              productId: item.productId,
-              quantity: item.quantity,
-              price: item.product.price,
-              name: item.product.name,
-            })),
+            if (!product || !product.isActive) {
+              throw createError(`Produkt "${item.product.name}" nie jest już dostępny`, 400, 'PRODUCT_UNAVAILABLE');
+            }
+
+            if (product.stock < item.quantity) {
+              throw createError(
+                `Niewystarczająca ilość produktu "${product.name}" (dostępne: ${product.stock})`,
+                400,
+                'INSUFFICIENT_STOCK'
+              );
+            }
+          }
+
+          // Pobierz kategorie produktów w koszyku
+          const productsWithCategories = await tx.product.findMany({
+            where: { id: { in: cart.items.map(i => i.productId) } },
+            include: { category: true },
+          });
+
+          const productCategoryMap = new Map(
+            productsWithCategories.map(p => [p.id, p.category?.slug || 'unknown'])
+          );
+
+          // Określ shipmentType
+          const hasClothing = cart.items.some(i => productCategoryMap.get(i.productId) === 'clothing');
+          const hasAccessories = cart.items.some(i => productCategoryMap.get(i.productId) !== 'clothing');
+          const isMixed = hasClothing && hasAccessories;
+
+          // Jeśli nie jest mieszane, wymuś STANDARD
+          const finalShipmentType = isMixed ? (data.shipmentType || 'STANDARD') : 'STANDARD';
+
+          // Utwórz zamówienie
+          const newOrder = await tx.order.create({
+            data: {
+              orderNumber,
+              userId,
+              guestEmail: userId ? null : data.email, // Zapisz email tylko dla gości
+              status: 'PENDING',
+              paymentStatus: 'PENDING',
+              shipmentType: finalShipmentType,
+              shippingFirstName: data.shippingAddress.firstName,
+              shippingLastName: data.shippingAddress.lastName,
+              shippingStreet: data.shippingAddress.street,
+              shippingCity: data.shippingAddress.city,
+              shippingPostalCode: data.shippingAddress.postalCode,
+              shippingCountry: data.shippingAddress.country,
+              shippingPhone: data.shippingAddress.phone,
+              // Dane do faktury
+              wantInvoice: data.wantInvoice || false,
+              billingCompanyName: data.billingAddress?.companyName || null,
+              billingNip: data.billingAddress?.nip || null,
+              billingFirstName: data.billingAddress?.firstName || null,
+              billingLastName: data.billingAddress?.lastName || null,
+              billingStreet: data.billingAddress?.street || null,
+              billingCity: data.billingAddress?.city || null,
+              billingPostalCode: data.billingAddress?.postalCode || null,
+              billingEmail: data.billingAddress?.email || null,
+              subtotal,
+              shippingCost,
+              discount: 0,
+              total,
+              note: data.note,
+              items: {
+                create: cart.items.map((item) => ({
+                  productId: item.productId,
+                  quantity: item.quantity,
+                  price: item.product.price,
+                  name: item.product.name,
+                })),
+              },
+            },
+            include: {
+              items: true,
+            },
+          });
+
+          // Zmniejsz stan magazynowy
+          for (const item of cart.items) {
+            await tx.product.update({
+              where: { id: item.productId },
+              data: {
+                stock: { decrement: item.quantity },
+              },
+            });
+          }
+
+          // Wyczyść koszyk
+          await tx.cartItem.deleteMany({
+            where: { cartId: cart.id },
+          });
+
+          // Create receipts logic (kept assuming existing logic was correct in context of transaction)
+          if (finalShipmentType === 'SPLIT') {
+            await tx.receipt.createMany({
+              data: [
+                { orderId: newOrder.id, type: 'accessories', status: 'PENDING' },
+                { orderId: newOrder.id, type: 'clothing', status: 'PENDING' },
+              ],
+            });
+          } else {
+            await tx.receipt.create({
+              data: { orderId: newOrder.id, type: 'full', status: 'PENDING' },
+            });
+          }
+
+          return newOrder;
+        });
+
+        res.status(201).json({
+          message: 'Zamówienie zostało utworzone',
+          order: {
+            id: order.id,
+            orderNumber: order.orderNumber,
+            total: Number(order.total),
+            status: order.status,
+            paymentStatus: order.paymentStatus,
           },
-        },
-        include: {
-          items: true,
-        },
-      });
-
-      // Utwórz rekordy paragonów w zależności od shipmentType
-      if (finalShipmentType === 'SPLIT') {
-        // Dwa paragony: jeden dla akcesoriów (wystawiony od razu po płatności),
-        // drugi dla ciuchów (oczekujący na uszycie)
-        await tx.receipt.createMany({
-          data: [
-            { orderId: newOrder.id, type: 'accessories', status: 'PENDING' },
-            { orderId: newOrder.id, type: 'clothing', status: 'PENDING' },
-          ],
         });
-      } else if (finalShipmentType === 'COMBINED') {
-        // Jeden paragon - wystawiony dopiero po skompletowaniu (ciuchy ze szwalni)
-        await tx.receipt.create({
-          data: { orderId: newOrder.id, type: 'full', status: 'PENDING' },
-        });
-      } else {
-        // STANDARD - jeden paragon, wystawiony od razu po płatności
-        await tx.receipt.create({
-          data: { orderId: newOrder.id, type: 'full', status: 'PENDING' },
-        });
+        return; // Success, exit loop
+      } catch (error: any) {
+        if (error.message === 'ORDER_NUMBER_COLLISION') {
+          attempts++;
+          continue; // Retry
+        }
+        throw error; // Other errors (stock, db, etc) - propagate
       }
+    }
 
-      // Zmniejsz stan magazynowy
-      for (const item of cart.items) {
-        await tx.product.update({
-          where: { id: item.productId },
-          data: {
-            stock: { decrement: item.quantity },
-          },
-        });
-      }
+    throw createError('Nie udało się wygenerować numeru zamówienia', 500, 'ORDER_CREATION_FAILED');
 
-      // Wyczyść koszyk
-      await tx.cartItem.deleteMany({
-        where: { cartId: cart.id },
-      });
-
-      return newOrder;
-    });
-
-    res.status(201).json({
-      message: 'Zamówienie zostało utworzone',
-      order: {
-        id: order.id,
-        orderNumber: order.orderNumber,
-        total: Number(order.total),
-        status: order.status,
-        paymentStatus: order.paymentStatus,
-      },
-    });
   } catch (error) {
     next(error);
   }

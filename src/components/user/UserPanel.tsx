@@ -32,7 +32,7 @@ import { authApi, addressApi, newsletterApi, type User, type Address, type Addre
 
 const ease = [0.22, 1, 0.36, 1] as const
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+import { API_BASE_URL as API_URL } from '@/lib/api'
 
 // Dane kontaktowe
 const SUPPORT_EMAIL = 'support@wb-partners.pl'

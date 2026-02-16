@@ -25,7 +25,7 @@ const getItemKey = (item: CartItem) => item.selectedSize ? `${item.id}-${item.se
 
 export function CartPage({ items, onContinueShopping, onUpdateQuantity, onRemoveItem, onClearCart, onCheckout }: CartPageProps) {
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const shipping = subtotal > 300 ? 0 : 19.90
+  const shipping = 19.90
   const total = subtotal + shipping
 
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
@@ -211,8 +211,8 @@ export function CartPage({ items, onContinueShopping, onUpdateQuantity, onRemove
                   </div>
                   <div className="flex justify-between text-white/60 font-[family-name:var(--font-body)]">
                     <span>Dostawa</span>
-                    <span className={shipping === 0 ? 'text-green-500' : ''}>
-                      {shipping === 0 ? 'GRATIS' : `${shipping.toFixed(2)} PLN`}
+                    <span className="">
+                      {shipping.toFixed(2)} PLN
                     </span>
                   </div>
 

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 const ease = [0.22, 1, 0.36, 1] as const
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+import { API_BASE_URL as API_URL } from '@/lib/api'
 
 interface OrderConfirmationPageProps {
   orderNumber: string
@@ -62,7 +62,7 @@ export function OrderConfirmationPage({ orderNumber, paymentStatus = 'pending', 
     }
 
     fetchOrder()
-    
+
     // Poll for payment status update
     const interval = setInterval(fetchOrder, 5000)
     return () => clearInterval(interval)
@@ -105,11 +105,11 @@ export function OrderConfirmationPage({ orderNumber, paymentStatus = 'pending', 
               >
                 <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-6" />
               </motion.div>
-              
+
               <h1 className="font-[family-name:var(--font-heading)] font-bold text-2xl md:text-3xl text-white uppercase tracking-tight mb-4">
                 Dziękujemy za <span className="text-brand-gold">zamówienie!</span>
               </h1>
-              
+
               <p className="text-white/60 font-[family-name:var(--font-body)] mb-8">
                 Twoja płatność została zrealizowana pomyślnie.
                 <br />
@@ -160,11 +160,11 @@ export function OrderConfirmationPage({ orderNumber, paymentStatus = 'pending', 
               >
                 <XCircle className="w-20 h-20 text-red-500 mx-auto mb-6" />
               </motion.div>
-              
+
               <h1 className="font-[family-name:var(--font-heading)] font-bold text-2xl md:text-3xl text-white uppercase tracking-tight mb-4">
                 Płatność <span className="text-red-500">anulowana</span>
               </h1>
-              
+
               <p className="text-white/60 font-[family-name:var(--font-body)] mb-8">
                 Twoja płatność została anulowana lub nie powiodła się.
                 <br />
@@ -189,11 +189,11 @@ export function OrderConfirmationPage({ orderNumber, paymentStatus = 'pending', 
           ) : (
             <>
               <Loader2 className="w-20 h-20 text-brand-gold mx-auto mb-6 animate-spin" />
-              
+
               <h1 className="font-[family-name:var(--font-heading)] font-bold text-2xl md:text-3xl text-white uppercase tracking-tight mb-4">
                 Oczekiwanie na <span className="text-brand-gold">płatność</span>
               </h1>
-              
+
               <p className="text-white/60 font-[family-name:var(--font-body)] mb-8">
                 Twoje zamówienie oczekuje na potwierdzenie płatności.
                 <br />

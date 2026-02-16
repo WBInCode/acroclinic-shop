@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 const ease = [0.22, 1, 0.36, 1] as const
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+import { API_BASE_URL as API_URL } from '@/lib/api'
 
 interface ContactPageProps {
   onBack: () => void
@@ -67,7 +67,7 @@ export function ContactPage({ onBack }: ContactPageProps) {
       value: '570 034 367',
       href: 'tel:570034367'
     }
-    
+
   ]
 
   return (
@@ -115,7 +115,7 @@ export function ContactPage({ onBack }: ContactPageProps) {
             <h2 className="font-[family-name:var(--font-heading)] font-bold text-xl text-white mb-8">
               Napisz do nas
             </h2>
-            
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -145,7 +145,7 @@ export function ContactPage({ onBack }: ContactPageProps) {
                   />
                 </div>
               </div>
-              
+
               <div>
                 <label className="block text-white/40 text-xs uppercase tracking-wider mb-2 font-[family-name:var(--font-body)]">
                   Temat
@@ -159,7 +159,7 @@ export function ContactPage({ onBack }: ContactPageProps) {
                   placeholder="W czym możemy pomóc?"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-white/40 text-xs uppercase tracking-wider mb-2 font-[family-name:var(--font-body)]">
                   Wiadomość
@@ -173,9 +173,9 @@ export function ContactPage({ onBack }: ContactPageProps) {
                   placeholder="Twoja wiadomość..."
                 />
               </div>
-              
-              <button 
-                type="submit" 
+
+              <button
+                type="submit"
                 disabled={isSubmitting}
                 className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -203,7 +203,7 @@ export function ContactPage({ onBack }: ContactPageProps) {
             <h2 className="font-[family-name:var(--font-heading)] font-bold text-xl text-white mb-8">
               Dane kontaktowe
             </h2>
-            
+
             <div className="space-y-6 mb-12">
               {contactInfo.map((info, index) => (
                 <motion.a

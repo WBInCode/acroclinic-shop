@@ -28,7 +28,7 @@ import {
 import { toast } from 'sonner'
 
 const ease = [0.22, 1, 0.36, 1] as const
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+import { API_BASE_URL as API_URL } from '@/lib/api'
 
 interface AdminPanelProps {
   onBack: () => void

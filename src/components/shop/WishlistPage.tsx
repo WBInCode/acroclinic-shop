@@ -25,7 +25,7 @@ export function WishlistPage({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, ease }}
-      className="min-h-screen pt-40 pb-32"
+      className="min-h-screen pt-20 md:pt-40 pb-32"
     >
       <div className="container mx-auto px-4">
         {/* Back button */}
@@ -106,8 +106,8 @@ export function WishlistPage({
                     {item.badge && (
                       <div className="absolute top-4 left-4 z-10">
                         <span className={`px-3 py-1.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${item.badge === 'NEW'
-                            ? 'bg-brand-gold text-black'
-                            : 'bg-black/60 text-white backdrop-blur-sm'
+                          ? 'bg-brand-gold text-black'
+                          : 'bg-black/60 text-white backdrop-blur-sm'
                           }`} style={{ fontFamily: "'Lato', sans-serif" }}>
                           {item.badge}
                         </span>
@@ -158,8 +158,8 @@ export function WishlistPage({
                           onClick={() => onAddToCart(item)}
                           disabled={isOutOfStock}
                           className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-all ${isOutOfStock
-                              ? 'bg-white/10 text-white/40 cursor-not-allowed'
-                              : 'btn-primary btn-sm'
+                            ? 'bg-white/10 text-white/40 cursor-not-allowed'
+                            : 'btn-primary btn-sm'
                             }`}
                         >
                           <ShoppingCart className="w-3.5 h-3.5" />

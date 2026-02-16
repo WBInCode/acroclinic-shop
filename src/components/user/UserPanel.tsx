@@ -406,7 +406,7 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, ease }}
-      className="min-h-screen pt-40 pb-32"
+      className="min-h-screen pt-20 md:pt-40 pb-32"
     >
       <div className="container mx-auto px-4 max-w-5xl">
         {/* Header */}

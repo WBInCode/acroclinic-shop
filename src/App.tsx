@@ -61,7 +61,6 @@ function App() {
     localStorage.setItem('acro-wishlist', JSON.stringify(wishlistItems))
   }, [wishlistItems])
 
-  const [mobileTab, setMobileTab] = useState('home')
   const [showSplash, setShowSplash] = useState(true)
   const [currentView, setCurrentView] = useState<PageView>('home')
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
@@ -72,6 +71,15 @@ function App() {
   const [user, setUser] = useState<User | null>(null)
   const [isAuthOpen, setIsAuthOpen] = useState(false)
   const [postAuthView, setPostAuthView] = useState<PageView | null>(null)
+
+  // Determine active mobile tab based on current view
+  const activeMobileTab = (() => {
+    if (['home', 'product', 'about', 'contact', 'terms', 'privacy'].includes(currentView)) return 'home'
+    if (['cart', 'checkout', 'order-confirmation'].includes(currentView)) return 'cart'
+    if (currentView === 'wishlist') return 'wishlist'
+    if (currentView === 'account' || isAuthOpen) return 'user'
+    return ''
+  })()
 
   // Router implementation
   const navigateTo = (view: PageView, state: any = null) => {
@@ -651,8 +659,10 @@ function App() {
               <MobileNavBar
                 cartCount={cartCount}
                 wishlistCount={wishlistCount}
-                activeTab={mobileTab}
-                onTabChange={setMobileTab}
+                activeTab={activeMobileTab}
+                onTabChange={(tab) => {
+                  if (tab === 'home') navigateTo('home')
+                }}
                 onCartClick={handleOpenCart}
                 onWishlistClick={handleOpenWishlist}
                 onUserClick={handleOpenAuth}

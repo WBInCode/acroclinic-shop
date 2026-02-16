@@ -30,6 +30,15 @@ export const resetPasswordSchema = z.object({
     .regex(/[0-9]/, 'Hasło musi zawierać cyfrę'),
 });
 
+export const changePasswordSchema = z.object({
+  oldPassword: z.string().min(1, 'Obecne hasło jest wymagane'),
+  newPassword: z
+    .string()
+    .min(8, 'Hasło musi mieć minimum 8 znaków')
+    .regex(/[A-Z]/, 'Hasło musi zawierać wielką literę')
+    .regex(/[0-9]/, 'Hasło musi zawierać cyfrę'),
+});
+
 // Product schemas
 export const productQuerySchema = z.object({
   category: z.string().optional(),

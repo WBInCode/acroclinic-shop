@@ -183,10 +183,10 @@ export const authApi = {
     });
   },
 
-  async changePassword(currentPassword: string, newPassword: string): Promise<{ message: string }> {
+  async changePassword(data: { oldPassword: string; newPassword: string }): Promise<{ message: string }> {
     return apiFetch('/auth/change-password', {
       method: 'POST',
-      body: JSON.stringify({ currentPassword, newPassword }),
+      body: JSON.stringify(data),
     });
   },
 

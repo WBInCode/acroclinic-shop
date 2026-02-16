@@ -8,7 +8,7 @@ import {
   generateRefreshToken,
   verifyRefreshToken
 } from '../lib/jwt.js';
-import { forgotPasswordSchema, loginSchema, registerSchema, resetPasswordSchema } from '../lib/validators.js';
+import { forgotPasswordSchema, loginSchema, registerSchema, resetPasswordSchema, changePasswordSchema } from '../lib/validators.js';
 import { authenticate } from '../middleware/auth.js';
 import { createError } from '../middleware/errorHandler.js';
 import { sendPasswordResetEmail, sendWelcomeEmail } from '../lib/email.js';
@@ -293,6 +293,34 @@ router.post('/refresh', async (req: Request, res: Response, next: NextFunction) 
     res.json({
       accessToken: newAccessToken,
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// POST /api/auth/change-password
+router.post('/change-password', authenticate, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const data = changePasswordSchema.parse(req.body);
+    const userId = req.user!.userId;
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw createError('Użytkownik nie istnieje', 404, 'USER_NOT_FOUND');
+    }
+
+    const isPasswordValid = await bcrypt.compare(data.oldPassword, user.password);
+    if (!isPasswordValid) {
+      throw createError('Obecne hasło jest nieprawidłowe', 400, 'INVALID_PASSWORD');
+    }
+
+    const hashedPassword = await bcrypt.hash(data.newPassword, 12);
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+
+    res.json({ message: 'Hasło zostało zmienione pomyślnie' });
   } catch (error) {
     next(error);
   }

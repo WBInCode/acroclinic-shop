@@ -6,6 +6,7 @@ import {
   User as UserIcon,
   Settings,
   LogOut,
+  Lock,
   Mail,
   Phone,
   ChevronRight,
@@ -93,6 +94,12 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
   // Contact form
   const [contactOrderNumber, setContactOrderNumber] = useState('')
   const [contactMessage, setContactMessage] = useState('')
+
+  // Password change state
+  const [oldPassword, setOldPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [isChangingPassword, setIsChangingPassword] = useState(false)
 
   // Addresses state
   const [addresses, setAddresses] = useState<Address[]>([])
@@ -224,6 +231,31 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
     const body = encodeURIComponent(contactMessage)
     window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${body}`
     toast.success('Otwarto klienta poczty')
+  }
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (newPassword !== confirmPassword) {
+      toast.error('Nowe hasła nie są identyczne')
+      return
+    }
+    if (newPassword.length < 8) {
+      toast.error('Hasło musi mieć min. 8 znaków')
+      return
+    }
+
+    setIsChangingPassword(true)
+    try {
+      await authApi.changePassword({ oldPassword, newPassword })
+      toast.success('Hasło zostało zmienione')
+      setOldPassword('')
+      setNewPassword('')
+      setConfirmPassword('')
+    } catch (error: any) {
+      toast.error(error.message || 'Błąd zmiany hasła')
+    } finally {
+      setIsChangingPassword(false)
+    }
   }
 
   // Address form handlers
@@ -1091,6 +1123,68 @@ export function UserPanel({ user, onBack, onLogout, onUserUpdate }: UserPanelPro
                   </Button>
                 </div>
 
+                {/* Sekcja zmiany hasła */}
+                <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-6 md:p-8 mt-8">
+                  <h3 className="font-[family-name:var(--font-heading)] font-bold text-lg md:text-xl text-white mb-6 flex items-center gap-3">
+                    <Lock className="w-5 h-5 text-brand-gold" />
+                    Zmiana hasła
+                  </h3>
+
+                  <form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
+                    <div className="space-y-2">
+                      <label className="text-sm font-[family-name:var(--font-heading)] text-white/60 uppercase tracking-wider">
+                        Obecne hasło
+                      </label>
+                      <Input
+                        type="password"
+                        value={oldPassword}
+                        onChange={(e) => setOldPassword(e.target.value)}
+                        className="bg-white/5 border-white/10 text-white focus:border-brand-gold/50"
+                        placeholder="••••••••"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-4 pt-2">
+                      <div className="space-y-2">
+                        <label className="text-sm font-[family-name:var(--font-heading)] text-white/60 uppercase tracking-wider">
+                          Nowe hasło
+                        </label>
+                        <Input
+                          type="password"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          className="bg-white/5 border-white/10 text-white focus:border-brand-gold/50"
+                          placeholder="Min. 8 znaków, cyfra, wielka litera"
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-[family-name:var(--font-heading)] text-white/60 uppercase tracking-wider">
+                          Potwierdź nowe hasło
+                        </label>
+                        <Input
+                          type="password"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          className="bg-white/5 border-white/10 text-white focus:border-brand-gold/50"
+                          placeholder="••••••••"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <Button
+                      type="submit"
+                      disabled={isChangingPassword}
+                      className="w-full bg-white/10 hover:bg-white/20 text-white border-white/10"
+                    >
+                      {isChangingPassword ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Lock className="w-4 h-4 mr-2" />}
+                      zmień hasło
+                    </Button>
+                  </form>
+                </div>
                 {/* Newsletter */}
                 <div className="mt-8 pt-6 border-t border-white/10">
                   <h3 className="text-lg font-semibold text-white mb-4">Newsletter</h3>

@@ -106,6 +106,15 @@ app.get('/api/health', (req, res) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     version: '1.0.0',
+    env: process.env.NODE_ENV,
+  });
+});
+
+// Root route for basic connectivity check
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Acro Clinic Shop API is running 🚀',
+    docs: '/api/health',
   });
 });
 
@@ -147,6 +156,8 @@ app.listen(PORT, () => {
 📡 Server:    http://localhost:${PORT}
 🔧 Mode:      ${process.env.NODE_ENV || 'development'}
 📊 Health:    http://localhost:${PORT}/api/health
+🌍 Frontend:  ${process.env.FRONTEND_URL || 'Not set'}
+👑 Admin:     ${process.env.ADMIN_URL || 'Not set'}
 ━━━━━━━━━━━━━━━━━━━━━━━━
   `);
 });

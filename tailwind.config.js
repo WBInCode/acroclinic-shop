@@ -92,6 +92,11 @@ const defaultTheme = {
       },
       "focus-ring": "var(--color-focus-ring)",
     },
+    fontFamily: {
+      heading: ["var(--font-heading)", "sans-serif"],
+      body: ["var(--font-body)", "sans-serif"],
+      sans: ["var(--font-body)", "sans-serif"],
+    },
     borderRadius: {
       sm: "var(--radius-sm)",
       md: "var(--radius-md)",
@@ -143,7 +148,7 @@ const defaultTheme = {
 
 export default {
   content: [
-    "./index.html", 
+    "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
     "./admin/**/*.{js,ts,jsx,tsx}"
   ],

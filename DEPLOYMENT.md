@@ -98,6 +98,19 @@ npm run build
 
 #### ✅ Rekomendowana: Vercel (Frontend + Admin) + Render (Backend)
 
+**Projekt 1: Sklep (Frontend)**
+- **Root Directory**: `.` (zostaw puste)
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist`
+- **Install Command**: `npm install`
+
+**Projekt 2: Panel Administratora**
+- **Root Directory**: `.` (zostaw puste - NIE ustawiaj na `admin`!)
+- **Build Command**: `npm run build:admin`
+- **Output Directory**: `dist-admin`
+- **Install Command**: `npm install`
+- **Framework Preset**: Vite
+
 ##### Render - Backend API
 
 1. **Połącz repo z Render:**

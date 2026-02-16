@@ -102,20 +102,20 @@ export function TermsPage({ onBack }: TermsPageProps) {
           {sections.map((section, index) => (
             <motion.div
               key={section.title}
-              className="p-6 md:p-8 bg-white/[0.02] border border-white/10 hover:border-brand-gold/20 transition-colors duration-300"
+              className="p-6 md:p-8 bg-white/[0.02] border border-white/10 rounded-2xl hover:border-brand-gold/20 transition-colors duration-300"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease, delay: 0.2 + index * 0.1 }}
             >
               <div className="flex items-start gap-4 mb-6">
-                <div className="w-12 h-12 flex items-center justify-center border border-brand-gold/30 flex-shrink-0">
+                <div className="w-12 h-12 flex items-center justify-center border border-brand-gold/30 rounded-xl flex-shrink-0">
                   <section.icon className="w-5 h-5 text-brand-gold" />
                 </div>
                 <h2 className="font-[family-name:var(--font-heading)] font-bold text-lg text-white">
                   {section.title}
                 </h2>
               </div>
-              
+
               <ul className="space-y-3 pl-16">
                 {section.content.map((item, idx) => (
                   <li key={idx} className="text-white/60 font-[family-name:var(--font-body)] leading-relaxed flex items-start gap-3">
@@ -130,13 +130,13 @@ export function TermsPage({ onBack }: TermsPageProps) {
 
         {/* Contact note */}
         <motion.div
-          className="max-w-4xl mx-auto mt-12 p-6 bg-brand-gold/5 border border-brand-gold/20 text-center"
+          className="max-w-4xl mx-auto mt-12 p-6 bg-brand-gold/5 border border-brand-gold/20 rounded-2xl text-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease, delay: 0.8 }}
         >
           <p className="text-white/60 font-[family-name:var(--font-body)]">
-            W przypadku pytań dotyczących regulaminu, prosimy o kontakt: 
+            W przypadku pytań dotyczących regulaminu, prosimy o kontakt:
             <a href="mailto:support@wb-partners.pl" className="text-brand-gold hover:underline ml-1">
               support@wb-partners.pl
             </a>

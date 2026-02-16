@@ -127,7 +127,7 @@ export function ContactPage({ onBack }: ContactPageProps) {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     required
-                    className="w-full px-4 py-3 bg-white/[0.02] border border-white/10 text-white font-[family-name:var(--font-body)] focus:border-brand-gold/50 focus:outline-none transition-colors"
+                    className="w-full px-4 py-3 bg-white/[0.02] border border-white/10 text-white font-[family-name:var(--font-body)] rounded-xl focus:border-brand-gold/50 focus:outline-none transition-colors"
                     placeholder="Jan Kowalski"
                   />
                 </div>
@@ -140,7 +140,7 @@ export function ContactPage({ onBack }: ContactPageProps) {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     required
-                    className="w-full px-4 py-3 bg-white/[0.02] border border-white/10 text-white font-[family-name:var(--font-body)] focus:border-brand-gold/50 focus:outline-none transition-colors"
+                    className="w-full px-4 py-3 bg-white/[0.02] border border-white/10 text-white font-[family-name:var(--font-body)] rounded-xl focus:border-brand-gold/50 focus:outline-none transition-colors"
                     placeholder="jan@example.com"
                   />
                 </div>
@@ -155,7 +155,7 @@ export function ContactPage({ onBack }: ContactPageProps) {
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                   required
-                  className="w-full px-4 py-3 bg-white/[0.02] border border-white/10 text-white font-[family-name:var(--font-body)] focus:border-brand-gold/50 focus:outline-none transition-colors"
+                  className="w-full px-4 py-3 bg-white/[0.02] border border-white/10 text-white font-[family-name:var(--font-body)] rounded-xl focus:border-brand-gold/50 focus:outline-none transition-colors"
                   placeholder="W czym możemy pomóc?"
                 />
               </div>
@@ -169,7 +169,7 @@ export function ContactPage({ onBack }: ContactPageProps) {
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   required
                   rows={6}
-                  className="w-full px-4 py-3 bg-white/[0.02] border border-white/10 text-white font-[family-name:var(--font-body)] focus:border-brand-gold/50 focus:outline-none transition-colors resize-none"
+                  className="w-full px-4 py-3 bg-white/[0.02] border border-white/10 text-white font-[family-name:var(--font-body)] rounded-xl focus:border-brand-gold/50 focus:outline-none transition-colors resize-none"
                   placeholder="Twoja wiadomość..."
                 />
               </div>
@@ -209,12 +209,12 @@ export function ContactPage({ onBack }: ContactPageProps) {
                 <motion.a
                   key={info.title}
                   href={info.href}
-                  className="flex items-start gap-4 p-4 bg-white/[0.02] border border-white/10 hover:border-brand-gold/30 transition-all duration-300 group"
+                  className="flex items-start gap-4 p-4 bg-white/[0.02] border border-white/10 rounded-2xl hover:border-brand-gold/30 transition-all duration-300 group"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, ease, delay: 0.4 + index * 0.1 }}
                 >
-                  <div className="w-12 h-12 flex items-center justify-center border border-brand-gold/30 group-hover:bg-brand-gold/10 transition-colors duration-300">
+                  <div className="w-12 h-12 flex items-center justify-center border border-brand-gold/30 rounded-xl group-hover:bg-brand-gold/10 transition-colors duration-300">
                     <info.icon className="w-5 h-5 text-brand-gold" />
                   </div>
                   <div>

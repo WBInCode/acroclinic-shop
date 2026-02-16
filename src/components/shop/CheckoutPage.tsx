@@ -551,7 +551,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                 className="space-y-6"
               >
                 {/* Wybór metody dostawy */}
-                <div className="bg-[#0c0c0c] rounded-none p-6 md:p-8">
+                <div className="bg-[#0c0c0c] rounded-2xl p-6 md:p-8">
                   <h2 className="font-[family-name:var(--font-heading)] font-bold text-lg text-white uppercase tracking-wide mb-6 flex items-center gap-3">
                     <Truck className="w-5 h-5 text-brand-gold" />
                     Metoda dostawy
@@ -562,7 +562,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                     <button
                       type="button"
                       onClick={() => setDeliveryMethod('courier')}
-                      className={`p-4  border-2 transition-all duration-300 text-left ${deliveryMethod === 'courier'
+                      className={`p-4 border-2 rounded-2xl transition-all duration-300 text-left ${deliveryMethod === 'courier'
                         ? 'border-brand-gold bg-brand-gold/10'
                         : 'border-white/10 hover:border-white/30'
                         }`}
@@ -583,7 +583,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                     <button
                       type="button"
                       onClick={() => setDeliveryMethod('parcel-locker')}
-                      className={`p-4 border-2 transition-all duration-300 text-left ${deliveryMethod === 'parcel-locker'
+                      className={`p-4 border-2 rounded-2xl transition-all duration-300 text-left ${deliveryMethod === 'parcel-locker'
                         ? 'border-brand-gold bg-brand-gold/10'
                         : 'border-white/10 hover:border-white/30'
                         }`}
@@ -604,7 +604,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
 
                 {/* Opcja dzielenia przesyłki - tylko dla mieszanego koszyka */}
                 {isMixedCart && (
-                  <div id="field-shipmentType" className="bg-[#0c0c0c] p-6 md:p-8">
+                  <div id="field-shipmentType" className="bg-[#0c0c0c] rounded-2xl p-6 md:p-8">
                     <h2 className="font-[family-name:var(--font-heading)] font-bold text-lg text-white uppercase tracking-wide mb-2 flex items-center gap-3">
                       <PackageCheck className="w-5 h-5 text-brand-gold" />
                       Opcja wysyłki
@@ -618,7 +618,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                       <button
                         type="button"
                         onClick={() => setShipmentType('SPLIT')}
-                        className={`w-full p-4 border-2 transition-all duration-300 text-left  ${shipmentType === 'SPLIT'
+                        className={`w-full p-4 border-2 rounded-2xl transition-all duration-300 text-left  ${shipmentType === 'SPLIT'
                           ? 'border-brand-gold bg-brand-gold/10'
                           : 'border-white/10 hover:border-white/30'
                           }`}
@@ -638,7 +638,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                       <button
                         type="button"
                         onClick={() => setShipmentType('COMBINED')}
-                        className={`w-full p-4 border-2 transition-all duration-300 text-left  ${shipmentType === 'COMBINED'
+                        className={`w-full p-4 border-2 rounded-2xl transition-all duration-300 text-left  ${shipmentType === 'COMBINED'
                           ? 'border-brand-gold bg-brand-gold/10'
                           : 'border-white/10 hover:border-white/30'
                           }`}
@@ -655,7 +655,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                       </button>
                     </div>
                     {errors.shipmentType && (
-                      <div className="bg-red-500/10 border border-red-500/30 text-red-500 p-3 rounded-none mt-4 text-sm font-bold text-center">
+                      <div className="bg-red-500/10 border border-red-500/30 text-red-500 p-3 rounded-xl mt-4 text-sm font-bold text-center">
                         {errors.shipmentType}
                       </div>
                     )}
@@ -663,7 +663,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                 )}
 
                 {/* Dane kontaktowe */}
-                <div className="bg-[#0c0c0c] rounded-none p-6 md:p-8">
+                <div className="bg-[#0c0c0c] rounded-2xl p-6 md:p-8">
                   <h2 className="font-[family-name:var(--font-heading)] font-bold text-lg text-white uppercase tracking-wide mb-6 flex items-center gap-3">
                     <MapPin className="w-5 h-5 text-brand-gold" />
                     {deliveryMethod === 'courier' ? 'Adres dostawy' : 'Dane odbiorcy'}
@@ -679,7 +679,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                         <button
                           type="button"
                           onClick={() => setShowAddressSelector(!showAddressSelector)}
-                          className="w-full p-4 border-2 border-white/20 hover:border-white/40 bg-white/5 text-left transition-all flex items-center justify-between"
+                          className="w-full p-4 border-2 rounded-2xl border-white/20 hover:border-white/40 bg-white/5 text-left transition-all flex items-center justify-between"
                         >
                           {selectedAddressId ? (
                             <div className="flex-1">
@@ -1162,7 +1162,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.95 }}
-                      className="relative w-full max-w-5xl h-[85vh] bg-white overflow-hidden rounded-none"
+                      className="relative w-full max-w-5xl h-[85vh] bg-white overflow-hidden rounded-2xl"
                     >
                       {/* Header */}
                       <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-[#FFCD00]">
@@ -1219,7 +1219,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, ease }}
-                className="bg-[#0c0c0c] rounded-none p-6 md:p-8"
+                className="bg-[#0c0c0c] rounded-2xl p-6 md:p-8"
               >
                 <h2 className="font-[family-name:var(--font-heading)] font-bold text-lg text-white uppercase tracking-wide mb-6 flex items-center gap-3">
                   <CreditCard className="w-5 h-5 text-brand-gold" />
@@ -1227,13 +1227,13 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                 </h2>
 
                 {errors.payment && (
-                  <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-none mb-6 text-sm">
+                  <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl mb-6 text-sm">
                     {errors.payment}
                   </div>
                 )}
 
                 <div className="space-y-4">
-                  <div className="flex items-center gap-4 p-4 border border-brand-gold bg-brand-gold/10 rounded-none">
+                  <div className="flex items-center gap-4 p-4 border border-brand-gold bg-brand-gold/10 rounded-xl">
                     <input type="radio" name="payment" checked readOnly className="accent-brand-gold" />
                     <div className="flex-1">
                       <p className="text-white font-[family-name:var(--font-heading)] font-bold">PayU</p>
@@ -1306,7 +1306,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5, ease }}
-                className="bg-[#0c0c0c] rounded-none p-12 flex flex-col items-center justify-center text-center"
+                className="bg-[#0c0c0c] rounded-2xl p-12 flex flex-col items-center justify-center text-center"
               >
                 <Loader2 className="w-16 h-16 text-brand-gold animate-spin mb-6" />
                 <h2 className="font-[family-name:var(--font-heading)] font-bold text-xl text-white uppercase tracking-wide mb-2">
@@ -1326,7 +1326,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease, delay: 0.2 }}
           >
-            <div className="sticky top-24 p-6 md:p-8 bg-[#0c0c0c] rounded-none">
+            <div className="sticky top-24 p-6 md:p-8 bg-[#0c0c0c] rounded-2xl">
               <h2 className="font-[family-name:var(--font-heading)] font-bold text-lg text-white uppercase tracking-wide mb-6">
                 Twoje zamówienie
               </h2>
@@ -1335,8 +1335,8 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
               <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
                 {items.map((item) => (
                   <div key={item.id + (item.selectedSize || '')} className="flex gap-3">
-                    <div className="w-16 h-16 bg-[#0a0a0a] flex-shrink-0 overflow-hidden rounded-none p-1">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded-none" />
+                    <div className="w-16 h-16 bg-[#0a0a0a] flex-shrink-0 overflow-hidden rounded-xl p-1">
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded-lg" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm font-[family-name:var(--font-heading)] truncate">{item.name}</p>

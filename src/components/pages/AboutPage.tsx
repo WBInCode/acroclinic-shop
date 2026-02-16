@@ -9,7 +9,7 @@ interface AboutPageProps {
 
 export function AboutPage({ onBack }: AboutPageProps) {
   const values = [
-    
+
   ]
 
   return (
@@ -54,10 +54,10 @@ export function AboutPage({ onBack }: AboutPageProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease, delay: 0.2 }}
         >
-          <div className="relative p-8 md:p-12 bg-white/[0.02] border border-white/10">
+          <div className="relative p-8 md:p-12 bg-white/[0.02] border border-white/10 rounded-3xl overflow-hidden">
             <div className="absolute top-0 left-0 w-16 h-px bg-brand-gold" />
             <div className="absolute top-0 left-0 w-px h-16 bg-brand-gold" />
-            
+
             <h2 className="font-[family-name:var(--font-heading)] font-bold text-2xl text-white mb-6">
               Nasza Historia
             </h2>
@@ -70,13 +70,13 @@ export function AboutPage({ onBack }: AboutPageProps) {
             <p className="text-white/60 font-[family-name:var(--font-body)] leading-relaxed">
               Jako oficjalny partner WB Partners, oferujemy również wysokiej jakości sprzęt i akcesoria dla pasjonatów akrobatyki. Naszą misją jest wspieranie rozwoju każdego sportowca - od początkujących po zawodowców.
             </p>
-            
+
             <div className="absolute bottom-0 right-0 w-16 h-px bg-brand-gold" />
             <div className="absolute bottom-0 right-0 w-px h-16 bg-brand-gold" />
           </div>
         </motion.div>
 
-        
+
       </div>
     </motion.div>
   )

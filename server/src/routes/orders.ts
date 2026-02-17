@@ -169,8 +169,10 @@ router.post('/', optionalAuth, async (req: Request, res: Response, next: NextFun
       0
     );
 
-    // Stały koszt wysyłki 19.90 PLN (brak darmowej dostawy logic)
-    const shippingCost = 19.90;
+    // Koszt wysyłki: przy SPLIT podwajamy (2 paczki = 2x wysyłka)
+    const baseShippingCost = 19.90;
+    const requestedShipmentType = data.shipmentType || 'STANDARD';
+    const shippingCost = requestedShipmentType === 'SPLIT' ? baseShippingCost * 2 : baseShippingCost;
     const total = subtotal + shippingCost;
 
     let attempts = 0;

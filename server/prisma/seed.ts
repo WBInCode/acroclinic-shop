@@ -397,7 +397,9 @@ Jakie ćwiczenia uwielbiasz wykonywać – siłowe, gimnastyczne, a może relaks
 
   const admin = await prisma.user.upsert({
     where: { email: 'admin@acroclinic.pl' },
-    update: {},
+    update: {
+      password: adminPassword,
+    },
     create: {
       email: 'admin@acroclinic.pl',
       password: adminPassword,

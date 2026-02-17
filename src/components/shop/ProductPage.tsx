@@ -1,7 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, ShoppingCart, Shield, Truck, RotateCcw, Check, Heart, ShieldCheck, Gem } from 'lucide-react'
+import { ArrowLeft, ShoppingCart, Shield, Truck, RotateCcw, Check, Heart, ShieldCheck, Gem, CalendarClock } from 'lucide-react'
 import { useState } from 'react'
 import type { Product } from './ProductCard'
+import { getEstimatedClothingShipDate, getEstimatedAccessoriesDelivery } from '@/components/layout/OrderCountdown'
 
 // Spójne animacje
 const ease = [0.22, 1, 0.36, 1] as const
@@ -288,6 +289,23 @@ export function ProductPage({ product, onBack, onAddToCart, onToggleWishlist, is
                 <span className="text-[10px] uppercase tracking-wider text-white/40 font-[family-name:var(--font-body)] block">
                   Gwarancja
                 </span>
+              </div>
+            </div>
+
+            {/* Estimated delivery info */}
+            <div className="flex items-start gap-3 p-4 mt-4 bg-white/[0.02] border border-white/[0.06] rounded-2xl">
+              <CalendarClock className="w-5 h-5 text-brand-gold/60 shrink-0 mt-0.5" />
+              <div>
+                <h4 className="text-white/70 text-sm font-[family-name:var(--font-heading)] font-bold mb-1">Przewidywany czas dostawy</h4>
+                {product.category === 'clothing' ? (
+                  <p className="text-white/40 text-xs font-[family-name:var(--font-body)] leading-relaxed">
+                    Szyta na zamówienie. Przewidywana dostawa ok. <span className="text-brand-gold/70">{getEstimatedClothingShipDate().toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' })}</span> (10 dni produkcja + 3 dni dostawa).
+                  </p>
+                ) : (
+                  <p className="text-white/40 text-xs font-[family-name:var(--font-body)] leading-relaxed">
+                    Wysyłka natychmiast. Dostawa: 1-3 dni robocze.
+                  </p>
+                )}
               </div>
             </div>
           </motion.div>

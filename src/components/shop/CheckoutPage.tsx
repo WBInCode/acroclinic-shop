@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion'
-import { ArrowLeft, CreditCard, Truck, Shield, Lock, CheckCircle, Loader2, Package, MapPin, Search, ChevronDown, Star, Building2, Save, Scissors, PackageCheck } from 'lucide-react'
+import { ArrowLeft, CreditCard, Truck, Shield, Lock, CheckCircle, Loader2, Package, MapPin, Search, ChevronDown, Star, Building2, Save, Scissors, PackageCheck, CalendarClock } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import type { CartItem } from './CartPage'
 import { addressApi, type User, type Address, getAccessToken } from '@/lib/api'
 import { PayULogo } from '@/components/ui/PayULogo'
+import { getEstimatedClothingShipDate, getEstimatedAccessoriesDelivery, getOrderDeadline } from '@/components/layout/OrderCountdown'
 
 // Token GeoWidget InPost
 const INPOST_GEOWIDGET_TOKEN = 'eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzQlpXVzFNZzVlQnpDYU1XU3JvTlBjRWFveFpXcW9Ua2FuZVB3X291LWxvIn0.eyJleHAiOjIwODU1NTk0MzQsImlhdCI6MTc3MDE5OTQzNCwianRpIjoiZGExNDkzYjgtMjUxOC00M2ZjLWJmNzYtYmNkODZkMDcxZDIzIiwiaXNzIjoiaHR0cHM6Ly9sb2dpbi5pbnBvc3QucGwvYXV0aC9yZWFsbXMvZXh0ZXJuYWwiLCJzdWIiOiJmOjEyNDc1MDUxLTFjMDMtNGU1OS1iYTBjLTJiNDU2OTVlZjUzNTp3V2VfRW1yNU9XYmpRbnpuMmxSOU5Ubk5ncF9CWDZxaGZDWG5uQ1dyNko0IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoic2hpcHgiLCJzZXNzaW9uX3N0YXRlIjoiZGMyNGJkYjYtZmRlOC00YWQ1LTgyNDMtNmI4OWIwYzBlMzJmIiwic2NvcGUiOiJvcGVuaWQgYXBpOmFwaXBvaW50cyIsInNpZCI6ImRjMjRiZGI2LWZkZTgtNGFkNS04MjQzLTZiODliMGMwZTMyZiIsImFsbG93ZWRfcmVmZXJyZXJzIjoiIiwidXVpZCI6ImI3OTNjZTJhLThiZTItNDNhYS1iNjMzLTNkYjA1ZWE4MTRkYiJ9.HDBqjOx5BX_yeT4MYgWD-urqzFdPNiaC9cJq9vMdUjZUukuJlEF4D64Qhg5qj7UnJx91vuqL6i5clMe7Ecd-Mrc34m49Eec_OlJ9RKckz-CGiTty13jlZKEyTLqNRKdBrt19L0rGihotOW_eTWZ8DrhMxR-_Y0xpxk7mMJEQ-TWRoNnKB6xuYznaBQRaRhhJKzC-NWv2U4FFNrNQkKo4eu4HnHmpGKOkLoAxyB6RQwF7_s-NxqJgh17-uK0syS86VnwD8As3bNji6VQ_vqN78yXYc1-2WIiP1UonnK661_JlR0OV8tCnUAopRXo4B4yJDjRqJkyAjTLG1h23dfzm5w'
@@ -104,7 +105,8 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
   }, [items, onBack])
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const shippingCost = standardShippingCost
+  // Przy SPLIT podwajamy koszt wysyłki (2 paczki = 2x wysyłka)
+  const shippingCost = shipmentType === 'SPLIT' ? standardShippingCost * 2 : standardShippingCost
   const shipping = shippingCost
   const [showGeoWidget, setShowGeoWidget] = useState(false)
   const [geoWidgetLoaded, setGeoWidgetLoaded] = useState(false)
@@ -631,6 +633,7 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                         </div>
                         <p className="text-white/50 text-sm font-[family-name:var(--font-body)] ml-8">
                           Akcesoria zostaną wysłane natychmiast, a odzież po uszyciu. Otrzymasz dwa osobne paragony.
+                          <span className="block mt-1 text-brand-gold/70 text-xs">Uwaga: podwójny koszt wysyłki ({(standardShippingCost * 2).toFixed(2)} PLN) - dwie osobne paczki.</span>
                         </p>
                       </button>
 
@@ -650,9 +653,28 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                           <span className="ml-auto text-xs text-white/40 font-[family-name:var(--font-body)] uppercase tracking-wider">Jedna paczka</span>
                         </div>
                         <p className="text-white/50 text-sm font-[family-name:var(--font-body)] ml-8">
-                          Poczekaj na uszycie odzieży — cały order w jednej paczce z jednym paragonem.
+                          Poczekaj na uszycie odzieży - cały order w jednej paczce z jednym paragonem.
                         </p>
                       </button>
+
+                      {/* Estimated delivery info */}
+                      <div className="mt-4 p-4 bg-white/[0.02] border border-white/[0.06] rounded-2xl">
+                        <div className="flex items-center gap-2 mb-3">
+                          <CalendarClock className="w-4 h-4 text-brand-gold/60" />
+                          <span className="text-white/70 text-sm font-[family-name:var(--font-heading)] font-bold">Przewidywane terminy dostawy</span>
+                        </div>
+                        <div className="space-y-2 text-xs text-white/50 font-[family-name:var(--font-body)]">
+                          <div className="flex items-center gap-2">
+                            <Truck className="w-3.5 h-3.5 text-brand-gold/50" />
+                            <span>Akcesoria: <span className="text-brand-gold/70">{getEstimatedAccessoriesDelivery()}</span></span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Package className="w-3.5 h-3.5 text-brand-gold/50" />
+                            <span>Odzież: ok. <span className="text-brand-gold/70">{getEstimatedClothingShipDate().toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' })}</span></span>
+                          </div>
+                          <p className="text-white/30 text-[10px] mt-1">Koniec tury: {getOrderDeadline().targetDate.toLocaleDateString('pl-PL', { day: 'numeric', month: 'long' })} + 10 dni produkcja + 3 dni dostawa</p>
+                        </div>
+                      </div>
                     </div>
                     {errors.shipmentType && (
                       <div className="bg-red-500/10 border border-red-500/30 text-red-500 p-3 rounded-xl mt-4 text-sm font-bold text-center">
@@ -1359,11 +1381,29 @@ export function CheckoutPage({ items, onBack, onOrderComplete, user }: CheckoutP
                   <span>{subtotal.toFixed(2)} PLN</span>
                 </div>
                 <div className="flex justify-between text-white/60 font-[family-name:var(--font-body)] text-sm">
-                  <span>{deliveryMethod === 'courier' ? 'Kurier' : 'Paczkomat InPost'}</span>
+                  <span>{deliveryMethod === 'courier' ? 'Kurier' : 'Paczkomat InPost'}{shipmentType === 'SPLIT' ? ' (×2 paczki)' : ''}</span>
                   <span className={shipping === 0 ? 'text-green-500' : ''}>
                     {shipping === 0 ? 'GRATIS' : `${shipping.toFixed(2)} PLN`}
                   </span>
                 </div>
+              </div>
+
+              {/* Estimated delivery info in sidebar */}
+              <div className="border-t border-white/10 pt-4 mt-2">
+                <div className="flex items-center gap-2 mb-2">
+                  <CalendarClock className="w-3.5 h-3.5 text-brand-gold/50" />
+                  <span className="text-[10px] text-white/40 font-[family-name:var(--font-body)] uppercase tracking-wider">Przewidywana dostawa</span>
+                </div>
+                {items.some(item => item.category !== 'clothing') && (
+                  <p className="text-[11px] text-white/50 font-[family-name:var(--font-body)]">
+                    Akcesoria: <span className="text-brand-gold/60">{getEstimatedAccessoriesDelivery()}</span>
+                  </p>
+                )}
+                {items.some(item => item.category === 'clothing') && (
+                  <p className="text-[11px] text-white/50 font-[family-name:var(--font-body)]">
+                    Odzież: ok. <span className="text-brand-gold/60">{getEstimatedClothingShipDate().toLocaleDateString('pl-PL', { day: 'numeric', month: 'long' })}</span> (10 dni produkcja + 3 dni dostawa)
+                  </p>
+                )}
               </div>
 
               <div className="border-t border-white/10 pt-4 mt-4">

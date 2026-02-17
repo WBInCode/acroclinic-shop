@@ -297,16 +297,18 @@ export async function generatePartialInvoiceForOrder(
     0
   );
 
-  // Koszt wysyłki: przy SPLIT, dolicz do akcesoriów (pierwsza paczka).
+  // Koszt wysyłki: przy SPLIT, każda paczka ma swój koszt wysyłki (po połowie).
   // Przy COMBINED lub STANDARD - dolicz normalnie.
   let partialShippingCost = 0;
   if (receiptType === 'full') {
     partialShippingCost = Number(order.shippingCost);
   } else if (receiptType === 'accessories') {
-    // Akcesoria idą jako pierwsza paczka - doliczamy wysyłkę
-    partialShippingCost = Number(order.shippingCost);
+    // Akcesoria - pierwsza paczka, połowa kosztu wysyłki
+    partialShippingCost = Number(order.shippingCost) / 2;
+  } else if (receiptType === 'clothing') {
+    // Ciuchy - druga paczka, połowa kosztu wysyłki
+    partialShippingCost = Number(order.shippingCost) / 2;
   }
-  // Ciuchy (druga paczka) - brak dodatkowej opłaty za wysyłkę
 
   const partialTotal = partialSubtotal + partialShippingCost;
 

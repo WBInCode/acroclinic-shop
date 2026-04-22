@@ -26,7 +26,7 @@ export function ProductGrid({ products, onAddToCart, onProductClick, onToggleWis
   return (
     <section
       id="products"
-      className="container mx-auto px-6 py-32 relative"
+      className="container mx-auto px-6 py-8 md:py-16 relative"
     >
       <motion.div
         className="text-center mb-20"
@@ -38,15 +38,15 @@ export function ProductGrid({ products, onAddToCart, onProductClick, onToggleWis
         {/* Elegancki nagłówek sekcji */}
         <span
           className="text-xs tracking-[0.4em] uppercase text-brand-gold/50 block mb-6"
-          style={{ fontFamily: "'Lato', sans-serif" }}
+          style={{ fontFamily: "'Inter', sans-serif" }}
         >
           Kolekcja
         </span>
         <h2
           className="text-4xl md:text-5xl text-white font-light mb-6"
-          style={{ fontFamily: "'Playfair Display', serif" }}
+          style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}
         >
-          Nasza <span className="text-brand-gold italic">Kolekcja</span>
+          Nasza <span className="text-white italic">Kolekcja</span>
         </h2>
 
         {/* Elegancka linia z ornamentem */}
@@ -79,7 +79,7 @@ export function ProductGrid({ products, onAddToCart, onProductClick, onToggleWis
         <div className="text-center py-20">
           <p
             className="text-white/30 text-base"
-            style={{ fontFamily: "'Lato', sans-serif" }}
+            style={{ fontFamily: "'Inter', sans-serif" }}
           >
             Brak produktów w tej kategorii
           </p>

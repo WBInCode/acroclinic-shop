@@ -38,7 +38,7 @@ export function CategoryPills({ activeCategory, onCategoryChange }: CategoryPill
                 ? 'text-brand-gold' 
                 : 'text-white/40 hover:text-white/70'
             }`}
-            style={{ fontFamily: "'Lato', sans-serif", fontWeight: 400 }}
+            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400 }}
           >
             {category.label}
             {/* Elegancka linia pod aktywną kategorią */}

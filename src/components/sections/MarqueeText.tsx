@@ -5,7 +5,7 @@ export function MarqueeText() {
   
   return (
     <motion.div 
-      className="relative overflow-hidden py-10 my-20 border-y border-white/[0.06]"
+      className="relative overflow-hidden py-6 my-4 md:my-10 border-y border-white/[0.06]"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
@@ -25,7 +25,7 @@ export function MarqueeText() {
             <span 
               key={i}
               className="text-2xl md:text-3xl text-white/[0.08] tracking-[0.3em] uppercase px-8"
-              style={{ fontFamily: "'Playfair Display', serif", fontWeight: 300 }}
+              style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}
             >
               {text}
             </span>

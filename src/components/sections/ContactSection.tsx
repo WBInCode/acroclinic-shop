@@ -11,7 +11,7 @@ interface ContactSectionProps {
 export function ContactSection({ onContactClick }: ContactSectionProps) {
   return (
     <motion.section
-      className="container mx-auto px-6 py-32"
+      className="container mx-auto px-6 py-8 md:py-16"
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-100px' }}
@@ -20,7 +20,7 @@ export function ContactSection({ onContactClick }: ContactSectionProps) {
       <div className="max-w-2xl mx-auto text-center">
         <motion.span
           className="text-xs tracking-[0.4em] uppercase text-brand-gold/50 block mb-6"
-          style={{ fontFamily: "'Lato', sans-serif" }}
+          style={{ fontFamily: "'Inter', sans-serif" }}
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -31,13 +31,13 @@ export function ContactSection({ onContactClick }: ContactSectionProps) {
 
         <motion.h2
           className="text-4xl md:text-5xl text-white font-light mb-8"
-          style={{ fontFamily: "'Playfair Display', serif" }}
+          style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ ...transition, delay: 0.2 }}
         >
-          Potrzebujesz <span className="text-brand-gold italic">pomocy?</span>
+          Potrzebujesz <span className="text-white italic">pomocy?</span>
         </motion.h2>
 
         <motion.div
@@ -54,7 +54,7 @@ export function ContactSection({ onContactClick }: ContactSectionProps) {
 
         <motion.p
           className="text-white/40 text-base mb-14 font-light tracking-wide"
-          style={{ fontFamily: "'Lato', sans-serif" }}
+          style={{ fontFamily: "'Inter', sans-serif" }}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -78,7 +78,7 @@ export function ContactSection({ onContactClick }: ContactSectionProps) {
               <Phone className="w-4 h-4 text-brand-gold/60" />
               <span
                 className="text-white/70 group-hover:text-brand-gold transition-colors duration-300 text-lg tracking-wide"
-                style={{ fontFamily: "'Playfair Display', serif" }}
+                style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}
               >
                 570 034 367
               </span>
@@ -95,7 +95,7 @@ export function ContactSection({ onContactClick }: ContactSectionProps) {
               <Mail className="w-4 h-4 text-brand-gold/60" />
               <span
                 className="text-white/50 group-hover:text-white/80 transition-colors duration-300 text-sm tracking-wide"
-                style={{ fontFamily: "'Lato', sans-serif" }}
+                style={{ fontFamily: "'Inter', sans-serif" }}
               >
                 support@wb-partners.pl
               </span>

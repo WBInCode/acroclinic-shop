@@ -442,6 +442,7 @@ function App() {
                 onWishlistClick={handleOpenWishlist}
                 onLogoClick={handleBackToShop}
                 onUserClick={handleOpenAuth}
+                onContactClick={() => document.getElementById('contact-section')?.scrollIntoView({ behavior: 'smooth' })}
                 isAuthenticated={!!user}
               />
 
@@ -536,7 +537,9 @@ function App() {
                       />
                       <MarqueeText />
                       <NewsletterSection />
-                      <ContactSection onContactClick={handleOpenContact} />
+                      <div id="contact-section">
+                        <ContactSection onContactClick={handleOpenContact} />
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -563,16 +566,16 @@ function App() {
                     {/* Brand name - serif elegant */}
                     <h3
                       className="text-3xl md:text-4xl mb-2"
-                      style={{ fontFamily: "'Playfair Display', serif", fontWeight: 400 }}
+                      style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}
                     >
                       <span className="text-white">Acro</span>
-                      <span className="text-brand-gold italic ml-1">Clinic</span>
+                      <span className="text-white italic ml-1">Clinic</span>
                     </h3>
 
                     {/* Tagline */}
                     <p
                       className="text-white/30 text-xs tracking-[0.25em] uppercase mb-12"
-                      style={{ fontFamily: "'Lato', sans-serif" }}
+                      style={{ fontFamily: "'Inter', sans-serif" }}
                     >
                       Professional Acrobatic Equipment
                     </p>
@@ -590,7 +593,7 @@ function App() {
                           key={link.label}
                           onClick={link.onClick}
                           className="group relative text-white/40 hover:text-white text-xs uppercase tracking-[0.2em] transition-colors duration-500"
-                          style={{ fontFamily: "'Lato', sans-serif" }}
+                          style={{ fontFamily: "'Inter', sans-serif" }}
                         >
                           {link.label}
                           <span className="absolute -bottom-1 left-0 w-0 h-px bg-brand-gold transition-all duration-500 group-hover:w-full" />
@@ -645,7 +648,7 @@ function App() {
                     {/* Copyright - minimal */}
                     <p
                       className="text-white/15 text-[10px] tracking-[0.2em] uppercase"
-                      style={{ fontFamily: "'Lato', sans-serif" }}
+                      style={{ fontFamily: "'Inter', sans-serif" }}
                     >
                       © 2026 Acro Clinic
                     </p>
@@ -666,6 +669,10 @@ function App() {
                 onCartClick={handleOpenCart}
                 onWishlistClick={handleOpenWishlist}
                 onUserClick={handleOpenAuth}
+                onContactClick={() => {
+                  if (currentView !== 'home') navigateTo('home')
+                  setTimeout(() => document.getElementById('contact-section')?.scrollIntoView({ behavior: 'smooth' }), 100)
+                }}
               />
             </div>
           </motion.div>

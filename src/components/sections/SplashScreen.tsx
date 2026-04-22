@@ -72,7 +72,7 @@ export function SplashScreen({ onEnterShop }: SplashScreenProps) {
         >
           <motion.span 
             className="text-white text-4xl sm:text-5xl md:text-6xl inline-block"
-            style={{ fontFamily: "'Playfair Display', serif", fontWeight: 400 }}
+            style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, delay: 0.3, ease }}
@@ -81,8 +81,8 @@ export function SplashScreen({ onEnterShop }: SplashScreenProps) {
           </motion.span>
           <span className="inline-block w-3" />
           <motion.span 
-            className="text-brand-gold text-4xl sm:text-5xl md:text-6xl italic inline-block"
-            style={{ fontFamily: "'Playfair Display', serif", fontWeight: 400 }}
+            className="text-white text-4xl sm:text-5xl md:text-6xl italic inline-block"
+            style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, delay: 0.5, ease }}
@@ -116,7 +116,7 @@ export function SplashScreen({ onEnterShop }: SplashScreenProps) {
             <motion.img 
               src="/images/logo.png" 
               alt="AC" 
-              className="w-40 h-40 sm:w-52 sm:h-52 md:w-64 md:h-64 lg:w-72 lg:h-72 object-contain mb-6"
+              className="w-72 h-72 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 object-contain mb-6"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, delay: 1, ease }}
@@ -128,7 +128,7 @@ export function SplashScreen({ onEnterShop }: SplashScreenProps) {
             {/* Premium Sportswear */}
             <motion.p
               className="text-brand-gold text-xs md:text-sm tracking-[0.4em] uppercase mb-4"
-              style={{ fontFamily: "'Lato', sans-serif", fontWeight: 400 }}
+              style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400 }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1, delay: 1.2 }}
@@ -139,7 +139,7 @@ export function SplashScreen({ onEnterShop }: SplashScreenProps) {
             {/* Podtytuł */}
             <motion.p
               className="text-white/40 text-xs md:text-sm tracking-[0.25em] uppercase"
-              style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300 }}
+              style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300 }}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 1.4 }}
@@ -158,7 +158,7 @@ export function SplashScreen({ onEnterShop }: SplashScreenProps) {
         >
           <motion.button
             className="relative px-14 py-4 rounded-full text-brand-gold text-xs tracking-[0.25em] uppercase overflow-hidden group border border-brand-gold/50 hover:border-brand-gold hover:bg-brand-gold transition-all duration-300"
-            style={{ fontFamily: "'Lato', sans-serif", fontWeight: 500 }}
+            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500 }}
             onClick={onEnterShop}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.98 }}

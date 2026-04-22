@@ -1,4 +1,4 @@
-import { ShoppingCart, User, Heart } from 'lucide-react'
+import { ShoppingCart, User, Heart, Phone } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { motion } from 'framer-motion'
 
@@ -9,12 +9,13 @@ interface NavigationProps {
   onWishlistClick?: () => void
   onLogoClick?: () => void
   onUserClick?: () => void
+  onContactClick?: () => void
   isAuthenticated?: boolean
 }
 
 const ease = [0.4, 0, 0.2, 1] as const
 
-export function Navigation({ cartCount, wishlistCount = 0, onCartClick, onWishlistClick, onLogoClick, onUserClick, isAuthenticated = false }: NavigationProps) {
+export function Navigation({ cartCount, wishlistCount = 0, onCartClick, onWishlistClick, onLogoClick, onUserClick, onContactClick, isAuthenticated = false }: NavigationProps) {
   return (
     <motion.nav
       className="hidden md:block fixed left-0 right-0 z-50 top-[64px] md:top-[72px]"
@@ -43,7 +44,7 @@ export function Navigation({ cartCount, wishlistCount = 0, onCartClick, onWishli
             <img
               src="/images/logo.png"
               alt="Acro Clinic"
-              className="relative object-contain h-8 w-8 md:h-16 md:w-16 opacity-90 group-hover:opacity-100 transition-opacity duration-300"
+              className="relative object-contain h-10 w-10 md:h-20 md:w-20 opacity-90 group-hover:opacity-100 transition-opacity duration-300"
             />
           </div>
 
@@ -51,10 +52,10 @@ export function Navigation({ cartCount, wishlistCount = 0, onCartClick, onWishli
           <div className="flex flex-col min-w-0">
             <span
               className="text-xl md:text-2xl font-light tracking-wide"
-              style={{ fontFamily: "'Playfair Display', serif" }}
+              style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}
             >
               <span className="text-white/90 group-hover:text-white transition-colors duration-300">Acro</span>
-              <span className="text-brand-gold italic ml-1">Clinic</span>
+              <span className="text-white/90 group-hover:text-white transition-colors duration-300 italic ml-1">Clinic</span>
             </span>
           </div>
         </motion.button>
@@ -66,6 +67,18 @@ export function Navigation({ cartCount, wishlistCount = 0, onCartClick, onWishli
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.6, ease }}
         >
+          {/* Contact button */}
+          <button
+            onClick={onContactClick}
+            className="relative group p-3 transition-all duration-300"
+            aria-label="Kontakt"
+          >
+            <Phone className="w-5 h-5 text-white/50 group-hover:text-brand-gold transition-colors duration-300" />
+          </button>
+
+          {/* Separator */}
+          <div className="w-px h-4 bg-white/10 mx-1" />
+
           {/* User button */}
           <button
             onClick={onUserClick}
@@ -91,7 +104,7 @@ export function Navigation({ cartCount, wishlistCount = 0, onCartClick, onWishli
             {wishlistCount > 0 && (
               <span
                 className="absolute top-1.5 right-1.5 flex items-center justify-center w-4 h-4 bg-brand-gold text-[10px] text-black font-medium rounded-full"
-                style={{ fontFamily: "'Lato', sans-serif" }}
+                style={{ fontFamily: "'Inter', sans-serif" }}
               >
                 {wishlistCount}
               </span>
@@ -108,7 +121,7 @@ export function Navigation({ cartCount, wishlistCount = 0, onCartClick, onWishli
             {cartCount > 0 && (
               <span
                 className="absolute top-1.5 right-1.5 flex items-center justify-center w-4 h-4 bg-brand-gold text-[10px] text-black font-medium rounded-full"
-                style={{ fontFamily: "'Lato', sans-serif" }}
+                style={{ fontFamily: "'Inter', sans-serif" }}
               >
                 {cartCount}
               </span>

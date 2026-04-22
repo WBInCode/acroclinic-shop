@@ -109,7 +109,7 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
               <div className="absolute top-4 left-4">
                 <span
                   className="px-3 py-1.5 bg-brand-gold text-black text-[10px] font-semibold tracking-wider uppercase rounded-full"
-                  style={{ fontFamily: "'Lato', sans-serif" }}
+                  style={{ fontFamily: "'Inter', sans-serif" }}
                 >
                   {product.badge}
                 </span>
@@ -130,7 +130,7 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
             {/* Out of stock sash */}
             {isOutOfStock && (
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] bg-neutral-900/95 text-white py-2 -rotate-45 flex items-center justify-center z-20 border-y border-white/10 shadow-xl backdrop-blur-sm pointer-events-none">
-                <span className="text-xs font-bold tracking-[0.3em] uppercase opacity-90" style={{ fontFamily: "'Lato', sans-serif" }}>
+                <span className="text-xs font-bold tracking-[0.3em] uppercase opacity-90" style={{ fontFamily: "'Inter', sans-serif" }}>
                   Niedostępny
                 </span>
               </div>
@@ -149,7 +149,7 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
                     ? 'hidden' // Hide button if banner is present to avoid clutter, or keep it?
                     : 'bg-brand-gold hover:bg-brand-gold/80 hover:shadow-lg hover:shadow-brand-gold/30'
                   }`}
-                style={{ fontFamily: "'Lato', sans-serif" }}
+                style={{ fontFamily: "'Inter', sans-serif" }}
                 onClick={handleAddToCart}
               >
                 Dodaj do koszyka
@@ -161,13 +161,13 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
           <div className="p-4">
             <h3
               className="text-white text-sm mb-2 line-clamp-1"
-              style={{ fontFamily: "'Lato', sans-serif" }}
+              style={{ fontFamily: "'Inter', sans-serif" }}
             >
               {product.name}
             </h3>
             <p
               className="text-brand-gold text-lg font-semibold"
-              style={{ fontFamily: "'Playfair Display', serif" }}
+              style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}
             >
               {product.price.toFixed(2)} <span className="text-sm font-normal">zł</span>
             </p>
@@ -181,7 +181,7 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
             ? 'bg-white/10 cursor-not-allowed text-white/40'
             : 'bg-brand-gold'
             }`}
-          style={{ fontFamily: "'Lato', sans-serif" }}
+          style={{ fontFamily: "'Inter', sans-serif" }}
           onClick={handleAddToCart}
         >
           {isOutOfStock ? 'Tymczasowo niedostępny' : 'Dodaj do koszyka'}
@@ -215,7 +215,7 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
 
               <h3
                 className="text-3xl text-white mb-2 font-light"
-                style={{ fontFamily: "'Playfair Display', serif" }}
+                style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}
               >
                 {product.name}
               </h3>
@@ -227,7 +227,7 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
                   <div className="space-y-4">
                     <label
                       className="text-xs tracking-[0.2em] uppercase text-white/50"
-                      style={{ fontFamily: "'Lato', sans-serif" }}
+                      style={{ fontFamily: "'Inter', sans-serif" }}
                     >
                       Rozmiar
                     </label>
@@ -240,7 +240,7 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
                             ? 'border-brand-gold bg-brand-gold/10 text-brand-gold'
                             : 'border-white/10 text-white/50 hover:border-white/30 hover:text-white'
                             }`}
-                          style={{ fontFamily: "'Lato', sans-serif" }}
+                          style={{ fontFamily: "'Inter', sans-serif" }}
                         >
                           {size}
                         </button>
@@ -253,7 +253,7 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
                 <div className="space-y-4">
                   <label
                     className="text-xs tracking-[0.2em] uppercase text-white/50"
-                    style={{ fontFamily: "'Lato', sans-serif" }}
+                    style={{ fontFamily: "'Inter', sans-serif" }}
                   >
                     Ilość
                   </label>
@@ -267,7 +267,7 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
                     </button>
                     <span
                       className="text-2xl w-16 text-center text-white"
-                      style={{ fontFamily: "'Playfair Display', serif" }}
+                      style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}
                     >
                       {quantity}
                     </span>
@@ -285,13 +285,13 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
                   <div className="flex justify-between items-center mb-6">
                     <span
                       className="text-white/40 text-sm"
-                      style={{ fontFamily: "'Lato', sans-serif" }}
+                      style={{ fontFamily: "'Inter', sans-serif" }}
                     >
                       Razem
                     </span>
                     <span
                       className="text-3xl text-brand-gold font-light"
-                      style={{ fontFamily: "'Playfair Display', serif" }}
+                      style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}
                     >
                       {(product.price * quantity).toFixed(2)} PLN
                     </span>
@@ -301,7 +301,7 @@ export function ProductCard({ product, onAddToCart, onProductClick, onToggleWish
                     onClick={handleConfirmAddToCart}
                     disabled={product.category === 'clothing' && !selectedSize}
                     className="w-full py-4 rounded-full bg-brand-gold text-black text-xs tracking-[0.2em] uppercase transition-all duration-300 hover:bg-brand-gold/90 disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{ fontFamily: "'Lato', sans-serif", fontWeight: 500 }}
+                    style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500 }}
                   >
                     Dodaj do koszyka
                   </button>

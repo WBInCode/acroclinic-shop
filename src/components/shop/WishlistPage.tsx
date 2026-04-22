@@ -108,7 +108,7 @@ export function WishlistPage({
                         <span className={`px-3 py-1.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${item.badge === 'NEW'
                           ? 'bg-brand-gold text-black'
                           : 'bg-black/60 text-white backdrop-blur-sm'
-                          }`} style={{ fontFamily: "'Lato', sans-serif" }}>
+                          }`} style={{ fontFamily: "'Inter', sans-serif" }}>
                           {item.badge}
                         </span>
                       </div>
@@ -117,7 +117,7 @@ export function WishlistPage({
                     {/* Out of stock sash */}
                     {isOutOfStock && (
                       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] bg-neutral-900/95 text-white py-2 -rotate-45 flex items-center justify-center z-20 border-y border-white/10 shadow-xl backdrop-blur-sm pointer-events-none">
-                        <span className="text-[10px] font-bold tracking-[0.3em] uppercase opacity-90" style={{ fontFamily: "'Lato', sans-serif" }}>
+                        <span className="text-[10px] font-bold tracking-[0.3em] uppercase opacity-90" style={{ fontFamily: "'Inter', sans-serif" }}>
                           Niedostępny
                         </span>
                       </div>

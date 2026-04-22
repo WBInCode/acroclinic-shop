@@ -103,61 +103,61 @@ export function OrderCountdown() {
   return (
     <div className="fixed top-0 left-0 right-0 z-[60] bg-[#0a0a0a]/95 backdrop-blur-md border-b border-brand-gold/10">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-center py-3 md:py-4">
+        <div className="flex items-center justify-center py-5 md:py-4">
           {/* Main countdown section */}
-          <div className="flex-1 flex items-center justify-center gap-3 md:gap-8">
+          <div className="flex-1 flex items-center justify-center gap-5 md:gap-8">
             <div className="flex items-center gap-2 text-brand-gold/70">
-              <Clock className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              <Clock className="w-5 h-5 md:w-4 md:h-4" />
               <span
-                className="text-[10px] md:text-xs tracking-[0.15em] uppercase hidden sm:inline"
-                style={{ fontFamily: "'Lato', sans-serif", fontWeight: 400 }}
+                className="text-sm md:text-xs tracking-[0.15em] uppercase hidden sm:inline"
+                style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400 }}
               >
                 {currentRound} Tura - Czas do zamknięcia listy zamówień
               </span>
             </div>
 
             {/* Timer display - elegancki */}
-            <div className="flex items-center gap-3 md:gap-4">
+            <div className="flex items-center gap-5 md:gap-4">
               <div className="flex flex-col items-center">
                 <span
-                  className="text-xl md:text-2xl text-white font-light tabular-nums"
-                  style={{ fontFamily: "'Playfair Display', serif" }}
+                  className="text-4xl md:text-2xl text-white font-light tabular-nums"
+                  style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300 }}
                 >
                   {formatNumber(timeLeft.days)}
                 </span>
                 <span
-                  className="text-[8px] md:text-[9px] text-white/30 uppercase tracking-wider"
-                  style={{ fontFamily: "'Lato', sans-serif" }}
+                  className="text-xs md:text-[9px] text-white/30 uppercase tracking-wider"
+                  style={{ fontFamily: "'Inter', sans-serif" }}
                 >
                   dni
                 </span>
               </div>
-              <span className="text-brand-gold/40 text-lg">:</span>
+              <span className="text-brand-gold/40 text-2xl md:text-lg">:</span>
               <div className="flex flex-col items-center">
                 <span
-                  className="text-xl md:text-2xl text-white font-light tabular-nums"
-                  style={{ fontFamily: "'Playfair Display', serif" }}
+                  className="text-4xl md:text-2xl text-white font-light tabular-nums"
+                  style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300 }}
                 >
                   {formatNumber(timeLeft.hours)}
                 </span>
                 <span
-                  className="text-[8px] md:text-[9px] text-white/30 uppercase tracking-wider"
-                  style={{ fontFamily: "'Lato', sans-serif" }}
+                  className="text-xs md:text-[9px] text-white/30 uppercase tracking-wider"
+                  style={{ fontFamily: "'Inter', sans-serif" }}
                 >
                   godz
                 </span>
               </div>
-              <span className="text-brand-gold/40 text-lg">:</span>
+              <span className="text-brand-gold/40 text-2xl md:text-lg">:</span>
               <div className="flex flex-col items-center">
                 <span
-                  className="text-xl md:text-2xl text-white font-light tabular-nums"
-                  style={{ fontFamily: "'Playfair Display', serif" }}
+                  className="text-4xl md:text-2xl text-white font-light tabular-nums"
+                  style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300 }}
                 >
                   {formatNumber(timeLeft.minutes)}
                 </span>
                 <span
-                  className="text-[8px] md:text-[9px] text-white/30 uppercase tracking-wider"
-                  style={{ fontFamily: "'Lato', sans-serif" }}
+                  className="text-xs md:text-[9px] text-white/30 uppercase tracking-wider"
+                  style={{ fontFamily: "'Inter', sans-serif" }}
                 >
                   min
                 </span>
@@ -166,13 +166,13 @@ export function OrderCountdown() {
               <div className="hidden md:flex flex-col items-center">
                 <span
                   className="text-xl md:text-2xl text-white font-light tabular-nums"
-                  style={{ fontFamily: "'Playfair Display', serif" }}
+                  style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300 }}
                 >
                   {formatNumber(timeLeft.seconds)}
                 </span>
                 <span
                   className="text-[8px] md:text-[9px] text-white/30 uppercase tracking-wider"
-                  style={{ fontFamily: "'Lato', sans-serif" }}
+                  style={{ fontFamily: "'Inter', sans-serif" }}
                 >
                   sek
                 </span>
@@ -182,8 +182,8 @@ export function OrderCountdown() {
             {/* Info button */}
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="ml-4 text-[10px] md:text-xs text-white/30 hover:text-brand-gold/70 transition-colors duration-300"
-              style={{ fontFamily: "'Lato', sans-serif" }}
+              className="ml-4 text-sm md:text-xs text-white/40 hover:text-brand-gold/70 transition-colors duration-300"
+              style={{ fontFamily: "'Inter', sans-serif" }}
             >
               {isExpanded ? 'Zwiń' : 'Info'}
             </button>
@@ -203,18 +203,18 @@ export function OrderCountdown() {
               <div className="pb-6 pt-4 border-t border-white/[0.06]">
                 <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
                   {/* Clothing info */}
-                  <div className="flex items-start gap-4 p-5 bg-white/[0.02] border border-white/[0.06] rounded-2xl">
-                    <Package className="w-5 h-5 text-brand-gold/60 shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-4 p-6 bg-white/[0.02] border border-white/[0.06] rounded-2xl">
+                    <Package className="w-6 h-6 text-brand-gold/60 shrink-0 mt-0.5" />
                     <div>
                       <h4
-                        className="text-white/80 text-sm mb-2"
-                        style={{ fontFamily: "'Playfair Display', serif" }}
+                        className="text-white/80 text-base md:text-sm mb-2 font-semibold"
+                        style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}
                       >
                         Odzież sportowa
                       </h4>
                       <p
-                        className="text-white/40 text-xs leading-relaxed"
-                        style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300 }}
+                        className="text-white/40 text-sm md:text-xs leading-relaxed"
+                        style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300 }}
                       >
                         Szyta na zamówienie. Zbieramy zamówienia w turach co 14 dni.
                         Bieżąca tura kończy się <span className="text-brand-gold/70">{formatDate(deadlineDate)}</span>.
@@ -224,18 +224,18 @@ export function OrderCountdown() {
                   </div>
 
                   {/* Accessories info */}
-                  <div className="flex items-start gap-4 p-5 bg-white/[0.02] border border-white/[0.06] rounded-2xl">
-                    <Truck className="w-5 h-5 text-brand-gold/60 shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-4 p-6 bg-white/[0.02] border border-white/[0.06] rounded-2xl">
+                    <Truck className="w-6 h-6 text-brand-gold/60 shrink-0 mt-0.5" />
                     <div>
                       <h4
-                        className="text-white/80 text-sm mb-2"
-                        style={{ fontFamily: "'Playfair Display', serif" }}
+                        className="text-white/80 text-base md:text-sm mb-2 font-semibold"
+                        style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}
                       >
                         Akcesoria
                       </h4>
                       <p
-                        className="text-white/40 text-xs leading-relaxed"
-                        style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300 }}
+                        className="text-white/40 text-sm md:text-xs leading-relaxed"
+                        style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300 }}
                       >
                         Wysyłane natychmiast po złożeniu zamówienia (1-3 dni robocze).
                       </p>

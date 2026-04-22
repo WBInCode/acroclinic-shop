@@ -1,4 +1,4 @@
-import { Home, Heart, ShoppingCart, User } from 'lucide-react'
+import { Home, Heart, ShoppingCart, User, Phone } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface MobileNavBarProps {
@@ -9,13 +9,15 @@ interface MobileNavBarProps {
   onCartClick?: () => void
   onWishlistClick?: () => void
   onUserClick?: () => void
+  onContactClick?: () => void
 }
 
-export function MobileNavBar({ cartCount, wishlistCount = 0, activeTab, onTabChange, onCartClick, onWishlistClick, onUserClick }: MobileNavBarProps) {
+export function MobileNavBar({ cartCount, wishlistCount = 0, activeTab, onTabChange, onCartClick, onWishlistClick, onUserClick, onContactClick }: MobileNavBarProps) {
   const navItems = [
     { id: 'home', icon: Home, label: 'Główna' },
     { id: 'wishlist', icon: Heart, label: 'Ulubione', badge: wishlistCount },
     { id: 'cart', icon: ShoppingCart, label: 'Koszyk', badge: cartCount },
+    { id: 'contact', icon: Phone, label: 'Kontakt' },
     { id: 'user', icon: User, label: 'Konto' },
   ]
 
@@ -24,6 +26,8 @@ export function MobileNavBar({ cartCount, wishlistCount = 0, activeTab, onTabCha
       onCartClick()
     } else if (tabId === 'wishlist' && onWishlistClick) {
       onWishlistClick()
+    } else if (tabId === 'contact' && onContactClick) {
+      onContactClick()
     } else if (tabId === 'user' && onUserClick) {
       onUserClick()
     } else {
@@ -33,7 +37,7 @@ export function MobileNavBar({ cartCount, wishlistCount = 0, activeTab, onTabCha
 
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-md border-t border-white/[0.06] pb-safe">
-      <div className="grid grid-cols-4 h-[80px]">
+      <div className="grid grid-cols-5 h-[80px]">
         {navItems.map((item) => {
           const Icon = item.icon
           const isActive = activeTab === item.id
@@ -66,7 +70,7 @@ export function MobileNavBar({ cartCount, wishlistCount = 0, activeTab, onTabCha
               <span
                 className={`text-[10px] tracking-[0.1em] uppercase transition-colors duration-300 ${isActive ? 'text-brand-gold font-medium' : 'text-white/30'
                   }`}
-                style={{ fontFamily: "'Lato', sans-serif" }}
+                style={{ fontFamily: "'Inter', sans-serif" }}
               >
                 {item.label}
               </span>

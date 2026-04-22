@@ -35,7 +35,7 @@ export function NewsletterSection() {
 
     return (
         <motion.section
-            className="container mx-auto px-6 py-24"
+            className="container mx-auto px-6 py-8 md:py-16"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
@@ -71,7 +71,7 @@ export function NewsletterSection() {
                         {/* Header */}
                         <motion.span
                             className="text-xs tracking-[0.4em] uppercase text-brand-gold/50 block mb-4 text-center"
-                            style={{ fontFamily: "'Lato', sans-serif" }}
+                            style={{ fontFamily: "'Inter', sans-serif" }}
                             initial={{ opacity: 0 }}
                             whileInView={{ opacity: 1 }}
                             viewport={{ once: true }}
@@ -82,13 +82,13 @@ export function NewsletterSection() {
 
                         <motion.h2
                             className="text-3xl md:text-4xl text-white font-light mb-4 text-center"
-                            style={{ fontFamily: "'Playfair Display', serif" }}
+                            style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}
                             initial={{ opacity: 0, y: 15 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ ...transition, delay: 0.3 }}
                         >
-                            Bądź na <span className="text-brand-gold italic">bieżąco</span>
+                            Bądź na <span className="text-white italic">bieżąco</span>
                         </motion.h2>
 
                         {/* Divider */}
@@ -106,7 +106,7 @@ export function NewsletterSection() {
 
                         <motion.p
                             className="text-white/40 text-sm mb-10 font-light tracking-wide text-center max-w-md mx-auto"
-                            style={{ fontFamily: "'Lato', sans-serif" }}
+                            style={{ fontFamily: "'Inter', sans-serif" }}
                             initial={{ opacity: 0, y: 15 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
@@ -134,7 +134,7 @@ export function NewsletterSection() {
                                     </div>
                                     <p
                                         className="text-white/70 text-sm text-center"
-                                        style={{ fontFamily: "'Lato', sans-serif" }}
+                                        style={{ fontFamily: "'Inter', sans-serif" }}
                                     >
                                         Dziękujemy! Sprawdź swoją skrzynkę email,
                                         <br />aby potwierdzić subskrypcję.
@@ -149,7 +149,7 @@ export function NewsletterSection() {
                                             onChange={(e) => setEmail(e.target.value)}
                                             placeholder="Twój adres email"
                                             className="w-full px-5 py-4 bg-white/[0.03] text-white text-sm border border-white/[0.08] rounded-full outline-none transition-all duration-300 focus:border-brand-gold/40 focus:bg-brand-gold/[0.02] placeholder:text-white/25"
-                                            style={{ fontFamily: "'Lato', sans-serif" }}
+                                            style={{ fontFamily: "'Inter', sans-serif" }}
                                             disabled={isLoading}
                                             required
                                         />
@@ -182,7 +182,7 @@ export function NewsletterSection() {
                         {!isSubscribed && (
                             <motion.p
                                 className="text-white/20 text-[11px] text-center mt-5 tracking-wide"
-                                style={{ fontFamily: "'Lato', sans-serif" }}
+                                style={{ fontFamily: "'Inter', sans-serif" }}
                                 initial={{ opacity: 0 }}
                                 whileInView={{ opacity: 1 }}
                                 viewport={{ once: true }}

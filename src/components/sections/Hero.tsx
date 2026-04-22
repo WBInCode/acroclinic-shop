@@ -33,7 +33,7 @@ function GoldParticles() {
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ paddingTop: 'clamp(100px, 15vh, 200px)' }}>
+    <section className="relative min-h-[85vh] md:min-h-screen flex items-center justify-center overflow-hidden pt-0">
 
       {/* Animowany gradient tła */}
       <motion.div
@@ -60,7 +60,7 @@ export function Hero() {
           <motion.img
             src="/images/logo.png"
             alt="AC"
-            className="w-40 h-40 sm:w-52 sm:h-52 md:w-64 md:h-64 lg:w-72 lg:h-72 object-contain mb-6"
+            className="w-80 h-80 sm:w-96 sm:h-96 md:w-[28rem] md:h-[28rem] lg:w-[34rem] lg:h-[34rem] object-contain mb-6"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 1, ease }}
@@ -72,7 +72,7 @@ export function Hero() {
           {/* Premium Sportswear */}
           <motion.p
             className="text-brand-gold text-xs md:text-sm tracking-[0.4em] uppercase mb-4"
-            style={{ fontFamily: "'Lato', sans-serif", fontWeight: 400 }}
+            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400 }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1.2 }}
@@ -83,7 +83,7 @@ export function Hero() {
           {/* Podtytuł */}
           <motion.p
             className="text-white/40 text-xs md:text-sm tracking-[0.25em] uppercase"
-            style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300 }}
+            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300 }}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.4 }}
@@ -102,7 +102,7 @@ export function Hero() {
         >
           <button
             className="px-10 py-3.5 rounded-full border border-brand-gold/60 text-brand-gold text-[11px] tracking-[0.2em] uppercase transition-all duration-300 hover:bg-brand-gold hover:text-black"
-            style={{ fontFamily: "'Lato', sans-serif", fontWeight: 500 }}
+            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500 }}
             onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
           >
             Odkryj Kolekcję

@@ -1,10 +1,9 @@
-// @ts-nocheck
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { Lock, User, AlertCircle, Loader2 } from 'lucide-react'
 
 const ease = [0.22, 1, 0.36, 1] as const
-import { API_BASE_URL as API_URL } from '@/lib/api'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
 interface AdminLoginProps {
   onLogin: () => void

@@ -38,7 +38,7 @@ export function CartPage({ items, onContinueShopping, onUpdateQuantity, onRemove
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, ease }}
-      className="min-h-screen pt-20 md:pt-40 pb-32"
+      className="min-h-screen pt-28 md:pt-40 pb-32"
     >
       <div className="container mx-auto px-4">
         {/* Back button */}
@@ -117,7 +117,7 @@ export function CartPage({ items, onContinueShopping, onUpdateQuantity, onRemove
                         {/* Out of stock sash */}
                         {isOutOfStock && (
                           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] bg-neutral-900/95 text-white py-1 -rotate-45 flex items-center justify-center z-20 border-y border-white/10 shadow-xl backdrop-blur-sm pointer-events-none">
-                            <span className="text-[10px] font-bold tracking-[0.2em] uppercase opacity-90" style={{ fontFamily: "'Lato', sans-serif" }}>
+                            <span className="text-[10px] font-bold tracking-[0.2em] uppercase opacity-90" style={{ fontFamily: "'Inter', sans-serif" }}>
                               Niedostępny
                             </span>
                           </div>

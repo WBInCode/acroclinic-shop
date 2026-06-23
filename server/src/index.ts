@@ -39,6 +39,8 @@ const allowedOrigins = [
   'http://localhost:5002',
   'http://localhost:5003',
   process.env.ADMIN_URL || 'http://localhost:5173', // Admin panel
+  'https://acroclinicshop.wb-trade.pl',
+  'https://www.acroclinicshop.wb-trade.pl',
 ].filter(Boolean);
 
 // Add any additional origins from env
